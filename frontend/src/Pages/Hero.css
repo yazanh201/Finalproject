@@ -1,0 +1,7 @@
+.hero {
+    height: 80vh; /* גובה של 80% מהמסך */
+    background: url('/img/garageimg.png') no-repeat center center/cover;
+    color: white;
+    
+  }
+  

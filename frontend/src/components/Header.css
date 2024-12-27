@@ -1,0 +1,39 @@
+.header {
+  
+  direction: rtl; /* כיוון טקסט מימין לשמאל */
+  
+  
+}
+
+.navList {
+  list-style: none;
+  display: flex;
+  gap: 1.5rem;
+  padding: 0;
+}
+
+
+.navItem {
+  color: white;
+  text-decoration: none;
+  font-size: 1rem;
+  transition: color 0.3s ease;
+  
+}
+
+.navItem:hover {
+  color: #f4a261;
+}
+
+/* התאמות למובייל */
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-end;
+  }
+
+  .navList {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
