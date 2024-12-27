@@ -7,7 +7,6 @@ import Contact from './Pages/Contact';
 
 
 
-//github
 function App() {
   return (
     <Routes>
