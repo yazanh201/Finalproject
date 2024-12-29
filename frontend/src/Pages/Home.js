@@ -1,5 +1,5 @@
 import React from 'react';
-import Header from '../components/Header';
+import Layout from '../components/layout';
 import Hero from './Hero';
 import Services from './Services';
 import About from './About';
@@ -12,8 +12,9 @@ import Footer from '../components/footer';
  */
 function Home() {
   return (
+  
     <div>
-      <Header /> {/* החלק העליון של הדף */}
+    
       <Hero /> {/* חלק ה-Hero */}
       <Services /> {/* חלק השירותים */}
       <About /> {/* חלק האודות */}

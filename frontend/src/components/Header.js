@@ -1,40 +1,38 @@
-import React from 'react';
-import { Link } from 'react-router-dom'; // ייבוא Link
-import './Header.css'
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import './Header.css';
 
 function Header() {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const toggleMenu = () => {
+    setIsOpen(!isOpen);
+  };
+
   return (
-    <header className="header bg-dark text-white">
-      <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div className="container">
-          <a className="navbar-brand" href="/">MotorSport</a>
-          <button
-            className="navbar-toggler"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#navbarNav"
-            aria-controls="navbarNav"
-            aria-expanded="false"
-            aria-label="Toggle navigation"
-          >
-            <span className="navbar-toggler-icon"></span>
-          </button>
-          <div className="collapse navbar-collapse" id="navbarNav">
-            <ul className="navbar-nav ms-auto">
-              <li className="nav-item">
-                <Link to="/" className="nav-link">דף הבית</Link>
-              </li>
-              <li className="nav-item">
-                <Link to="/services" className="nav-link">שירותים</Link>
-              </li>
-              <li className="nav-item">
-                <Link to="/contact" className="nav-link">צור קשר</Link>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </nav>
-    </header>
+    <div className="header">
+      <div className="logo">
+        <img src="/img/logo2.png" alt="Garage Logo" />  
+        {/* תמונה שמתייחסת לLOGO  */}
+      </div>
+      <div className="hamburger" onClick={toggleMenu}>
+        <span className="line"></span>
+        <span className="line"></span>
+        <span className="line"></span>
+      </div>
+      {/* ב div הזה מיצרים את התפריט hamburger ו כשלוחצים על התפריט (שלושה קווים) גולל תפריט למטה (togglemenu)*/}
+      <ul className={`menu ${isOpen ? 'open' : ''}`}>
+        <li><Link to="/">עמוד הבית</Link></li>
+        <li><Link to="/services">שירותים</Link></li>
+        <li><Link to="/about">אודות</Link></li>
+        <li><Link to="/profile">אזור אישי</Link></li>
+        <li><Link to="/contact">צור קשר</Link></li>
+        <li><Link to="/story">הסיפור שלנו</Link></li>
+      </ul>
+    </div>
+    // הפונקציה toggleMenu משמשת לשנות את מצב isOpen (מצב פתיחת התפריט). היא מופעלת כאשר יש אינטראקציה עם האלמנט 
+    // אם isOpen שווה ל-false (ברירת המחדל), הפונקציה הופכת אותו ל-true, וכך התפריט נפתח.
+// אם  isOpen שווה ל-true, הפונקציה הופכת אותו ל-false, וכך התפריט נסגר.   
   );
 }
 

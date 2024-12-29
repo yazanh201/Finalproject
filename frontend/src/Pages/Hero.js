@@ -7,7 +7,7 @@ function Hero() {
       <div className="text-center text-white">
         <h1 className="display-4">ברוכים הבאים למוסך MotorSport</h1>
         <p className="lead">השותף המהימן שלכם לתחזוקה ותיקון רכבים</p>
-        <a href="/services" className="btn btn-light btn-lg mt-3">גלו את השירותים</a>
+        <a href="/services" className="btn btn-light btn-lg mt-3"> הזמן תור</a>
       </div>
     </section>
   );

@@ -1,19 +1,21 @@
-import logo from './logo.svg';
-import './App.css';
-import { Routes, Route } from 'react-router-dom';
-import Home from './Pages/Home'; // ייבוא ברירת מחדל
-import About from './Pages/About';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Home from './Pages/Home';
 import Contact from './Pages/Contact';
+import Layout from './components/layout';
+import Services from './Pages/Services';
 
-
-//ccc
 function App() {
   return (
-    <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/contact" element={<Contact />} />
-    </Routes>
+    <Layout>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/Services" element={<Services />} />
+      </Routes>
+    </Layout>
   );
 }
 
 export default App;
+

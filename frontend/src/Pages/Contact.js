@@ -1,5 +1,4 @@
 import React from 'react';
-
 /**
  * רכיב Contact
  * רכיב זה מציג את החלק של "צור קשר" בעמוד, כולל מידע ליצירת קשר עם המוסך
@@ -9,9 +8,11 @@ import React from 'react';
  */
 function Contact() {
   return (
+
+    
+   
     <section className="contact bg-light py-5">
-      <div className="container">
-        {/* כותרת החלק */}
+      <div className="container" >
         <h2 className="text-center mb-4">צור קשר</h2>
         <div className="row">
           {/* מידע ליצירת קשר */}
