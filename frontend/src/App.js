@@ -4,12 +4,16 @@ import Home from './Pages/Home';
 import Contact from './Pages/Contact';
 import Layout from './components/layout';
 import Services from './Pages/Services';
+import ServicesPage from './Pages/ServicesPage';
+
+
 
 function App() {
   return (
     <Layout>
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/ServicesPage" element={<ServicesPage />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/Services" element={<Services />} />
       </Routes>

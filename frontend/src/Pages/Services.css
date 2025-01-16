@@ -1,0 +1,55 @@
+/* Services.css */
+
+/* Services.css */
+
+/* עיצוב כללי לחלק השירותים */
+/* Services.css */
+
+/* עיצוב כללי לחלק השירותים */  
+
+/* Services.css */
+
+/* עיצוב כללי לסקשן השירותים */
+/* Services.css */
+
+/* עיצוב כללי לדף */
+.services {
+    background-color: #f9f9f9; /* רקע בהיר */
+    padding: 50px 0; /* ריווח פנימי */
+  }
+  
+  .services h2 {
+    font-size: 2.5rem;
+    color: #333;
+    margin-bottom: 40px;
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+  
+  /* כל שירות */
+  .service-item {
+    text-align: center;
+  }
+  
+  .service-img {
+    max-width: 100%; /* התאמת התמונה לרוחב הדף */
+    height: auto;
+    border-radius: 10px; /* פינות מעוגלות */
+  }
+  
+  .service-title {
+    font-size: 1.8rem;
+    color: #007bff; /* צבע הכותרת */
+    margin-top: 15px;
+    margin-bottom: 10px;
+  }
+  
+  .service-description {
+    font-size: 1rem;
+    color: #555;
+    line-height: 1.6; /* גובה שורה */
+    max-width: 800px; /* רוחב מקסימלי לטקסט */
+    margin: 0 auto; /* יישור מרכזי */
+  }
+  
+  

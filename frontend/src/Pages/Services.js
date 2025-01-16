@@ -1,10 +1,10 @@
 import React from 'react';
-
+import "../Pages/Services.css"; // אם הוא בתיקיית styles
 /**
  * רכיב Services
- * רכיב זה מציג את החלק של "השירותים שלנו" בעמוד, כולל כותרת ושלושה שירותים עיקריים.
- * השירותים מוצגים בתוך כרטיסים מעוצבים, המסודרים ברשת רספונסיבית.
- * 
+ * דף המציג את השירותים בצורה פשוטה, עם הסבר ותמונה לכל שירות.
+ * השירותים מוצגים כרשימה אנכית, כל שירות עם פסקה ותמונה רלוונטית.
+ *
  * @returns {JSX.Element} - רכיב ה-Services להצגה בדף
  */
 function Services() {
@@ -65,5 +65,4 @@ function Services() {
     </section>
   );
 }
-
-export default Services;
+export  default Services;

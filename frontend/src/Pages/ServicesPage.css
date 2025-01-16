@@ -1,0 +1,42 @@
+#d1 {
+    height: 80vh; /* גובה של 80% מהמסך */
+    background: url('/img/P1.png') no-repeat center center/cover;
+    color: rgb(255, 253, 253);
+    height: 300px;
+ 
+}
+
+p{
+    font-size: 1.5rem;
+}
+#d2 {
+    height: 80vh; /* גובה של 80% מהמסך */
+    background: url('/img/p2.png') no-repeat center center/cover;
+    color: white;
+    height: 350px;
+    background-color: black;
+}
+#d3 {
+    height: 80vh; /* גובה של 80% מהמסך */
+    background: url('/img/p3.png') no-repeat center center/cover;
+    color: white;
+    height: 300px;
+}
+#d4 {
+    height: 80vh; /* גובה של 80% מהמסך */
+    background: url('/img/p44.jpeg') no-repeat center center/cover;
+    color: white;
+    height: 300px;
+}
+#d5 {
+    height: 80vh; /* גובה של 80% מהמסך */
+    background: url('/img/p5.png') no-repeat center center/cover;
+    color: white;
+    height: 300px;
+}
+#d6 {
+    height: 80vh; /* גובה של 80% מהמסך */
+    background: url('/img/p6.png') no-repeat center center/cover;
+    color: white;
+    height: 300px;
+}
