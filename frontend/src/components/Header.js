@@ -25,8 +25,8 @@ function Header() {
         <li><Link to="/">עמוד הבית</Link></li>
         <li><Link to="/ServicesPage">שירותים</Link></li>
         <li><Link to="/about">אודות</Link></li>
-        <li><Link to="/profile">אזור אישי</Link></li>
         <li><Link to="/contact">צור קשר</Link></li>
+        <li><Link to="/login">אזור אישי </Link></li>
       
       </ul>
     </div>

@@ -1,42 +1,78 @@
-#d1 {
-    height: 80vh; /* גובה של 80% מהמסך */
-    background: url('/img/P1.png') no-repeat center center/cover;
-    color: rgb(255, 253, 253);
-    height: 300px;
- 
+/* ServicesPage.css */
+body {
+    font-family: 'Arial', sans-serif;
+    background: #f7f7f7;
+    color: #333;
 }
 
-p{
-    font-size: 1.5rem;
+h2 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #0066cc;
 }
+
+.service-card {
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 15px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.service-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.service-card h4 {
+    font-size: 1.8rem;
+    color: #ffffff;
+    margin-bottom: 10px;
+}
+
+.service-card p {
+    font-size: 1.2rem;
+    line-height: 1.6;
+}
+
+#d1 {
+    background: url('/img/P1.png') no-repeat center center/cover;
+    color: #fff;
+}
+
 #d2 {
-    height: 80vh; /* גובה של 80% מהמסך */
     background: url('/img/p2.png') no-repeat center center/cover;
-    color: white;
-    height: 350px;
-    background-color: black;
+    color: #fff;
 }
+
 #d3 {
-    height: 80vh; /* גובה של 80% מהמסך */
     background: url('/img/p3.png') no-repeat center center/cover;
-    color: white;
-    height: 300px;
+    color: #fff;
 }
+
 #d4 {
-    height: 80vh; /* גובה של 80% מהמסך */
     background: url('/img/p44.jpeg') no-repeat center center/cover;
-    color: white;
-    height: 300px;
+    color: #fff;
 }
+
 #d5 {
-    height: 80vh; /* גובה של 80% מהמסך */
     background: url('/img/p5.png') no-repeat center center/cover;
-    color: white;
-    height: 300px;
+    color: #fff;
 }
+
 #d6 {
-    height: 80vh; /* גובה של 80% מהמסך */
     background: url('/img/p6.png') no-repeat center center/cover;
-    color: white;
-    height: 300px;
+    color: #fff;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.bg-light {
+    background-color: #f8f9fa !important;
+}
+
+.shadow-lg {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;
 }
