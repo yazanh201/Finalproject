@@ -11,13 +11,12 @@ import Footer from '../components/footer';
 function Contact() {
   return (
     <>
-    <Header /> 
       <section className="contact bg-light py-5">
         <div className="container">
-          <div className="contact-wrapper" style={{ border: '2px solid #ddd', borderRadius: '10px', padding: '20px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)' , borderBlockColor:'black'}}>
+          <div className="contact-wrapper" style={{ border: '2px solid #ddd', borderRadius: '10px', padding: '20px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)' }}>
             <div className="row">
-              {/* כותרת - צור קשר */}
-              <div className="col-12 text-start mb-4">
+              {/* כותרת במרכז */}
+              <div className="col-12 text-center mb-4">
                 <h2>צור קשר</h2>
               </div>
             </div>
@@ -37,12 +36,12 @@ function Contact() {
                     <label htmlFor="message" className="form-label">הודעה</label>
                     <textarea className="form-control" id="message" rows="4"></textarea>
                   </div>
-                  <button type="submit" className="btn btn-primary" >שלח</button>
+                  <button type="submit" className="btn btn-primary">שלח</button>
                 </form>
               </div>
 
               {/* מידע ליצירת קשר */}
-              <div className="col-md-5 order-md-1 text-end">
+              <div className="col-md-6 order-md-1 text-end">
                 <h4>כתובת</h4>
                 <p>רחוב ראשי 123, עיר, מדינה</p>
                 <h4>טלפון</h4>
@@ -54,7 +53,7 @@ function Contact() {
           </div>
         </div>
       </section>
-      <Footer />
+      
     </>
   );
 }

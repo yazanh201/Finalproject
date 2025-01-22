@@ -11,7 +11,6 @@ import Header from '../components/Header';
 function About() {
   return (
   <>
-    <Header/>
     <section className="about bg-white py-5">
       <div className="container text-center">
         {/* כותרת "אודותינו" */}
