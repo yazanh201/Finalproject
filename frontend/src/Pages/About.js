@@ -1,4 +1,5 @@
 import React from 'react';
+import Header from '../components/Header';
 
 /**
  * רכיב About
@@ -9,6 +10,8 @@ import React from 'react';
  */
 function About() {
   return (
+  <>
+    <Header/>
     <section className="about bg-white py-5">
       <div className="container text-center">
         {/* כותרת "אודותינו" */}
@@ -21,6 +24,7 @@ function About() {
         </p>
       </div>
     </section>
+  </>
   );
 }
 

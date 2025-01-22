@@ -15,8 +15,17 @@ const Login = () => {
     if (username === "admin" && password === "1234") {
       // אם שם המשתמש והסיסמה תואמים
       localStorage.setItem("isLoggedIn", "true"); // שומר מצב התחברות ב-localStorage (אפשרות בסיסית)
+      localStorage.setItem("role", "admin"); //
       navigate("/dashboard"); // מעביר את המשתמש לדף ה-Dashboard
-    } else {
+
+    }
+    else if (username === "employee" && password === "1234") {
+      localStorage.setItem("isLoggedIn", "true"); // שו��ר מצב התחברות ב-localStorage (אפשרות ב��י��י��)
+      localStorage.setItem("role", "employee"); //
+      navigate("/dashboard"); // מעבי�� את המשתמש לד�� ה-Dashboard
+    }
+    
+    else {
       // אם שם המשתמש או הסיסמה שגויים
       alert("שם משתמש או סיסמה שגויים!"); // מציג הודעת שגיאה
     }

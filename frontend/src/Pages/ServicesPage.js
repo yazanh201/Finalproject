@@ -1,9 +1,12 @@
 // ServicesPage.js
 import "../Pages/ServicesPage.css";
 import Footer from "../components/footer";
+import Header from "../components/Header";
 
 function ServicesPage() {
     return (
+    <>
+      <Header /> 
       <section className="services bg-light py-5" id="body">
         <div className="container text-center">
           {/* כותרת "השירותים שלנו" */}
@@ -69,6 +72,7 @@ function ServicesPage() {
         </div>
         <Footer />
       </section>
+    </>
     );
   }
   
