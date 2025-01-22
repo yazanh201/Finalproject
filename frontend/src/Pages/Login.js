@@ -1,6 +1,7 @@
 import React, { useState } from "react"; // ייבוא React וה-hook useState לניהול state מקומי
 import { useNavigate } from "react-router-dom"; // ייבוא useNavigate לניווט בין דפים
 
+
 const Login = () => {
   // state עבור שם המשתמש והסיסמה
   const [username, setUsername] = useState(""); // מאחסן את שם המשתמש שהמשתמש מכניס

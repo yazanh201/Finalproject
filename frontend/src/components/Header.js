@@ -22,11 +22,11 @@ function Header() {
       </div>
       {/* ב div הזה מיצרים את התפריט hamburger ו כשלוחצים על התפריט (שלושה קווים) גולל תפריט למטה (togglemenu)*/}
       <ul className={`menu ${isOpen ? 'open' : ''}`}>
-        <li><Link to="/">עמוד הבית</Link></li>
-        <li><Link to="/ServicesPage">שירותים</Link></li>
+      <li><Link to="/login">אזור אישי </Link></li>
         <li><Link to="/about">אודות</Link></li>
+        <li><Link to="/ServicesPage">שירותים</Link></li>
         <li><Link to="/contact">צור קשר</Link></li>
-        <li><Link to="/login">אזור אישי </Link></li>
+        <li><Link to="/">עמוד הבית</Link></li>
       
       </ul>
     </div>
