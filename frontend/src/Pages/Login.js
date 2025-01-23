@@ -1,5 +1,6 @@
 import React, { useState } from "react"; // ייבוא React וה-hook useState לניהול state מקומי
 import { useNavigate } from "react-router-dom"; // ייבוא useNavigate לניווט בין דפים
+import Header from "../components/Header";
 
 
 const Login = () => {
@@ -33,7 +34,8 @@ const Login = () => {
   };
 
   return (
-    // מבנה רספונסיבי עם Bootstrap
+    <>
+    <Header /> 
     <div className="container d-flex justify-content-center align-items-center vh-100">
       {/* הקופסה המרכזית של הטופס */}
       <div className="card p-4 shadow-lg" style={{ width: "100%", maxWidth: "400px" }}>
@@ -76,6 +78,7 @@ const Login = () => {
         </form>
       </div>
     </div>
+    </>
   );
 };
 

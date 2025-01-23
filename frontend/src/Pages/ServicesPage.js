@@ -70,8 +70,8 @@ function ServicesPage() {
             </p>
           </div>
         </div>
-        <Footer />
       </section>
+      <Footer />
     </>
     );
   }

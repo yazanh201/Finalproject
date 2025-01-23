@@ -11,6 +11,7 @@ import Footer from '../components/footer';
 function Contact() {
   return (
     <>
+    <Header />
       <section className="contact bg-light py-5">
         <div className="container">
           <div className="contact-wrapper" style={{ border: '2px solid #ddd', borderRadius: '10px', padding: '20px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)' }}>
@@ -53,6 +54,7 @@ function Contact() {
           </div>
         </div>
       </section>
+      <Footer />
       
     </>
   );
