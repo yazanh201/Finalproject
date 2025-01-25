@@ -11,7 +11,7 @@ import './footer.css'; // ייבוא קובץ ה-CSS לעיצוב
  */
 function Footer() {
   return (
-    <footer className="footer bg-dark text-white py-5">
+    <footer className="footer text-white py-5">
       <div className="container">
         {/* חלוקה ל-2 עמודות */}
         <div className="row">

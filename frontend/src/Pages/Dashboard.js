@@ -6,6 +6,10 @@ import Customers from "../Tabels/CustomersTable";
 import Inquiries from "../Tabels/Inquiries"; 
 import TreatmentsTable from "../Tabels/TreatmentsTable";
 import Appointment from "../Tabels/Appointments";
+import Employees from "../Tabels/EmployeesTable";
+import Repairtypes from "../Tabels/RepairtypesTable";
+import CarsUnderMaintance from "../Tabels/CarsUnderMaintance";
+import CarOrders from "../Tabels/CarOrders";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -74,7 +78,31 @@ const Dashboard = () => {
           <>
           <Appointment />
           </>
-        )
+        );
+      case "Employees":
+        return(
+          <>
+          <Employees />
+          </>
+        );
+      case "Repairtypes":
+        return(
+          <>
+          <Repairtypes />
+          </>
+        );
+      case "CarsUnderMaintance":
+        return(
+          <>
+          <CarsUnderMaintance/>
+          </>
+        );
+        case "CarOrders":
+          return(
+            <>
+            <CarOrders/>
+            </>
+          )
 
     }
   };
@@ -118,13 +146,13 @@ const Dashboard = () => {
                   <button className="btn btn-dark w-100 text-start" onClick={() => setActiveView("Inquiries")}>פניות</button>
                 </li>
                 <li className="nav-item mb-2">
-                  <button className="btn btn-dark w-100 text-start" onClick={() => alert("הזמנות לרכבים")}>הזמנות לרכבים</button>
+                  <button className="btn btn-dark w-100 text-start" onClick={() => setActiveView("CarOrders")}>הזמנות לרכבים</button>
                 </li>
                 <li className="nav-item mb-2">
                   <button className="btn btn-dark w-100 text-start" onClick={() => setActiveView("Appointments")}>תורים</button>
                 </li>
                 <li className="nav-item mb-2">
-                  <button className="btn btn-dark w-100 text-start" onClick={() => setActiveView("Appointments")}>עובדים</button>
+                  <button className="btn btn-dark w-100 text-start" onClick={() => setActiveView("Employees")}>עובדים</button>
                 </li>
               </>
             )}
@@ -134,10 +162,10 @@ const Dashboard = () => {
               <button className="btn btn-dark w-100 text-start" onClick={() => setActiveView("Treatments")}>טיפולים</button>
             </li>
             <li className="nav-item mb-2">
-              <button className="btn btn-dark w-100 text-start" onClick={() => alert("רכבים בטיפול")}>רכבים בטיפול</button>
+              <button className="btn btn-dark w-100 text-start" onClick={() => setActiveView("CarsUnderMaintance")}>רכבים בטיפול</button>
             </li>
             <li className="nav-item mb-2">
-              <button className="btn btn-dark w-100 text-start" onClick={() => setActiveView("Appointments")}>סוגי טיפולים/תיקונים</button>
+              <button className="btn btn-dark w-100 text-start" onClick={() => setActiveView("Repairtypes")}>סוגי טיפולים/תיקונים</button>
             </li>
           </ul>
         </nav>

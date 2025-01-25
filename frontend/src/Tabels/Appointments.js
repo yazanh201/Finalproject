@@ -39,7 +39,7 @@ const Appointments = () => (
         <tbody>
           {/* נתוני תורים */}
           <tr>
-            <td>001</td>
+            <td>4001</td>
             <td>08/01/2025</td>
             <td>09:00</td>
             <td>החלפת שמן מנוע</td>
@@ -54,7 +54,7 @@ const Appointments = () => (
             </td>
           </tr>
           <tr>
-            <td>002</td>
+            <td>4002</td>
             <td>08/01/2025</td>
             <td>10:00</td>
             <td>בדיקת מערכת בלמים</td>
@@ -69,7 +69,7 @@ const Appointments = () => (
             </td>
           </tr>
           <tr>
-            <td>003</td>
+            <td>4003</td>
             <td>08/01/2025</td>
             <td>11:00</td>
             <td>יישור גלגלים</td>
@@ -84,7 +84,7 @@ const Appointments = () => (
             </td>
           </tr>
           <tr>
-            <td>004</td>
+            <td>4004</td>
             <td>08/01/2025</td>
             <td>12:00</td>
             <td>החלפת צמיגים</td>
@@ -99,7 +99,7 @@ const Appointments = () => (
             </td>
           </tr>
           <tr>
-            <td>005</td>
+            <td>4005</td>
             <td>08/01/2025</td>
             <td>13:00</td>
             <td>טיפול שנתי</td>

@@ -1,78 +1,31 @@
-/* ServicesPage.css */
-body {
-    font-family: 'Arial', sans-serif;
-    background: #f7f7f7;
-    color: #333;
-}
-
-h2 {
-    font-size: 2.5rem;
-    font-weight: 700;
-    color: #0066cc;
-}
-
-.service-card {
-    background: #ffffff;
+.hero2 {
+    background: url('/img/p9.jpg') no-repeat center center/cover;
+    height: 80vh;
+  }
+  
+  .service-card {
+    display: flex;
+    align-items: center;
+    background-color: #162447;
     padding: 20px;
-    border-radius: 15px;
+    border-radius: 10px;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
+  }
+  
+  .service-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+  }
 
-.service-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-}
-
-.service-card h4 {
-    font-size: 1.8rem;
-    color: #ffffff;
-    margin-bottom: 10px;
-}
-
-.service-card p {
-    font-size: 1.2rem;
-    line-height: 1.6;
-}
-
-#d1 {
-    background: url('/img/P1.png') no-repeat center center/cover;
-    color: #fff;
-}
-
-#d2 {
-    background: url('/img/p2.png') no-repeat center center/cover;
-    color: #fff;
-}
-
-#d3 {
-    background: url('/img/p3.png') no-repeat center center/cover;
-    color: #fff;
-}
-
-#d4 {
-    background: url('/img/p44.jpeg') no-repeat center center/cover;
-    color: #fff;
-}
-
-#d5 {
-    background: url('/img/p5.png') no-repeat center center/cover;
-    color: #fff;
-}
-
-#d6 {
-    background: url('/img/p6.png') no-repeat center center/cover;
-    color: #fff;
-}
-
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-.bg-light {
-    background-color: #f8f9fa !important;
-}
-
-.shadow-lg {
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;
-}
+  
+  .text-end, .text-start {
+    padding: 15px;
+  }
+  
+  
+.img-fluid {
+    height: 300px; /* גובה קבוע לכל התמונות */
+    width: 100%; /* התאמה לרוחב העמודה */
+    object-fit: cover; /* חיתוך התמונה למילוי המרחב */
+    border-radius: 10px; /* פינות מעוגלות */
+  }

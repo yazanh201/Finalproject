@@ -38,7 +38,6 @@ const TreatmentsTable = () => (
             <th>תאריך</th>
             <th>עלות (ש"ח)</th>
             <th>מזהה עובד</th>
-            <th>סוג טיפול</th>
             <th>מזהה סוג טיפול</th>
             <th>מספר רישוי רכב</th>
             <th>מזהה תור</th>
@@ -53,8 +52,7 @@ const TreatmentsTable = () => (
             <td>08/01/2025</td>
             <td>800</td>
             <td>5001</td>
-            <td>החלפת שמן</td>
-            <td>3001</td>
+            <td>6001</td>
             <td>123-45-678</td>
             <td>4001</td>
             <td>7001</td>
@@ -73,8 +71,7 @@ const TreatmentsTable = () => (
             <td>07/01/2025</td>
             <td>1200</td>
             <td>5002</td>
-            <td>בדיקת בלמים</td>
-            <td>3002</td>
+            <td>6002</td>
             <td>987-65-432</td>
             <td>4002</td>
             <td>7002</td>
@@ -93,8 +90,7 @@ const TreatmentsTable = () => (
             <td>09/01/2025</td>
             <td>600</td>
             <td>5003</td>
-            <td>תיקון חשמל</td>
-            <td>3003</td>
+            <td>6003</td>
             <td>321-54-876</td>
             <td>4003</td>
             <td>7003</td>
