@@ -110,10 +110,10 @@ const Dashboard = () => {
   return (
     <div className="dashboard-container">
       {/* כותרת עליונה */}
-      <header className="header bg-light text-dark py-3 px-4 d-flex align-items-center">
-        <div className="container text-center">
+      <header className="header bg-light text-dark py-2 px-4 d-flex align-items-center">
+        <div className="container text-center   ">
           {/* הצגת כותרת ותפקיד המשתמש */}
-          <h4 className="m-0">Dashboard ניהול מוסך</h4>
+          <h4 className="m-0 py-2" id="dash">Dashboard</h4>
           <h5 className="m-0">תפקיד: {role === "admin" ? "מנהל" : "עובד"}</h5>
         </div>
         <div className="logout-button">
@@ -126,46 +126,46 @@ const Dashboard = () => {
 
       <div className="d-flex">
         {/* תפריט צדדי */}
-        <nav className="sidebar bg-dark text-light p-3 vh-100">
+        <nav className="sidebar bg-dark text-light p-1 vh-100">
           <ul className="nav flex-column">
             {/* תפריט מנהל */}
             {role === "admin" && (
               <>
                 <li className="nav-item mb-2">
                   <button
-                    className="btn btn-dark w-100 text-start"
+                    className="btn btn-dark "
                     onClick={() => setActiveView("cars")}
                   >
                     רכבים
                   </button>
                 </li>
                 <li className="nav-item mb-2">
-                  <button className="btn btn-dark w-100 text-start" onClick={() => setActiveView("Customers")}>לקוחות</button>
+                  <button className="btn btn-dark" onClick={() => setActiveView("Customers")}>לקוחות</button>
                 </li>
                 <li className="nav-item mb-2">
-                  <button className="btn btn-dark w-100 text-start" onClick={() => setActiveView("Inquiries")}>פניות</button>
+                  <button className="btn btn-dark " onClick={() => setActiveView("Inquiries")}>פניות</button>
                 </li>
                 <li className="nav-item mb-2">
-                  <button className="btn btn-dark w-100 text-start" onClick={() => setActiveView("CarOrders")}>הזמנות לרכבים</button>
+                  <button className="btn btn-dark " onClick={() => setActiveView("CarOrders ")}>הזמנות לרכבים</button>
                 </li>
                 <li className="nav-item mb-2">
-                  <button className="btn btn-dark w-100 text-start" onClick={() => setActiveView("Appointments")}>תורים</button>
+                  <button className="btn btn-dark " onClick={() => setActiveView("Appointments")}>תורים</button>
                 </li>
                 <li className="nav-item mb-2">
-                  <button className="btn btn-dark w-100 text-start" onClick={() => setActiveView("Employees")}>עובדים</button>
+                  <button className="btn btn-dark " onClick={() => setActiveView("Employees")}>עובדים</button>
                 </li>
               </>
             )}
 
             {/* תפריט לעובד ולמנהל */}
             <li className="nav-item mb-2">
-              <button className="btn btn-dark w-100 text-start" onClick={() => setActiveView("Treatments")}>טיפולים</button>
+              <button className="btn btn-dark" onClick={() => setActiveView("Treatments")}>טיפולים</button>
             </li>
             <li className="nav-item mb-2">
-              <button className="btn btn-dark w-100 text-start" onClick={() => setActiveView("CarsUnderMaintance")}>רכבים בטיפול</button>
+              <button className="btn btn-dark " onClick={() => setActiveView("CarsUnderMaintance")}>רכבים בטיפול</button>
             </li>
             <li className="nav-item mb-2">
-              <button className="btn btn-dark w-100 text-start" onClick={() => setActiveView("Repairtypes")}>סוגי טיפולים/תיקונים</button>
+              <button className="btn btn-dark " onClick={() => setActiveView("Repairtypes")}>סוגי טיפולים/תיקונים</button>
             </li>
           </ul>
         </nav>

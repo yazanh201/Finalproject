@@ -1,125 +1,146 @@
-import React from "react";
+import React, { useState } from "react";
+import Modal from "./Modal"; // ייבוא רכיב ה-Modal לשימוש בהצגת חלון קופץ
 
 /**
- * רכיב Customers - מציג טבלת לקוחות עם נתונים ודוגמאות.
- * כולל כפתורים להוספת לקוח ולחיפוש לפי שם או תעודת זהות.
+ * רכיב הלקוחות (Customers)
+ * מציג טבלת לקוחות, ומאפשר פתיחת חלון קופץ להוספת לקוח חדש ורכב.
  */
-const Customers = () => (
-  <div>
-    {/* כותרת ראשית של הדף */}
-    <div className="text-center">
-      <h2>לקוחות</h2>
-    </div>
+const Customers = () => {
+  // State לניהול פתיחה וסגירה של חלון המודל
+  const [showModal, setShowModal] = useState(false);
 
-    {/* כפתורים להוספת לקוח ולחיפוש */}
-    <div className="d-flex mb-3">
-      <button
-        className="btn btn-primary me-3"
-        onClick={() => alert("הוספת לקוח חדש")}
-      >
-        הוספת לקוח
-      </button>
-      <button
-        className="btn btn-primary me-3"
-        onClick={() => alert("חיפוש לפי ת\"ז או שם")}
-      >
-        חיפוש לפי ת"ז או שם
-      </button>
-    </div>
+  // פונקציה לפתיחת חלון המודל
+  const handleShowModal = () => setShowModal(true);
 
-    {/* טבלת הלקוחות */}
-    <table className="table table-striped">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>שם לקוח</th>
-          <th>ת"ז</th>
-          <th>מספר טלפון</th>
-          <th>מייל</th>
-          <th>סטטוס לקוח</th>
-          <th>מספר רישוי רכב</th>
-          <th>פעולה</th>
-        </tr>
-      </thead>
-      <tbody>
-        {/* לקוח 1 */}
-        <tr>
-          <td>1</td>
-          <td>יונתן לוי</td>
-          <td>123456789</td>
-          <td>050-123-4567</td>
-          <td>yonatan@example.com</td>
-          <td className="text-success">פעיל</td>
-          <td>123-45-678</td>
-          <td>
-            <button
-              className="btn btn-primary btn-sm"
-              onClick={() => alert("עריכת פרטי הלקוח")}
-            >
-              עריכה
-            </button>
-          </td>
-        </tr>
+  // פונקציה לסגירת חלון המודל
+  const handleCloseModal = () => setShowModal(false);
 
-        {/* לקוח 2 */}
-        <tr>
-          <td>2</td>
-          <td>שרה כהן</td>
-          <td>987654321</td>
-          <td>052-987-6543</td>
-          <td>sara@example.com</td>
-          <td className="text-success">פעיל</td>
-          <td>987-65-432</td>
-          <td>
-            <button
-              className="btn btn-primary btn-sm"
-              onClick={() => alert("עריכת פרטי הלקוח")}
-            >
-              עריכה
-            </button>
-          </td>
-        </tr>
+  // פונקציה המדמה שמירת נתונים (תוכל להוסיף לוגיקה אמיתית מאחורי הקלעים)
+  const handleSave = () => {
+    alert("לקוח ורכב נוספו בהצלחה!"); // הודעה למשתמש
+    handleCloseModal(); // סגירת החלון לאחר שמירה
+  };
 
-        {/* לקוח 3 */}
-        <tr>
-          <td>3</td>
-          <td>אבי מזרחי</td>
-          <td>456123789</td>
-          <td>054-456-1234</td>
-          <td>avi@example.com</td>
-          <td className="text-danger">לא פעיל</td>
-          <td>321-54-876</td>
-          <td>
-            <button
-              className="btn btn-primary btn-sm"
-              onClick={() => alert("עריכת פרטי הלקוח")}
-            >
-              עריכה
-            </button>
-          </td>
-        </tr>
+  return (
+    <div>
+      {/* כותרת ראשית של הדף */}
+      <div className="text-center">
+        <h2>לקוחות</h2>
+      </div>
 
-        {/* לקוח 4 */}
-        <tr>
-          <td>4</td>
-          <td>נועה ישראלי</td>
-          <td>321654987</td>
-          <td>053-321-6549</td>
-          <td>noa@example.com</td>
-          <td className="text-success">פעיל</td>
-          <td>654-32-109</td>
-          <td>
-            <button
-              className="btn btn-primary btn-sm"
-              onClick={() => alert("עריכת פרטי הלקוח")}
-            >
-              עריכה
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-);
+      {/* כפתורי פעולות */}
+      <div className="d-flex mb-3">
+        {/* כפתור לפתיחת המודל */}
+        <button
+          className="btn btn-primary me-3"
+          onClick={handleShowModal} // פתיחת חלון המודל
+        >
+          הוספת לקוח ורכב
+        </button>
+
+        {/* כפתור המדמה חיפוש */}
+        <button
+          className="btn btn-primary me-3"
+          onClick={() => alert('חיפוש לפי ת"ז או שם')} // פעולה לדוגמה
+        >
+          חיפוש לפי ת"ז או שם
+        </button>
+      </div>
+
+      {/* טבלת הלקוחות */}
+      <table className="table table-striped">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>שם לקוח</th>
+            <th>ת"ז</th>
+            <th>מספר טלפון</th>
+            <th>מייל</th>
+            <th>סטטוס לקוח</th>
+            <th>מספר רישוי רכב</th>
+            <th>פעולה</th>
+          </tr>
+        </thead>
+        <tbody>
+          {/* נתונים לדוגמה של לקוח */}
+          <tr>
+            <td>1</td>
+            <td>יונתן לוי</td>
+            <td>123456789</td>
+            <td>050-123-4567</td>
+            <td>yonatan@example.com</td>
+            <td className="text-success">פעיל</td>
+            <td>123-45-678</td>
+            <td>
+              {/* כפתור לעריכת פרטי הלקוח */}
+              <button className="btn btn-primary btn-sm">עריכה</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      {/* שימוש ברכיב המודל (חלון קופץ) */}
+      <Modal isOpen={showModal} onClose={handleCloseModal} onSave={handleSave}>
+        <h3>הוספת לקוח ורכב</h3> {/* כותרת המודל */}
+
+        {/* טופס להוספת לקוח */}
+        <form>
+          <div className="form-group mb-3">
+            <label>שם לקוח</label>
+            <input
+              type="text"
+              placeholder="הזן שם לקוח"
+              className="form-control"
+            />
+          </div>
+
+          <div className="form-group mb-3">
+            <label>תעודת זהות</label>
+            <input
+              type="text"
+              placeholder="הזן תעודת זהות"
+              className="form-control"
+            />
+          </div>
+
+          <div className="form-group mb-3">
+            <label>מספר טלפון</label>
+            <input
+              type="text"
+              placeholder="הזן מספר טלפון"
+              className="form-control"
+            />
+          </div>
+
+          <div className="form-group mb-3">
+            <label>מייל</label>
+            <input
+              type="email"
+              placeholder="הזן מייל"
+              className="form-control"
+            />
+          </div>
+
+          <div className="form-group mb-3">
+            <label>סטטוס לקוח</label>
+            <select className="form-control">
+              <option value="active">פעיל</option>
+              <option value="inactive">לא פעיל</option>
+            </select>
+          </div>
+
+          <div className="form-group mb-3">
+            <label>מספר רישוי רכב</label>
+            <input  
+              type="text"
+              placeholder="הזן תאריך"
+              className="form-control"
+            />
+          </div>
+        </form>
+      </Modal>
+    </div>      
+  );
+};
 
 export default Customers;

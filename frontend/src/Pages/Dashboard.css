@@ -1,48 +1,153 @@
 /* עיצוב כללי */
 .dashboard-container {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    direction: rtl;
-  }
-  
-  /* עיצוב ה-Header */
-  .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  }
-  
-  .header .container {
-    flex: 1;
-  }
-  
-  .header .logout-button {
-    margin-left: 5px;
-  }
-  
-  /* עיצוב ה-Sidebar */
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  direction: rtl;
+  font-family: "Arial", sans-serif;
+  background-color: #f4f6f9;
+}
+
+/* עיצוב ה-Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #ffffff;
+  padding: 15px 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.header .container {
+  flex: 1;
+  text-align: center;
+}
+
+.header h4 {
+  font-size: 22px;
+  font-weight: bold;
+  color: #333;
+}
+
+.header h5 {
+  font-size: 16px;
+  color: #555;
+}
+
+/* כפתור התנתקות */
+.logout-button {
+  margin-left: 5px;
+}
+
+.logout-button .btn {
+  background-color: #dc3545;
+  color: white;
+  padding: 10px 15px;
+  border-radius: 5px;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+.logout-button .btn:hover {
+  background-color: #c82333;
+}
+
+/* עיצוב ה-Sidebar */
+.sidebar {
+  direction: ltr;
+
+  width: 250px;
+  flex-shrink: 0;
+  background-color: #1f1f2e;
+  color: white;
+  height: 100vh;
+  padding-top: 20px;
+  position: fixed;
+  right: 0;
+  top: 0;
+  overflow-y: auto;
+  padding-right: 10px; /* הצמדת הכפתורים עוד יותר לצד ימין */
+}
+
+/* כפתורים בתפריט ה-Sidebar */
+.sidebar .nav-item {
+  text-align: right;
+  margin-bottom: 8px;
+  padding-right: 5px; /* הצמדת הכפתורים לצד ימין */
+}
+
+.sidebar .nav-item button {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 16px;
+  width: 100%;
+  text-align: right; /* מיישר את הכתב לצד ימין */
+  padding: 12px 15px;
+  cursor: pointer;
+  transition: 0.3s;
+  font-weight: bold;
+  display: flex;
+  justify-content: flex-end; /* הצמדה מלאה לימין */
+}
+
+.sidebar .nav-item button:hover {
+  background-color: #44445c;
+  border-right: 5px solid #007bff; /* מדגיש את הכפתור הפעיל */
+}
+
+/* עיצוב תוכן מרכזי */
+.main-content {
+  flex-grow: 1;
+  padding: 40px;
+  background-color: #f8f9fa;
+  margin-right: 250px;
+  min-height: 100vh;
+}
+
+/* כותרת התוכן */
+.main-content h3 {
+  font-size: 26px;
+  font-weight: bold;
+  color: #222;
+  margin-bottom: 10px;
+}
+
+.main-content p {
+  font-size: 18px;
+  color: #555;
+}
+
+/* התאמה למסכים קטנים */
+@media (max-width: 992px) {
   .sidebar {
-    width: 250px;
-    flex-shrink: 0;
-    overflow-y: auto;
+      width: 220px;
   }
   
-  /* כפתורי ה-Sidebar */
-  .sidebar .nav-item button {
-    margin-bottom: 10px;
-    color: white;
-  }
-  
-  .sidebar .nav-item button:hover {
-    background-color: #6c757d;
-  }
-  
-  /* עיצוב תוכן מרכזי */
   .main-content {
-    flex-grow: 1;
-    background-color: #f8f9fa;
-    padding-top: 20px;
+      margin-right: 220px;
+      padding: 20px;
   }
-  
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+      position: absolute;
+      width: 200px;
+      height: 100%;
+      z-index: 10;
+      box-shadow: 2px 0px 10px rgba(0, 0, 0, 0.2);
+  }
+
+  .main-content {
+      margin-right: 0;
+      padding: 15px;
+  }
+
+  .sidebar .nav-item button {
+      font-size: 14px;
+      padding: 10px;
+  }
+
+
+}

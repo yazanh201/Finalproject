@@ -1,31 +1,75 @@
 .hero2 {
-    background: url('/img/p9.jpg') no-repeat center center/cover;
-    height: 80vh;
-  }
-  
-  .service-card {
-    display: flex;
-    align-items: center;
-    background-color: #162447;
-    padding: 20px;
-    border-radius: 10px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-  }
-  
-  .service-card:hover {
-    transform: scale(1.05);
-    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
-  }
+  background: url('/img/p9.jpg') no-repeat center center/cover;
+  height: 80vh;
+}
 
-  
-  .text-end, .text-start {
-    padding: 15px;
-  }
-  
-  
+.service-card {
+  display: flex;
+  align-items: center;
+  background-color: #162447;
+  padding: 20px;
+  border-radius: 10px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.service-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+}
+
+.text-end, .text-start {
+  padding: 15px;
+}
+
 .img-fluid {
-    height: 300px; /* גובה קבוע לכל התמונות */
-    width: 100%; /* התאמה לרוחב העמודה */
-    object-fit: cover; /* חיתוך התמונה למילוי המרחב */
-    border-radius: 10px; /* פינות מעוגלות */
-  }
+  height: 300px; /* גובה קבוע לכל התמונות */
+  width: 100%; /* התאמה לרוחב העמודה */
+  object-fit: cover; /* חיתוך התמונה למילוי המרחב */
+  border-radius: 10px; /* פינות מעוגלות */
+}
+
+/* עיצוב לכרטיסים הקטנים */
+.additional-service-card {
+  background-color: #162447;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.additional-service-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+}
+
+.additional-service-card img {
+  width: 220px;
+  height: 130px;
+  object-fit: cover;
+  border-radius: 5px;
+}
+
+.additional-service-card h5 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #ffffff;
+  margin-left: 15px;
+}
+
+/* הגדרות למבנה הכרטיסים */
+.additional-services {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px; /* מרווחים בין הכרטיסים */
+  justify-content: center; /* מרכז את הכרטיסים */
+}
+
+.additional-service-card-wrapper {
+  width: 45%; /* שני כרטיסים בשורה */
+  max-width: 300px; /* מקסימום רוחב לכרטיס */
+  min-width: 250px; /* מינימום רוחב לכרטיס */
+}

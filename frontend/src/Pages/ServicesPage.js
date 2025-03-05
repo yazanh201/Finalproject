@@ -37,11 +37,22 @@ const servicesData = [
   },
   {
     id: 6,
-    title: 'שיפוץ ותיקון בלמים',
-    description: ' הוא שירות מקיף שמטרתו לשמור על תקינות הרכב וביצועיו לאורך זמן. השירות כולל אבחון ותיקון של מערכות מרכזיות ברכב כמו מנוע, בלמים, מתלים ותיבות הילוכים. כל תיקון מתבצע על ידי צוות מומחים מנוסה המשתמש בציוד מתקדם ובחלקים איכותיים כדי להבטיח עבודה ברמה הגבוהה ביותר. השירות מתמקד בזיהוי מוקדם של תקלות נסתרות, שיפור ביצועי המנוע והמערכות המכניות, ושמירה על אמינות הרכב לאורך זמן. טיפול זה מבטיח חוויית נהיגה חלקה, בטיחותית ומהימנה בכל תנאי הדרך',
+    title: 'תיקונים במנוע',
+    description: 'תיקון מנוע הוא שירות מקצועי ומקיף שמטרתו להבטיח את תקינות המנוע וביצועיו האופטימליים לאורך זמן. השירות כולל אבחון מדויק של תקלות, תיקון ושיפוץ רכיבים חיוניים, וכן שימוש בחלקים איכותיים ובטכנולוגיות מתקדמות להחזרת המנוע למצבו האידיאלי. צוות המומחים מבצע בדיקות יסודיות כדי לזהות בעיות נסתרות, לשפר את יעילות הדלק ולמנוע שחיקה מואצת של רכיבי המנוע. טיפול זה מבטיח פעולה חלקה של הרכב, חוויית נהיגה משופרת ועמידות גבוהה בתנאי דרך משתנים, תוך שמירה על בטיחות ומהימנות לאורך זמן',
     image: '/img/p7.webp',
   },
 ];
+
+
+
+const additionalServices = [
+  { id: 1, title: 'בלמים', image: '/img/p10.jpg' },
+  { id: 2, title: 'תיבת הילוכים', image: '/img/p11.jpg' },
+  { id: 3, title: 'מצברים ', image: '/img/p12.webp' },
+  { id: 4, title: 'בדיקות בטיחות', image: '/img/p13.jpg' },
+
+];
+
 
 const Services = () => {
   return (
@@ -102,6 +113,24 @@ const Services = () => {
           </div>
         ))}
       </div>
+      <section className="additional-services bg-dark py-5">
+  <div className="container">
+    <div className="additional-services">
+      {additionalServices.map((service) => (
+        <div className="col-md-4 mb-4" key={service.id}>
+          <div className="additional-service-card">
+            <img
+              src={service.image}
+              alt={service.title}
+              className="service-card-img"
+            />
+            <h5 className="text-white">{service.title}</h5>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
     </section>
     <Footer/>
     </>
