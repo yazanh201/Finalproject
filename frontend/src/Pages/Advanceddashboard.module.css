@@ -1,0 +1,279 @@
+.dashboardContainer {
+    display: flex;
+    flex-direction: column;
+    margin: 0 auto;
+    background-color: #f8f9fa;
+}
+
+.dashboardHeader {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background-color: #2f3640;
+    color: white;
+    padding: 15px 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 1000;
+}
+
+.headerh2{
+    padding-right: 570px;
+}
+
+.backBtn {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 5px;
+    font-size: 16px;
+    transition: background-color 0.3s;
+    border: none;
+    cursor: pointer;
+}
+
+.backBtn:hover {
+    background-color: #0056b3;
+}
+
+.sidebar {
+    position: fixed;
+    right: 0;
+    top: 60px;
+    width: 250px;
+    height: calc(100vh - 60px);
+    background-color: #2f3640;
+    color: white;
+    padding-top: 20px;
+    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.sendMessageBtn {
+    width: 90%;
+    margin: 10px auto;
+    padding: 12px;
+    background-color: #0097e6;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    text-align: center;
+    margin-right: 10px;
+}
+
+.sendMessageBtn:hover {
+    background-color: #007bbd;
+}
+
+.mainContent {
+    flex-grow: 1;
+    padding: 80px 20px 20px;
+    margin-right: 260px;
+}
+
+.notificationsSection {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+    margin-top: 20px;
+}
+
+.notificationsSection ul {
+    list-style: none;
+    padding: 0;
+}
+
+.notificationsSection li {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.notificationsSection li:hover {
+    background-color: #f0f0f0;
+}
+
+.statsSection {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.statCard {
+    background-color: white;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+    text-align: center;
+    transition: transform 0.3s, box-shadow 0.3s;
+    cursor: pointer;
+    min-height: 100px;
+}
+
+.statCard:hover {
+    transform: scale(1.02);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+
+.statCard h3 {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.statCard p {
+    font-size: 20px;
+    font-weight: bold;
+    color: #40739e;
+}
+
+/* 🔹 טבלה דינמית */
+.tableSection {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+    margin-top: 20px;
+    overflow-x: auto;
+}
+
+.tableSection h3 {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.closeTable {
+    background-color: #e84118;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    float: left;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+}
+
+th, td {
+    border-bottom: 1px solid #ddd;
+    padding: 12px;
+    text-align: center;
+}
+
+th {
+    background-color: #40739e;
+    color: white;
+}
+
+td {
+    font-size: 14px;
+}
+
+/* 📩 חלון קופץ לשליחת הודעות */
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modalContent {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    width: 400px;
+    text-align: center;
+}
+
+.modalContent h3 {
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+
+.modalContent input,
+.modalContent textarea {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.modalButtons {
+    display: flex;
+    justify-content: space-between;
+}
+
+.sendBtn {
+    background-color: #0097e6;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.sendBtn:hover {
+    background-color: #007bbd;
+}
+
+.cancelBtn {
+    background-color: #e84118;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.cancelBtn:hover {
+    background-color: #c23616;
+}
+
+/* 📱 התאמה רספונסיבית */
+@media (max-width: 992px) {
+    .statsSection {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        width: 200px;
+    }
+
+    .mainContent {
+        margin-right: 210px;
+    }
+
+    .statsSection {
+        grid-template-columns: repeat(1, 1fr);
+    }
+}
+
+@media (max-width: 500px) {
+    .sidebar {
+        width: 180px;
+    }
+
+    .mainContent {
+        margin-right: 190px;
+        padding: 70px 10px 10px;
+    }
+}

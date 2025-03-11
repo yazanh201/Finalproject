@@ -17,7 +17,7 @@ function About() {
     <section className="about bg-white py-5">
       <div className="container text-center">
         {/* כותרת "אודותינו" */}
-        <h2 className="mb-4">אודותינו</h2>
+        <h2 className="mb-4 me-3">אודותינו</h2>
 
         {/* תיאור קצר על המוסך */}
         <p className="lead">

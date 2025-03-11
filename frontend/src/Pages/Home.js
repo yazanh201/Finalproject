@@ -17,7 +17,7 @@ function Home() {
       <section className="services bg-dark py-5">
         <div className="container">
           <div className="text-center mb-5">
-            <h2 className="text-white">השירותים שלנו</h2>
+            <h2 className="text-white me-3">השירותים שלנו</h2>
           </div>
           <div className="row">
             {/* שירות 1 */}
@@ -99,7 +99,7 @@ function Home() {
       <section className="about bg-white py-5">
         <div className="container text-center">
           {/* כותרת "אודותינו" */}
-          <h2 className="mb-4">אודותינו</h2>
+          <h2 className="mb-4 me-2">אודותינו</h2>
 
           {/* תיאור קצר על המוסך */}
           <p className="lead">

@@ -1,132 +1,183 @@
-import React from "react";
+import React, { useState } from "react";
+import Modal from "./Modal"; // רכיב ה-Modal להצגת חלון קופץ
 
-const CarOrders = () => (
-  <div>
-    {/* כותרת ראשית */}
-    <div className="text-center mb-4">
-      <h2>הזמנות רכבים</h2>
-    </div>
+/**
+ * רכיב `CarOrders`
+ * - מציג טבלת הזמנות רכבים עם אפשרות הוספה, חיפוש ועריכה.
+ */
+const CarOrders = () => {
+  // סטייט לניהול הצגת מודלים
+  const [modalType, setModalType] = useState(null);
+  const [selectedOrder, setSelectedOrder] = useState(null); // שמירת הנתונים של הזמנה שנבחרה לעריכה
 
-    {/* כפתורים */}
-    <div className="d-flex  mb-3">
-      <button className="btn btn-primary me-3" onClick={() => alert("הוספת הזמנה חדשה")}>
-        הוסף הזמנה
-      </button>
-      <button className="btn btn-primary me-3" onClick={() => alert("חיפוש הזמנה לפי מספר רכב")}>
-        חיפוש הזמנה לפי מספר רכב
-      </button>
-    </div>
+  // נתוני הזמנות לדוגמה
+  const orders = [
+    { id: 1001, carNumber: "123-45-678", orderDate: "2025-01-01", deliveryDate: "2025-01-05", details: "בלמים, צמיגים", cost: 2500, status: "התקבלה" },
+    { id: 1002, carNumber: "234-56-789", orderDate: "2025-02-15", deliveryDate: "2025-02-20", details: "פילטר שמן, שמן מנוע", cost: 800, status: "בטיפול" }
+  ];
 
-    {/* טבלת הזמנות רכבים */}
-    <div className="table-responsive">
-      <table className="table table-striped">
-        <thead>
-          <tr>
-            <th>מזהה הזמנה</th>
-            <th>מספר רכב</th>
-            <th>תאריך הזמנה</th>
-            <th>תאריך אספקה</th>
-            <th>פרטי הזמנה</th>
-            <th>עלות (ש"ח)</th>
-            <th>סטטוס הזמנה</th>
-            <th>פעולה</th>
-          </tr>
-        </thead>
-        <tbody>
-          {/* הזמנה 1 */}
-          <tr>
-            <td>1001</td>
-            <td>123-45-678</td>
-            <td>01/01/2025</td>
-            <td>05/01/2025</td>
-            <td>בלמים, צמיגים</td>
-            <td>2,500</td>
-            <td className="text-success">התקבלה</td>
-            <td>
-              <button
-                className="btn btn-primary btn-sm"
-                onClick={() => alert("עריכת פרטי ההזמנה")}
-              >
-                עריכה
-              </button>
-            </td>
-          </tr>
-          {/* הזמנה 2 */}
-          <tr>
-            <td>1002</td>
-            <td>234-56-789</td>
-            <td>02/01/2025</td>
-            <td>07/01/2025</td>
-            <td>פילטר שמן, שמן מנוע</td>
-            <td>800</td>
-            <td className="text-danger">לא התקבלה</td>
-            <td>
-              <button
-                className="btn btn-primary btn-sm"
-                onClick={() => alert("עריכת פרטי ההזמנה")}
-              >
-                עריכה
-              </button>
-            </td>
-          </tr>
-          {/* הזמנה 3 */}
-          <tr>
-            <td>1003</td>
-            <td>345-67-890</td>
-            <td>03/01/2025</td>
-            <td>09/01/2025</td>
-            <td>פנס קדמי, מראה צד</td>
-            <td>1,200</td>
-            <td className="text-success">התקבלה</td>
-            <td>
-              <button
-                className="btn btn-primary btn-sm"
-                onClick={() => alert("עריכת פרטי ההזמנה")}
-              >
-                עריכה
-              </button>
-            </td>
-          </tr>
-          {/* הזמנה 4 */}
-          <tr>
-            <td>1004</td>
-            <td>456-78-901</td>
-            <td>04/01/2025</td>
-            <td>10/01/2025</td>
-            <td>רצועת מנוע, מצבר</td>
-            <td>1,800</td>
-            <td className="text-danger">לא התקבלה</td>
-            <td>
-              <button
-                className="btn btn-primary btn-sm"
-                onClick={() => alert("עריכת פרטי ההזמנה")}
-              >
-                עריכה
-              </button>
-            </td>
-          </tr>
-          {/* הזמנה 5 */}
-          <tr>
-            <td>1005</td>
-            <td>567-89-012</td>
-            <td>05/01/2025</td>
-            <td>12/01/2025</td>
-            <td>מערכת שמע</td>
-            <td>3,000</td>
-            <td className="text-success">התקבלה</td>
-            <td>
-              <button
-                className="btn btn-primary btn-sm"
-                onClick={() => alert("עריכת פרטי ההזמנה")}
-              >
-                עריכה
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+  /**
+   * פונקציה לפתיחת מודל
+   * @param {string} type - סוג הפעולה (add, search, edit)
+   * @param {Object} [order] - אובייקט הזמנה במידה ומדובר בעריכה
+   */
+  const handleShowModal = (type, order = null) => {
+    setModalType(type);
+    if (order) setSelectedOrder(order);
+  };
+
+  // פונקציה לסגירת המודל
+  const handleCloseModal = () => {
+    setModalType(null);
+    setSelectedOrder(null);
+  };
+
+  // פונקציה המדמה שמירת נתונים
+  const handleSave = () => {
+    alert("הפעולה בוצעה בהצלחה!");
+    handleCloseModal();
+  };
+
+
+  const orderStatuses = ["התקבלה", "בטיפול", "הושלמה", "בוטלה"];
+
+  return (
+    <div>
+      {/* כותרת ראשית */}
+      <div className="text-center mb-4">
+        <h2 className="me-3" >הזמנות רכבים</h2>
+      </div>
+
+      {/* כפתורים לניהול ההזמנות */}
+      <div className="d-flex mb-3">
+        <button className="btn btn-primary me-3" onClick={() => handleShowModal("add")}>
+          הוסף הזמנה
+        </button>
+        <button className="btn btn-primary me-3" onClick={() => handleShowModal("search")}>
+          חיפוש הזמנה לפי מספר רכב
+        </button>
+      </div>
+
+      {/* טבלת הזמנות */}
+      <div className="table-responsive">
+        <table className="table table-striped">
+          <thead>
+            <tr>
+              <th>מזהה הזמנה</th>
+              <th>מספר רכב</th>
+              <th>תאריך הזמנה</th>
+              <th>תאריך אספקה</th>
+              <th>פרטי הזמנה</th>
+              <th>עלות (ש"ח)</th>
+              <th>סטטוס הזמנה</th>
+              <th>פעולה</th>
+            </tr>
+          </thead>
+          <tbody>
+            {orders.map((order) => (
+              <tr key={order.id}>
+                <td>{order.id}</td>
+                <td>{order.carNumber}</td>
+                <td>{order.orderDate}</td>
+                <td>{order.deliveryDate}</td>
+                <td>{order.details}</td>
+                <td>{order.cost}</td>
+                <td className={order.status === "התקבלה" ? "text-success" : "text-warning"}>
+                  {order.status}
+                </td>
+                <td>
+                  <button className="btn btn-primary btn-sm" onClick={() => handleShowModal("edit", order)}>
+                    עריכה
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* === מודלים לפי `modalType` === */}
+
+      {/* מודל להוספת הזמנה חדשה */}
+      {modalType === "add" && (
+        <Modal isOpen={true} onClose={handleCloseModal} onSave={handleSave}>
+          <h3>הוספת הזמנה חדשה</h3>
+          <form>
+            <div className="form-group mb-3">
+              <label>מספר רכב</label>
+              <input type="text" className="form-control" placeholder="הזן מספר רכב" required />
+            </div>
+            <div className="form-group mb-3">
+              <label>תאריך הזמנה</label>
+              <input type="date" className="form-control" required />
+            </div>
+            <div className="form-group mb-3">
+              <label>תאריך אספקה</label>
+              <input type="date" className="form-control" required />
+            </div>
+            <div className="form-group mb-3">
+              <label>פרטי הזמנה</label>
+              <textarea className="form-control" placeholder="פרטי ההזמנה" required />
+            </div>
+            <div className="form-group mb-3">
+              <label>עלות (ש"ח)</label>
+              <input type="number" className="form-control" placeholder="הזן עלות" required />
+            </div>
+          </form>
+        </Modal>
+      )}
+
+      {/* מודל חיפוש לפי מספר רכב */}
+      {modalType === "search" && (
+        <Modal isOpen={true} onClose={handleCloseModal}>
+          <h3>חיפוש הזמנה</h3>
+          <div className="form-group mb-3">
+            <label>הזן מספר רכב</label>
+            <input type="text" className="form-control" placeholder="חיפוש לפי מספר רכב" required />
+          </div>
+        </Modal>
+      )}
+
+      {/* מודל עריכת הזמנה */}
+      {modalType === "edit" && selectedOrder && (
+        <Modal isOpen={true} onClose={handleCloseModal} onSave={handleSave}>
+          <h3>עריכת הזמנה #{selectedOrder.id}</h3>
+          <form>
+            <div className="form-group mb-3">
+              <label>מספר רכב</label>
+              <input type="text" className="form-control" defaultValue={selectedOrder.carNumber} required />
+            </div>
+            <div className="form-group mb-3">
+              <label>תאריך הזמנה</label>
+              <input type="date" className="form-control" defaultValue={selectedOrder.orderDate} required />
+            </div>
+            <div className="form-group mb-3">
+              <label>תאריך אספקה</label>
+              <input type="date" className="form-control" defaultValue={selectedOrder.deliveryDate} required />
+            </div>
+            <div className="form-group mb-3">
+              <label>פרטי הזמנה</label>
+              <textarea className="form-control" defaultValue={selectedOrder.details} required />
+            </div>
+            <div className="form-group mb-3">
+              <label>עלות (ש"ח)</label>
+              <input type="number" className="form-control" defaultValue={selectedOrder.cost} required />
+            </div>
+            <div className="form-group mb-3">
+              <label>סטטוס הזמנה</label>
+              <select className="form-control" defaultValue={selectedOrder.status} required>
+                {orderStatuses.map((status, index) => (
+                  <option key={index} value={status}>
+                    {status}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </form>
+        </Modal>
+      )}
     </div>
-  </div>
-);
+  );
+};
 
 export default CarOrders;

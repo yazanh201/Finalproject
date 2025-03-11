@@ -17,7 +17,7 @@ function Contact() {
           <div className="contact-wrapper" style={{ border: '2px solid #ddd', borderRadius: '10px', padding: '20px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)' }}>
             <div className="row">
               {/* כותרת במרכז */}
-              <div className="col-12 text-center mb-4">
+              <div className="col-12 mb-4 me-1">
                 <h2>צור קשר</h2>
               </div>
             </div>

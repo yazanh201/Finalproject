@@ -8,11 +8,13 @@ import Login from './Pages/Login';
 import Dashboard from './Pages/Dashboard';
 import PrivateRoute from './PrivateRoute';
 import About from './Pages/About';
+import AdvancedDashboard from "./Pages/AdvancedDashboard"; // ✅ נכון
 
 
 
 
 function App() {
+
   return (
       <Routes>
         <Route path="/" element={<Home />} />
@@ -21,6 +23,7 @@ function App() {
         <Route path="/Services" element={<Services />} />
         <Route path='/Login' element={<Login/>} />
         <Route path="/About" element={<About />} />
+        <Route path="/AdvancedDashboard" element={<AdvancedDashboard />} />
         <Route
             path="/Dashboard"
             element={
@@ -34,4 +37,5 @@ function App() {
 }
 
 export default App;
+
 

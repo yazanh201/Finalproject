@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+  import { Link } from 'react-router-dom';
 import './Header.css';
 
 function Header() {
@@ -10,7 +10,7 @@ function Header() {
   };
 
   return (
-    <div className="header">
+    <div className="header1">
       <div className="logo">
         <img src="/img/logo2.png" alt="Garage Logo" />  
         {/* תמונה שמתייחסת לLOGO  */}
@@ -27,6 +27,7 @@ function Header() {
         <li><Link to="/ServicesPage">שירותים</Link></li>
         <li><Link to="/contact">צור קשר</Link></li>
         <li><Link to="/">עמוד הבית</Link></li>
+        
       
       </ul>
     </div>

@@ -1,43 +1,52 @@
 import React, { useState } from "react";
-import Modal from "./Modal"; // ייבוא רכיב ה-Modal לשימוש בהצגת חלון קופץ
+import Modal from "./Modal"; // ייבוא רכיב ה-Modal להצגת חלון קופץ
 
 const Appointments = () => {
-  // משתנה מצב לניהול הצגת החלון הקופץ
-  const [showModal, setShowModal] = useState(false);
-  
-  // פונקציה לפתיחת החלון הקופץ
-  const handleShowModal = () => setShowModal(true);
-  
-  // פונקציה לסגירת החלון הקופץ
-  const handleCloseModal = () => setShowModal(false);
-  
-  // פונקציה לשמירת התור והצגת הודעה
-  const handleSave = () => {
-    alert("תור נשמר בהצלחה!"); // הצגת הודעה למשתמש לאחר שמירת התור
-    handleCloseModal(); // סגירת החלון לאחר השמירה
+  const [modalType, setModalType] = useState(null);
+  const [selectedAppointment, setSelectedAppointment] = useState(null);
+
+  const handleShowModal = (type, appointment = null) => {
+    setModalType(type);
+    setSelectedAppointment(appointment);
   };
+
+  const handleCloseModal = () => {
+    setModalType(null);
+    setSelectedAppointment(null);
+  };
+
+  const handleSave = () => {
+    if (modalType === "edit") {
+      alert(`התור #${selectedAppointment?.id} עודכן בהצלחה!`);
+    } else {
+      alert("תור נוסף בהצלחה!");
+    }
+    handleCloseModal();
+  };
+
+  const appointments = [
+    { id: "4001", date: "08/01/2025", time: "09:00", description: "החלפת שמן מנוע", idNumber: "123456789", name: "יונתן לוי", carNumber: "123-45-678", treatmentId: "3001" },
+    { id: "4002", date: "08/01/2025", time: "10:00", description: "בדיקת מערכת בלמים", idNumber: "987654321", name: "שרה כהן", carNumber: "987-65-432", treatmentId: "3002" },
+  ];
 
   return (
     <div>
-      {/* כותרת ראשית */}
       <div className="text-center mb-4">
-        <h2>תורים</h2>
+        <h2 className="me-3">תורים</h2>
       </div>
 
-      {/* כפתורים לניהול התורים */}
       <div className="d-flex mb-3">
-        <button className="btn btn-primary me-3" onClick={handleShowModal}>
+        <button className="btn btn-primary me-3" onClick={() => handleShowModal("add")}>
           הוסף תור חדש
         </button>
-        <button className="btn btn-primary me-3" onClick={() => alert("חיפוש תור לפי תעודת זהות")}>
+        <button className="btn btn-primary me-3" onClick={() => handleShowModal("searchID")}>
           חיפוש לפי תעודת זהות
         </button>
-        <button className="btn btn-primary me-3" onClick={() => alert("הצגת תורים לפי תאריך")}>
+        <button className="btn btn-primary me-3" onClick={() => handleShowModal("searchDate")}>
           בחירת תאריך להצגת תורים
         </button>
       </div>
 
-      {/* טבלת הצגת התורים */}
       <div className="table-responsive">
         <table className="table table-striped">
           <thead>
@@ -54,79 +63,116 @@ const Appointments = () => {
             </tr>
           </thead>
           <tbody>
-            {/* נתוני תורים מדומים להצגה בטבלה */}
-            <tr>
-              <td>4001</td>
-              <td>08/01/2025</td>
-              <td>09:00</td>
-              <td>החלפת שמן מנוע</td>
-              <td>123456789</td>
-              <td>יונתן לוי</td>
-              <td>123-45-678</td>
-              <td>3001</td>
-              <td>
-                <button className="btn btn-primary btn-sm" onClick={() => alert("עריכת פרטי התור")}>עריכה</button>
-              </td>
-            </tr>
-            <tr>
-              <td>4002</td>
-              <td>08/01/2025</td>
-              <td>10:00</td>
-              <td>בדיקת מערכת בלמים</td>
-              <td>987654321</td>
-              <td>שרה כהן</td>
-              <td>987-65-432</td>
-              <td>3002</td>
-              <td>
-                <button className="btn btn-primary btn-sm" onClick={() => alert("עריכת פרטי התור")}>עריכה</button>
-              </td>
-            </tr>
-            {/* ניתן להוסיף שורות נוספות */}
+            {appointments.map((appointment) => (
+              <tr key={appointment.id}>
+                <td>{appointment.id}</td>
+                <td>{appointment.date}</td>
+                <td>{appointment.time}</td>
+                <td>{appointment.description}</td>
+                <td>{appointment.idNumber}</td>
+                <td>{appointment.name}</td>
+                <td>{appointment.carNumber}</td>
+                <td>{appointment.treatmentId}</td>
+                <td>
+                  <button className="btn btn-primary btn-sm" onClick={() => handleShowModal("edit", appointment)}>
+                    עריכה
+                  </button>
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
+      </div>
 
-        {/* חלון קופץ להוספת תור חדש */}
-  {/* חלון קופץ להוספת תור חדש */}
-  <Modal isOpen={showModal} onClose={handleCloseModal} onSave={handleSave}>
-        <h3>הוספת תור חדש</h3>
-        <form onSubmit={handleSave}>
+      {/* === מודלים שונים לפי `modalType` === */}
+
+      {/* מודל הוספת תור */}
+      {modalType === "add" && (
+        <Modal isOpen={true} onClose={handleCloseModal} onSave={handleSave}>
+          <h3>הוספת תור חדש</h3>
+          <form>
+            <div className="form-group mb-3">
+              <label>תאריך</label>
+              <input type="date" className="form-control" required />
+            </div>
+            <div className="form-group mb-3">
+              <label>שעה</label>
+              <input type="time" className="form-control" required />
+            </div>
+            <div className="form-group mb-3">
+              <label>תיאור</label>
+              <input type="text" className="form-control" placeholder="תיאור הטיפול" required />
+            </div>
+            <div className="form-group mb-3">
+              <label>תעודת זהות</label>
+              <input type="text" className="form-control" placeholder="הזן תעודת זהות" required />
+            </div>
+            <div className="form-group mb-3">
+              <label>שם לקוח</label>
+              <input type="text" className="form-control" placeholder="הזן שם לקוח" required />
+            </div>
+            <div className="form-group mb-3">
+              <label>מספר רישוי רכב</label>
+              <input type="text" className="form-control" placeholder="הזן מספר רישוי" required />
+            </div>
+          </form>
+        </Modal>
+      )}
+
+      {/* מודל חיפוש תור לפי ת"ז */}
+      {modalType === "searchID" && (
+        <Modal isOpen={true} onClose={handleCloseModal}>
+          <h3>חיפוש תורים לפי תעודת זהות</h3>
           <div className="form-group mb-3">
-            <label>תאריך</label>
+            <label>הזן תעודת זהות</label>
+            <input type="text" className="form-control" placeholder="תעודת זהות" required />
+          </div>
+        </Modal>
+      )}
+
+      {/* מודל חיפוש תור לפי תאריך */}
+      {modalType === "searchDate" && (
+        <Modal isOpen={true} onClose={handleCloseModal}>
+          <h3>חיפוש תורים לפי תאריך</h3>
+          <div className="form-group mb-3">
+            <label>בחר תאריך</label>
             <input type="date" className="form-control" required />
           </div>
+        </Modal>
+      )}
 
-          <div className="form-group mb-3">
-            <label>שעה</label>
-            <input type="time" className="form-control" required />
-          </div>
-
-          <div className="form-group mb-3">
-            <label>תיאור</label>
-            <input type="text" className="form-control" placeholder="תיאור הטיפול" required />
-          </div>
-
-          <div className="form-group mb-3">
-            <label>תעודת זהות</label>
-            <input type="text" className="form-control" placeholder="הזן תעודת זהות" required />
-          </div>
-
-          <div className="form-group mb-3">
-            <label>שם לקוח</label>
-            <input type="text" className="form-control" placeholder="הזן שם לקוח" required />
-          </div>
-
-          <div className="form-group mb-3">
-            <label>מספר רישוי רכב</label>
-            <input type="text" className="form-control" placeholder="הזן מספר רישוי" required />
-          </div>
-
-          {/* כפתורים */}
-          <div className="modal-buttons">
-
-          </div>
-        </form>
-      </Modal>
-      </div>
+      {/* מודל עריכת תור */}
+      {modalType === "edit" && selectedAppointment && (
+        <Modal isOpen={true} onClose={handleCloseModal} onSave={handleSave}>
+          <h3>עריכת תור</h3>
+          <form>
+            <div className="form-group mb-3">
+              <label>תאריך</label>
+              <input type="date" className="form-control" defaultValue={selectedAppointment.date} required />
+            </div>
+            <div className="form-group mb-3">
+              <label>שעה</label>
+              <input type="time" className="form-control" defaultValue={selectedAppointment.time} required />
+            </div>
+            <div className="form-group mb-3">
+              <label>תיאור</label>
+              <input type="text" className="form-control" defaultValue={selectedAppointment.description} required />
+            </div>
+            <div className="form-group mb-3">
+              <label>תעודת זהות</label>
+              <input type="text" className="form-control" defaultValue={selectedAppointment.idNumber} required />
+            </div>
+            <div className="form-group mb-3">
+              <label>שם לקוח</label>
+              <input type="text" className="form-control" defaultValue={selectedAppointment.name} required />
+            </div>
+            <div className="form-group mb-3">
+              <label>מספר רישוי רכב</label>
+              <input type="text" className="form-control" defaultValue={selectedAppointment.carNumber} required />
+            </div>
+          </form>
+        </Modal>
+      )}
     </div>
   );
 };

@@ -1,4 +1,5 @@
-.header {
+.header1 {
+  direction: ltr;
   width: 100%;
   display: flex;
   justify-content: space-between;

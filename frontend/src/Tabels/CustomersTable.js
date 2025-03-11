@@ -1,53 +1,49 @@
 import React, { useState } from "react";
 import Modal from "./Modal"; // ייבוא רכיב ה-Modal לשימוש בהצגת חלון קופץ
 
-/**
- * רכיב הלקוחות (Customers)
- * מציג טבלת לקוחות, ומאפשר פתיחת חלון קופץ להוספת לקוח חדש ורכב.
- */
 const Customers = () => {
-  // State לניהול פתיחה וסגירה של חלון המודל
-  const [showModal, setShowModal] = useState(false);
+  const [modalType, setModalType] = useState(null);
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
 
-  // פונקציה לפתיחת חלון המודל
-  const handleShowModal = () => setShowModal(true);
-
-  // פונקציה לסגירת חלון המודל
-  const handleCloseModal = () => setShowModal(false);
-
-  // פונקציה המדמה שמירת נתונים (תוכל להוסיף לוגיקה אמיתית מאחורי הקלעים)
-  const handleSave = () => {
-    alert("לקוח ורכב נוספו בהצלחה!"); // הודעה למשתמש
-    handleCloseModal(); // סגירת החלון לאחר שמירה
+  const handleShowModal = (type, customer = null) => {
+    setModalType(type);
+    setSelectedCustomer(customer);
   };
+
+  const handleCloseModal = () => {
+    setModalType(null);
+    setSelectedCustomer(null);
+  };
+
+  const handleSave = () => {
+    if (modalType === "edit") {
+      alert(`הפרטים של ${selectedCustomer?.name} עודכנו בהצלחה!`);
+    } else {
+      alert("לקוח נוסף בהצלחה!");
+    }
+    handleCloseModal();
+  };
+
+  const customers = [
+    { id: 1, name: "יונתן לוי", idNumber: "123456789", phone: "050-123-4567", email: "yonatan@example.com", status: "פעיל", carNumber: "123-45-678" },
+    { id: 2, name: "שרה כהן", idNumber: "987654321", phone: "052-987-6543", email: "sara@example.com", status: "לא פעיל", carNumber: "987-65-432" },
+  ];
 
   return (
     <div>
-      {/* כותרת ראשית של הדף */}
       <div className="text-center">
-        <h2>לקוחות</h2>
+        <h2 className="me-3">לקוחות</h2>
       </div>
 
-      {/* כפתורי פעולות */}
       <div className="d-flex mb-3">
-        {/* כפתור לפתיחת המודל */}
-        <button
-          className="btn btn-primary me-3"
-          onClick={handleShowModal} // פתיחת חלון המודל
-        >
-          הוספת לקוח ורכב
+        <button className="btn btn-primary me-3" onClick={() => handleShowModal("add")}>
+          הוסף לקוח חדש
         </button>
-
-        {/* כפתור המדמה חיפוש */}
-        <button
-          className="btn btn-primary me-3"
-          onClick={() => alert('חיפוש לפי ת"ז או שם')} // פעולה לדוגמה
-        >
+        <button className="btn btn-primary me-3" onClick={() => handleShowModal("searchID")}>
           חיפוש לפי ת"ז או שם
         </button>
       </div>
 
-      {/* טבלת הלקוחות */}
       <table className="table table-striped">
         <thead>
           <tr>
@@ -56,90 +52,116 @@ const Customers = () => {
             <th>ת"ז</th>
             <th>מספר טלפון</th>
             <th>מייל</th>
-            <th>סטטוס לקוח</th>
+            <th>סטטוס</th>
             <th>מספר רישוי רכב</th>
             <th>פעולה</th>
           </tr>
         </thead>
         <tbody>
-          {/* נתונים לדוגמה של לקוח */}
-          <tr>
-            <td>1</td>
-            <td>יונתן לוי</td>
-            <td>123456789</td>
-            <td>050-123-4567</td>
-            <td>yonatan@example.com</td>
-            <td className="text-success">פעיל</td>
-            <td>123-45-678</td>
-            <td>
-              {/* כפתור לעריכת פרטי הלקוח */}
-              <button className="btn btn-primary btn-sm">עריכה</button>
-            </td>
-          </tr>
+          {customers.map((customer) => (
+            <tr key={customer.id}>
+              <td>{customer.id}</td>
+              <td>{customer.name}</td>
+              <td>{customer.idNumber}</td>
+              <td>{customer.phone}</td>
+              <td>{customer.email}</td>
+              <td className={customer.status === "פעיל" ? "text-success" : "text-danger"}>{customer.status}</td>
+              <td>{customer.carNumber}</td>
+              <td>
+                <button className="btn btn-primary btn-sm" onClick={() => handleShowModal("edit", customer)}>
+                  עריכה
+                </button>
+              </td>
+            </tr>
+          ))}
         </tbody>
       </table>
 
-      {/* שימוש ברכיב המודל (חלון קופץ) */}
-      <Modal isOpen={showModal} onClose={handleCloseModal} onSave={handleSave}>
-        <h3>הוספת לקוח ורכב</h3> {/* כותרת המודל */}
+      {/* === מודלים שונים === */}
 
-        {/* טופס להוספת לקוח */}
-        <form>
-          <div className="form-group mb-3">
-            <label>שם לקוח</label>
-            <input
-              type="text"
-              placeholder="הזן שם לקוח"
-              className="form-control"
-            />
-          </div>
+      {/* מודל הוספת לקוח חדש */}
+      {modalType === "add" && (
+        <Modal isOpen={true} onClose={handleCloseModal} onSave={handleSave}>
+          <h3>הוספת לקוח ורכב</h3>
+          <form>
+            <div className="form-group mb-3">
+              <label>שם לקוח</label>
+              <input type="text" className="form-control" placeholder="הזן שם לקוח" required />
+            </div>
+            <div className="form-group mb-3">
+              <label>תעודת זהות</label>
+              <input type="text" className="form-control" placeholder="הזן תעודת זהות" required />
+            </div>
+            <div className="form-group mb-3">
+              <label>מספר טלפון</label>
+              <input type="text" className="form-control" placeholder="הזן מספר טלפון" required />
+            </div>
+            <div className="form-group mb-3">
+              <label>מייל</label>
+              <input type="email" className="form-control" placeholder="הזן מייל" required />
+            </div>
+            <div className="form-group mb-3">
+              <label>סטטוס</label>
+              <select className="form-control" required>
+                <option value="active">פעיל</option>
+                <option value="inactive">לא פעיל</option>
+              </select>
+            </div>
+            <div className="form-group mb-3">
+              <label>מספר רישוי רכב</label>
+              <input type="text" className="form-control" placeholder="הזן מספר רישוי" required />
+            </div>
+          </form>
+        </Modal>
+      )}
 
+      {/* מודל חיפוש לקוח לפי ת"ז או שם */}
+      {modalType === "searchID" && (
+        <Modal isOpen={true} onClose={handleCloseModal}>
+          <h3>חיפוש לקוח לפי תעודת זהות או שם</h3>
           <div className="form-group mb-3">
-            <label>תעודת זהות</label>
-            <input
-              type="text"
-              placeholder="הזן תעודת זהות"
-              className="form-control"
-            />
+            <label>הזן ת"ז / שם</label>
+            <input type="text" className="form-control" placeholder="תעודת זהות / שם" required />
           </div>
+        </Modal>
+      )}
 
-          <div className="form-group mb-3">
-            <label>מספר טלפון</label>
-            <input
-              type="text"
-              placeholder="הזן מספר טלפון"
-              className="form-control"
-            />
-          </div>
-
-          <div className="form-group mb-3">
-            <label>מייל</label>
-            <input
-              type="email"
-              placeholder="הזן מייל"
-              className="form-control"
-            />
-          </div>
-
-          <div className="form-group mb-3">
-            <label>סטטוס לקוח</label>
-            <select className="form-control">
-              <option value="active">פעיל</option>
-              <option value="inactive">לא פעיל</option>
-            </select>
-          </div>
-
-          <div className="form-group mb-3">
-            <label>מספר רישוי רכב</label>
-            <input  
-              type="text"
-              placeholder="הזן תאריך"
-              className="form-control"
-            />
-          </div>
-        </form>
-      </Modal>
-    </div>      
+      {/* מודל עריכת לקוח */}
+      {modalType === "edit" && selectedCustomer && (
+        <Modal isOpen={true} onClose={handleCloseModal} onSave={handleSave}>
+          <h3>עריכת פרטי לקוח</h3>
+          <form>
+            <div className="form-group mb-3">
+              <label>שם לקוח</label>
+              <input type="text" className="form-control" defaultValue={selectedCustomer.name} required />
+            </div>
+            <div className="form-group mb-3">
+              <label>תעודת זהות</label>
+              <input type="text" className="form-control" defaultValue={selectedCustomer.idNumber} required />
+            </div>
+            <div className="form-group mb-3">
+              <label>מספר טלפון</label>
+              <input type="text" className="form-control" defaultValue={selectedCustomer.phone} required />
+            </div>
+            <div className="form-group mb-3">
+              <label>מייל</label>
+              <input type="email" className="form-control" defaultValue={selectedCustomer.email} required />
+            </div>
+            <div className="form-group mb-3">
+              <label>סטטוס</label>
+              <select className="form-control" defaultValue={selectedCustomer.status} required>
+                <option value="פעיל">פעיל</option>
+                <option value="לא פעיל">לא פעיל</option>
+              </select>
+            </div>
+            <div className="form-group mb-3">
+              <label>מספר רישוי רכב</label>
+              <input type="text" className="form-control" defaultValue={selectedCustomer.carNumber} required />
+            </div>
+          </form>
+        </Modal>
+      )}
+    </div>
   );
 };
 

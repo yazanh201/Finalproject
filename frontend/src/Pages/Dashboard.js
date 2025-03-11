@@ -110,7 +110,12 @@ const Dashboard = () => {
   return (
     <div className="dashboard-container">
       {/* כותרת עליונה */}
-      <header className="header bg-light text-dark py-2 px-4 d-flex align-items-center">
+      <header className="header bg-light text-dark py-2x px-4 d-flex align-items-center">
+      <div>
+      <button className="btn" onClick={() => navigate("/AdvancedDashboard")}>
+      לוח ניהול מתקדם
+      </button>
+    </div>        
         <div className="container text-center   ">
           {/* הצגת כותרת ותפקיד המשתמש */}
           <h4 className="m-0 py-2" id="dash">Dashboard</h4>
@@ -126,7 +131,7 @@ const Dashboard = () => {
 
       <div className="d-flex">
         {/* תפריט צדדי */}
-        <nav className="sidebar bg-dark text-light p-1 vh-100">
+        <nav className="sidebar1 text-light p-1">
           <ul className="nav flex-column">
             {/* תפריט מנהל */}
             {role === "admin" && (
@@ -146,7 +151,7 @@ const Dashboard = () => {
                   <button className="btn btn-dark " onClick={() => setActiveView("Inquiries")}>פניות</button>
                 </li>
                 <li className="nav-item mb-2">
-                  <button className="btn btn-dark " onClick={() => setActiveView("CarOrders ")}>הזמנות לרכבים</button>
+                  <button className="btn btn-dark " onClick={() => setActiveView("CarOrders")}>הזמנות לרכבים</button>
                 </li>
                 <li className="nav-item mb-2">
                   <button className="btn btn-dark " onClick={() => setActiveView("Appointments")}>תורים</button>
@@ -171,10 +176,12 @@ const Dashboard = () => {
         </nav>
 
         {/* תוכן מרכזי */}
-        <main className="main-content flex-grow-1 p-4">
+        <main className="main-content flex-grow-1 p-5">
           {renderContent()}
         </main>
+        
       </div>
+      
     </div>
   );
 };

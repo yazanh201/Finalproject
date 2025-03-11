@@ -1,144 +1,166 @@
-import React from "react";
+import React, { useState } from "react";
+import Modal from "./Modal"; // ייבוא רכיב ה-Modal להצגת חלון קופץ
 
-const Inquiries = () => (
-  <div>
-    {/* כותרת הדף */}
-    <div className="text-center mb-4">
-      <h2>פניות</h2>
-    </div>
+const Inquiries = () => {
+  const [modalType, setModalType] = useState(null);
+  const [selectedInquiry, setSelectedInquiry] = useState(null);
 
-    {/* כפתור חיפוש */}
-    <div className="d-flex mb-3">
-      <button
-        className="btn btn-primary"
-        onClick={() => alert(" חיפוש לפי מספר טלפון")}
-      >
-        חיפוש לפי מספר טלפון או שם
-      </button>
-      <button
-        className="btn btn-primary me-3"
-        onClick={() => alert("הוספת לקוח חדש")}
-      >
-        הוספת פנייה
-      </button>
-    </div>
+  const handleShowModal = (type, inquiry = null) => {
+    setModalType(type);
+    setSelectedInquiry(inquiry);
+  };
 
-    {/* טבלת הפניות */}
-    <div className="table-responsive">
-      <table className="table table-striped">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>מספר פנייה</th>
-            <th>שם לקוח</th>
-            <th>מייל</th>
-            <th>מספר טלפון</th>
-            <th>תאריך פנייה</th>
-            <th>תיאור פנייה</th>
-            <th>סטטוס פנייה</th>
-            <th>פעולה</th>
-          </tr>
-        </thead>
-        <tbody>
-          {/* פנייה 1 */}
-          <tr>
-            <td>1</td>
-            <td>001</td>
-            <td>יונתן לוי</td>
-            <td>yonatan.levi@example.com</td>
-            <td>050-1234567</td>
-            <td>07/01/2025</td>
-            <td>רעש במנוע</td>
-            <td className="text-success">פתוחה</td>
-            <td>
-              <button
-                className="btn btn-primary btn-sm"
-                onClick={() => alert("עריכת פרטי הפנייה")}
-              >
-                עדכון
-              </button>
-            </td>
-          </tr>
-          {/* פנייה 2 */}
-          <tr>
-            <td>2</td>
-            <td>002</td>
-            <td>שרה כהן</td>
-            <td>sara.kohen@example.com</td>
-            <td>052-9876543</td>
-            <td>07/01/2025</td>
-            <td>החלפת שמן</td>
-            <td className="text-success">פתוחה</td>
-            <td>
-              <button
-                className="btn btn-primary btn-sm"
-                onClick={() => alert("עריכת פרטי הפנייה")}
-              >
-                עדכון
-              </button>
-            </td>
-          </tr>
-          {/* פנייה 3 */}
-          <tr>
-            <td>3</td>
-            <td>003</td>
-            <td>אבי מזרחי</td>
-            <td>avi.mizrahi@example.com</td>
-            <td>054-8765432</td>
-            <td>07/01/2025</td>
-            <td>בדיקת בלמים</td>
-            <td className="text-danger">סגורה</td>
-            <td>
-              <button
-                className="btn btn-primary btn-sm"
-                onClick={() => alert("עריכת פרטי הפנייה")}
-              >
-                עדכון
-              </button>
-            </td>
-          </tr>
-          {/* פנייה 4 */}
-          <tr>
-            <td>4</td>
-            <td>004</td>
-            <td>נועה ישראלי</td>
-            <td>noa.israeli@example.com</td>
-            <td>053-5678901</td>
-            <td>08/01/2025</td>
-            <td>טיפול שנתי</td>
-            <td className="text-success">פתוחה</td>
-            <td>
-              <button
-                className="btn btn-primary btn-sm"
-                onClick={() => alert("עריכת פרטי הפנייה")}
-              >
-                עדכון
-              </button>
-            </td>
-          </tr>
-          {/* פנייה 5 */}
-          <tr>
-            <td>5</td>
-            <td>005</td>
-            <td>דוד רפאל</td>
-            <td>david.rafael@example.com</td>
-            <td>052-4567890</td>
-            <td>08/01/2025</td>
-            <td>החלפת מצבר</td>
-            <td className="text-success">פתוחה</td>
-            <td>
-              <button
-                className="btn btn-primary btn-sm"
-                onClick={() => alert("עריכת פרטי הפנייה")}
-              >
-                עדכון
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+  const handleCloseModal = () => {
+    setModalType(null);
+    setSelectedInquiry(null);
+  };
+
+  const handleSave = () => {
+    if (modalType === "edit") {
+      alert(`הפרטים של הפנייה #${selectedInquiry?.id} עודכנו בהצלחה!`);
+    } else {
+      alert("פנייה נוספה בהצלחה!");
+    }
+    handleCloseModal();
+  };
+
+  const inquiries = [
+    { id: "001", name: "יונתן לוי", email: "yonatan.levi@example.com", phone: "050-1234567", date: "07/01/2025", description: "רעש במנוע", status: "פתוחה" },
+    { id: "002", name: "שרה כהן", email: "sara.kohen@example.com", phone: "052-9876543", date: "08/01/2025", description: "החלפת שמן", status: "סגורה" },
+  ];
+
+  return (
+    <div>
+      <div className="text-center mb-4">
+        <h2 className="me-3">פניות</h2>
+      </div>
+
+      <div className="d-flex mb-3">
+        <button className="btn btn-primary me-3" onClick={() => handleShowModal("add")}>
+          הוספת פנייה
+        </button>
+        <button className="btn btn-primary me-3" onClick={() => handleShowModal("search")}>
+          חיפוש לפי מספר טלפון או שם
+        </button>
+      </div>
+
+      <div className="table-responsive">
+        <table className="table table-striped">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>מספר פנייה</th>
+              <th>שם לקוח</th>
+              <th>מייל</th>
+              <th>מספר טלפון</th>
+              <th>תאריך פנייה</th>
+              <th>תיאור פנייה</th>
+              <th>סטטוס פנייה</th>
+              <th>פעולה</th>
+            </tr>
+          </thead>
+          <tbody>
+            {inquiries.map((inquiry, index) => (
+              <tr key={inquiry.id}>
+                <td>{index + 1}</td>
+                <td>{inquiry.id}</td>
+                <td>{inquiry.name}</td>
+                <td>{inquiry.email}</td>
+                <td>{inquiry.phone}</td>
+                <td>{inquiry.date}</td>
+                <td>{inquiry.description}</td>
+                <td className={inquiry.status === "פתוחה" ? "text-success" : "text-danger"}>
+                  {inquiry.status}
+                </td>
+                <td>
+                  <button className="btn btn-primary btn-sm" onClick={() => handleShowModal("edit", inquiry)}>
+                    עדכון
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* === מודלים שונים לפי `modalType` === */}
+
+      {/* מודל הוספת פנייה */}
+      {modalType === "add" && (
+        <Modal isOpen={true} onClose={handleCloseModal} onSave={handleSave}>
+          <h3>הוספת פנייה חדשה</h3>
+          <form>
+            <div className="form-group mb-3">
+              <label>שם לקוח</label>
+              <input type="text" className="form-control" placeholder="הזן שם לקוח" required />
+            </div>
+            <div className="form-group mb-3">
+              <label>מייל</label>
+              <input type="email" className="form-control" placeholder="הזן מייל" required />
+            </div>
+            <div className="form-group mb-3">
+              <label>מספר טלפון</label>
+              <input type="text" className="form-control" placeholder="הזן מספר טלפון" required />
+            </div>
+            <div className="form-group mb-3">
+              <label>תיאור פנייה</label>
+              <textarea className="form-control" placeholder="פרטי הפנייה" required />
+            </div>
+            <div className="form-group mb-3">
+              <label>סטטוס פנייה</label>
+              <select className="form-control" required>
+                <option value="פתוחה">פתוחה</option>
+                <option value="סגורה">סגורה</option>
+              </select>
+            </div>
+          </form>
+        </Modal>
+      )}
+
+      {/* מודל חיפוש פנייה לפי מספר טלפון או שם */}
+      {modalType === "search" && (
+        <Modal isOpen={true} onClose={handleCloseModal}>
+          <h3>חיפוש פנייה</h3>
+          <div className="form-group mb-3">
+            <label>מספר טלפון או שם</label>
+            <input type="text" className="form-control" placeholder="הזן מספר טלפון או שם" required />
+          </div>
+        </Modal>
+      )}
+
+      {/* מודל עריכת פנייה */}
+      {modalType === "edit" && selectedInquiry && (
+        <Modal isOpen={true} onClose={handleCloseModal} onSave={handleSave}>
+          <h3>עריכת פנייה</h3>
+          <form>
+            <div className="form-group mb-3">
+              <label>שם לקוח</label>
+              <input type="text" className="form-control" defaultValue={selectedInquiry.name} required />
+            </div>
+            <div className="form-group mb-3">
+              <label>מייל</label>
+              <input type="email" className="form-control" defaultValue={selectedInquiry.email} required />
+            </div>
+            <div className="form-group mb-3">
+              <label>מספר טלפון</label>
+              <input type="text" className="form-control" defaultValue={selectedInquiry.phone} required />
+            </div>
+            <div className="form-group mb-3">
+              <label>תיאור פנייה</label>
+              <textarea className="form-control" defaultValue={selectedInquiry.description} required />
+            </div>
+            <div className="form-group mb-3">
+              <label>סטטוס פנייה</label>
+              <select className="form-control" defaultValue={selectedInquiry.status} required>
+                <option value="פתוחה">פתוחה</option>
+                <option value="סגורה">סגורה</option>
+              </select>
+            </div>
+          </form>
+        </Modal>
+      )}
     </div>
-  </div>
-);
+  );
+};
 
 export default Inquiries;

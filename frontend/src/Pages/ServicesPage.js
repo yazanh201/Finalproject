@@ -60,7 +60,7 @@ const Services = () => {
     <Header/>
     <section className='hero2 d-flex align-items-center justify-content-center'>
       <div className="text-center text-white">
-        <h1 className="display-4">השירותים שלנו במוסך MotorSport</h1>
+        <h1 className="display-4 ">השירותים שלנו במוסך MotorSport</h1>
         <p className="lead">
           מגוון שירותים מקצועיים לרכב שלך: אבחון תקלות, טיפולים תקופתיים, החלפת צמיגים ועוד
         </p>
@@ -74,7 +74,7 @@ const Services = () => {
     <section className="services bg-dark py-5">
       <div className="container">
         <div className="text-center mb-5">
-          <h2 className="text-white">השירותים שלנו</h2>
+          <h2 className="text-white me-3">השירותים שלנו</h2>
           <p className="text-muted">מה אנחנו עושים</p>
         </div>
         {/* רינדור של כל השירותים מתוך המערך */}
