@@ -19,10 +19,10 @@ function Footer() {
           <div className="col-md-6">
             <h4>צור קשר</h4>
             <p>
-              <strong>כתובת:</strong> רחוב ראשי 123, עיר, מדינה
+              <strong>כתובת:</strong> גיימס ווט 9 , חיפה
             </p>
             <p>
-              <strong>טלפון:</strong> +972 50 123 4567
+              <strong>טלפון:</strong> +972 0499301
             </p>
             <h5>שעות פעילות:</h5>
             <ul className="list-unstyled">
@@ -34,10 +34,10 @@ function Footer() {
 
           {/* עמודת מפה */}
           <div className="col-md-6">
-            <h4>מפת המוסך</h4>
+            <h4 className='mt-5 text-end'>מפת המוסך</h4>
             <iframe
               title="Google Map"
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3151.835434509406!2d144.95373531531695!3d-37.81720997975171!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6ad642af0f11fd81%3A0xf5779f30c0b90f1b!2sSMC%20Autos%20Garage!5e0!3m2!1sen!2sil!4v1700000000000"
+               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3353.2196283230674!2d35.068256999999996!3d32.8129452!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x151db0ccee362cc3%3A0xca26975bcb5cda07!2z15In15nXmdee16Eg15XXldeYLCDXl9eZ16TXlA!5e0!3m2!1siw!2sil!4v1741179475823!5m2!1siw!2sil" 
               width="100%"
               height="200"
               style={{ border: 0 }}
@@ -52,7 +52,7 @@ function Footer() {
         <div className="row mt-4">
           <div className="col text-center">
             {/* הודעת זכויות יוצרים */}
-            <p>MotorSport, כל הזכויות שמורות &copy; 2024</p>
+            <p>  כל הזכויות שמורות  מוסך שירות מהיר&copy; 2024</p>
 
             {/* אייקונים של רשתות חברתיות */}
             <div className="social-icons mt-3">

@@ -12,8 +12,6 @@ function Header() {
   return (
     <div className="header1">
       <div className="logo">
-        <img src="/img/logo2.png" alt="Garage Logo" />  
-        {/* תמונה שמתייחסת לLOGO  */}
       </div>
       <div className="hamburger" onClick={toggleMenu}>
         <span className="line"></span>

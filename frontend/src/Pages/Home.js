@@ -96,21 +96,22 @@ function Home() {
       </section>
 
       {/* אזור "אודותינו" */}
-      <section className="about bg-white py-5">
-        <div className="container text-center">
+      <section className="about bg-dark py-5">
+        <div className="container  text-center">
           {/* כותרת "אודותינו" */}
-          <h2 className="mb-4 me-2">אודותינו</h2>
+          <h2 style={{ color: "white" }} className="mb-4 me-2">אודותינו</h2>
 
           {/* תיאור קצר על המוסך */}
-          <p className="lead">
-            במוסך SMC אנו מספקים שירותי תיקונים ותחזוקה איכותיים לרכב כבר מעל 20 שנה,
-            הצוות המקצועי שלנו מחויב להבטיח שהרכב שלך יפעל בצורה הטובה ביותר.
-          </p>
+          <p style={{ color: "white" }}>
+  מוסך מקצועי ואמין המציע שירותי תיקון, תחזוקה ושדרוג לכל סוגי הרכבים, עם דגש על אמינות, מהירות ושירות אישי.  
+  אצלנו תקבלו פתרונות רכב מתקדמים, ציוד חדיש וצוות מיומן הדואג לביצוע איכותי ללא פשרות
+</p>
+
         </div>
       </section>
 
       {/* טופס יצירת קשר */}
-      <section className="contact-form-section bg-light py-5">
+      <section className="contact-form-section bg-dark py-5">
         <div className="container">
           <div className="row justify-content-center">
             <div className="col-lg-10">

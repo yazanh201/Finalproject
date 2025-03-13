@@ -73,3 +73,107 @@
   max-width: 300px; /* מקסימום רוחב לכרטיס */
   min-width: 250px; /* מינימום רוחב לכרטיס */
 }
+
+/* 🎨 עיצוב החלק העליון של העמוד */
+.hero-about {
+  position: relative;
+  text-align: center;
+}
+
+.hero-image {
+  max-height: 400px;
+  object-fit: cover;
+}
+
+.hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6); /* אפקט כהה מעל התמונה */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  padding: 20px;
+}
+
+.hero-title {
+  font-size: 36px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.hero-subtitle {
+  font-size: 20px;
+  font-weight: 300;
+}
+
+/* 🔹 כותרת אודותינו */
+.about-title {
+  font-size: 32px;
+  font-weight: bold;
+  color: #162447;
+}
+
+/* 📝 תיאור קצר בעיצוב יפה */
+.about-description {
+  font-size: 18px;
+  line-height: 1.8;
+  color: #555;
+  max-width: 700px;
+  margin: auto;
+}
+
+.highlight-text {
+  color: #007bff;
+  font-weight: bold;
+}
+
+/* 💠 עיצוב כרטיסים */
+.service-card {
+  background-color: #162447;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  color: white;
+  text-align: right;
+}
+
+.service-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.4);
+}
+
+.card-title {
+  font-size: 22px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.card-text {
+  font-size: 16px;
+  line-height: 1.8;
+}
+
+/* 🎯 קריאה לפעולה */
+.call-to-action {
+  margin-top: 50px;
+}
+
+.call-to-action .btn {
+  background-color: #007bff;
+  padding: 12px 20px;
+  border-radius: 5px;
+  font-size: 18px;
+  font-weight: bold;
+  color: white;
+  transition: background-color 0.3s;
+}
+
+.call-to-action .btn:hover {
+  background-color: #0056b3;
+}
