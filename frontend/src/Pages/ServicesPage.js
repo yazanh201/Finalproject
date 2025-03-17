@@ -2,6 +2,7 @@ import React from 'react';
 import './ServicesPage.css';
 import Header from '../components/Header';
 import Footer from '../components/footer';
+import ChatBot from '../components/ChatBot';
 
 // מערך שמכיל את כל הנתונים על השירותים
 const servicesData = [
@@ -132,6 +133,7 @@ const Services = () => {
   </div>
 </section>
     </section>
+    <ChatBot/>
     <Footer/>
     </>
   );

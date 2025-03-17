@@ -57,9 +57,11 @@ const Dashboard = () => {
   return (
     <div className={styles.dashboardContainer}>
       <header className={styles.header}>
-        <button className={styles.advancedDashboardBtn} onClick={() => navigate("/AdvancedDashboard")}>
-          לוח ניהול מתקדם
-        </button>
+      {role === "admin" && (
+      <button className={styles.advancedDashboardBtn} onClick={() => navigate("/AdvancedDashboard")}>
+        לוח ניהול מתקדם
+      </button>
+    )}
         <div className={styles.dashboardTitle}>
           <h4>Dashboard</h4>
           <h5>תפקיד: {role === "admin" ? "מנהל" : "עובד"}</h5>

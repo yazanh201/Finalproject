@@ -19,6 +19,7 @@ const AdvancedDashboard = () => {
     const [message, setMessage] = useState("");
     const [phoneNumber, setPhoneNumber] = useState("");
     const [sendToAll, setSendToAll] = useState(false);
+    const [recommendedCars, setRecommendedCars] = useState([]);
 
     useEffect(() => {
         setStats([
@@ -42,10 +43,46 @@ const AdvancedDashboard = () => {
         ]);
     }, []);
 
+    // 🔹 חישוב רכבים מומלצים לטיפול
+    useEffect(() => {
+        const today = new Date();
+
+        const cars = [
+            { id: 1, owner: "ישראל כהן", plateNumber: "123-45-678", lastServiceDate: "2025-08-10", lastKm: 20000, avgMonthlyKm: 2000 },
+            { id: 2, owner: "דני לוי", plateNumber: "987-65-432", lastServiceDate: "2023-06-15", lastKm: 45000, avgMonthlyKm: 1800 },
+            { id: 3, owner: "מיכל לוי", plateNumber: "789-12-345", lastServiceDate: "2023-10-01", lastKm: 30000, avgMonthlyKm: 2200 },
+        ];
+
+        const filteredCars = cars.map((car) => {
+            const lastServiceDate = new Date(car.lastServiceDate);
+
+            const monthsSinceService =
+                (today.getFullYear() - lastServiceDate.getFullYear()) * 12 +
+                (today.getMonth() - lastServiceDate.getMonth());
+
+            const estimatedKm = car.lastKm + monthsSinceService * car.avgMonthlyKm;
+
+            const needsService = monthsSinceService >= 6 || estimatedKm - car.lastKm >= 15000;
+
+            return needsService ? {
+                plateNumber: car.plateNumber,
+                owner: car.owner,
+                estimatedKm: estimatedKm.toLocaleString(), 
+                monthsSinceService
+            } : null;
+        }).filter(car => car !== null);
+
+        setRecommendedCars(filteredCars);
+    }, []);
+
     const showTable = (key) => {
         let data = [];
         let title = "";
         switch (key) {
+            case "recommendedCars":
+                data = recommendedCars;
+                title = "רכבים מומלצים לבדיקה";
+                break;
             case "newCustomers":
                 data = [
                     { name: "ישראל כהן", phone: "050-1234567", joined: "15/03/2025" },
@@ -84,9 +121,11 @@ const AdvancedDashboard = () => {
                 <button className={styles.backBtn} onClick={goToDashboard}>⬅️ חזור לדשבורד</button>
             </header>
 
-            {/* 🔹 Sidebar */}
             <aside className={styles.sidebar}>
                 <button className={styles.sendMessageBtn} onClick={() => setIsModalOpen(true)}>📩 שליחת הודעות</button>
+                <button className={styles.sendMessageBtn} onClick={() => showTable("recommendedCars")}>🚗 רכבים מומלצים</button>
+                <button className={styles.sendMessageBtn}   >הורדת  דוח חודשי</button>
+
             </aside>
 
             <main className={styles.mainContent}>
@@ -135,28 +174,30 @@ const AdvancedDashboard = () => {
                     </section>
                 )}
             </main>
-
             {isModalOpen && (
-                <div className={styles.modalOverlay}>
-                    <div className={styles.modalContent}>
-                        <h3>📩 שליחת הודעה</h3>
-                        <label>
-                            <input type="checkbox" checked={sendToAll} onChange={() => setSendToAll(!sendToAll)} />
-                            שלח לכל הלקוחות
-                        </label>
-                        {!sendToAll && (
-                            <input type="text" placeholder="מספר טלפון" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} />
-                        )}
-                        <textarea placeholder="הקלד את ההודעה כאן..." value={message} onChange={(e) => setMessage(e.target.value)} />
-                        <div className={styles.modalButtons}>
-                            <button className={styles.sendBtn}>📤 שלח</button>
-                            <button className={styles.cancelBtn} onClick={() => setIsModalOpen(false)}>❌ סגור</button>
-                        </div>
-                    </div>
-                </div>
+    <div className={styles.modalOverlay}>
+        <div className={styles.modalContent}>
+            <h3>📩 שליחת הודעה</h3>
+            <label>
+                <input type="checkbox" checked={sendToAll} onChange={() => setSendToAll(!sendToAll)} />
+                שלח לכל הלקוחות
+            </label>
+            {!sendToAll && (
+                <input type="text" placeholder="מספר טלפון" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} />
             )}
+            <textarea placeholder="הקלד את ההודעה כאן..." value={message} onChange={(e) => setMessage(e.target.value)} />
+            <div className={styles.modalButtons}>
+                <button className={styles.sendBtn}>📤 שלח</button>
+                <button className={styles.cancelBtn} onClick={() => setIsModalOpen(false)}>❌ סגור</button>
+            </div>
+        </div>
+    </div>
+)}
         </div>
     );
 };
 
 export default AdvancedDashboard;
+
+
+

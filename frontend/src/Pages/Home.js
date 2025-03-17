@@ -2,6 +2,7 @@ import React from 'react';
 import Hero from './Hero';
 import Footer from '../components/footer';
 import Header from '../components/Header';
+import ChatBot from '../components/ChatBot';
 
 /**
  * רכיב Home - מייצג את דף הבית של האפליקציה.
@@ -159,6 +160,8 @@ function Home() {
           </div>
         </div>
       </section>
+      <ChatBot />
+
 
       <Footer /> {/* החלק התחתון של הדף */}
     </div>

@@ -9,13 +9,18 @@ import Dashboard from './Pages/Dashboard';
 import PrivateRoute from './PrivateRoute';
 import About from './Pages/About';
 import AdvancedDashboard from "./Pages/AdvancedDashboard"; // ✅ נכון
+import RecommendedCars from './recommendations/RecommendedCars';
+import ChatBot from "./components/ChatBot"; // ייבוא רכיב הצ'אט
+
 
 
 
 
 function App() {
 
+  
   return (
+    <>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/ServicesPage" element={<ServicesPage />} />
@@ -23,6 +28,7 @@ function App() {
         <Route path="/Services" element={<Services />} />
         <Route path='/Login' element={<Login/>} />
         <Route path="/About" element={<About />} />
+        <Route path="/RecommendedCars" element={<RecommendedCars />} /> 
         <Route path="/AdvancedDashboard" element={<AdvancedDashboard />} />
         <Route
             path="/Dashboard"
@@ -33,9 +39,13 @@ function App() {
             }
           />
       </Routes>
+
+      {/* הוספת הצ'אט שיופיע בכל העמודים */}
+    </>
   );
 }
 
 export default App;
+
 
 

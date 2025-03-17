@@ -2,6 +2,7 @@ import React from 'react';
 import Header from '../components/Header';
 import Footer from '../components/footer';
 import './ServicesPage.css';
+import ChatBot from '../components/ChatBot';
 
 function About() {
   return (
@@ -90,7 +91,7 @@ function About() {
 
         </div>
       </section>
-
+      <ChatBot/>
       <Footer />
     </>
   );

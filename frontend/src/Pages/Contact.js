@@ -1,6 +1,7 @@
 import React from 'react';
 import Header from '../components/Header';
 import Footer from '../components/footer';
+import ChatBot from '../components/ChatBot';
 /**
  * רכיב Contact
  * רכיב זה מציג את החלק של "צור קשר" בעמוד, כולל מידע ליצירת קשר עם המוסך
@@ -54,6 +55,7 @@ function Contact() {
           </div>
         </div>
       </section>
+      <ChatBot />
       <Footer />
       
     </>
