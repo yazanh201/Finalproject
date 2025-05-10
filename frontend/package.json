@@ -1,6 +1,7 @@
 {
   "name": "project-manual",
   "version": "1.0.0",
+  "proxy": "http://localhost:5000",
   "main": "index.js",
   "scripts": {
     "start": "react-scripts start",

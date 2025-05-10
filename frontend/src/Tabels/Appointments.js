@@ -1,33 +1,138 @@
-import React, { useState } from "react";
-import Modal from "./Modal"; // ייבוא רכיב ה-Modal להצגת חלון קופץ
+import React, { useState, useEffect } from "react";
+import Modal from "./Modal";
+import { useNavigate } from "react-router-dom";
 
-const Appointments = () => {
+
+const Appointments = ({ onSelectTreatment, filterAppointmentNumber }) => {
+  const navigate = useNavigate(); // ☑️ בתוך הקומפוננטה
   const [modalType, setModalType] = useState(null);
-  const [selectedAppointment, setSelectedAppointment] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [appointments, setAppointments] = useState([]);
+
+  const [selectedAppointment, setSelectedAppointment] = useState({
+    date: "",
+    time: "",
+    description: "",
+    idNumber: "",
+    name: "",
+    carNumber: "",
+    treatmentId: ""
+  });
+
+  useEffect(() => {
+    if (filterAppointmentNumber) {
+      fetch(`http://localhost:5000/api/appointments/by-number/${filterAppointmentNumber}`)
+        .then((res) => res.json())
+        .then((data) => {
+          const result = Array.isArray(data) ? data : [data];
+          setAppointments(result);
+        })
+        .catch((err) => console.error("❌ שגיאה בשליפת תור לפי מזהה:", err));
+    } else {
+      fetchAppointments();
+    }
+  }, [filterAppointmentNumber]);
+  
+
+  const fetchAppointments = async () => {
+    try {
+      const res = await fetch("http://localhost:5000/api/appointments");
+      const data = await res.json();
+      setAppointments(data);
+    } catch (error) {
+      console.error("❌ שגיאה בשליפת תורים:", error);
+    }
+  };
 
   const handleShowModal = (type, appointment = null) => {
     setModalType(type);
-    setSelectedAppointment(appointment);
+    if (type === "add") {
+      setSelectedAppointment({
+        date: "",
+        time: "",
+        description: "",
+        idNumber: "",
+        name: "",
+        carNumber: "",
+        treatmentId: ""
+      });
+    } else if (type === "edit" && appointment) {
+      setSelectedAppointment(appointment);
+    } else {
+      setSearchTerm("");
+    }
   };
 
   const handleCloseModal = () => {
     setModalType(null);
     setSelectedAppointment(null);
+    setSearchTerm("");
   };
 
-  const handleSave = () => {
-    if (modalType === "edit") {
-      alert(`התור #${selectedAppointment?.id} עודכן בהצלחה!`);
-    } else {
-      alert("תור נוסף בהצלחה!");
+  const handleSave = async () => {
+    try {
+      if (modalType === "edit") {
+        const res = await fetch(`http://localhost:5000/api/appointments/${selectedAppointment._id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(selectedAppointment),
+        });
+        const updated = await res.json();
+        setAppointments((prev) =>
+          prev.map((a) => (a._id === updated._id ? updated : a))
+        );
+        alert("✅ התור עודכן בהצלחה!");
+      } else {
+        const res = await fetch("http://localhost:5000/api/appointments", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(selectedAppointment),
+        });
+        const newOne = await res.json();
+        setAppointments((prev) => [newOne.appointment, ...prev]);
+        alert("✅ תור נוסף בהצלחה!");
+      }
+    } catch (err) {
+      console.error("❌ שגיאה בשמירה:", err);
+      alert("❌ שגיאה בשמירה");
     }
     handleCloseModal();
   };
 
-  const appointments = [
-    { id: "4001", date: "08/01/2025", time: "09:00", description: "החלפת שמן מנוע", idNumber: "123456789", name: "יונתן לוי", carNumber: "123-45-678", treatmentId: "3001" },
-    { id: "4002", date: "08/01/2025", time: "10:00", description: "בדיקת מערכת בלמים", idNumber: "987654321", name: "שרה כהן", carNumber: "987-65-432", treatmentId: "3002" },
-  ];
+  const handleSearchById = async () => {
+    try {
+      const res = await fetch(`http://localhost:5000/api/appointments/by-id/${searchTerm}`);
+      const data = await res.json();
+      setAppointments(data);
+      handleCloseModal();
+    } catch (error) {
+      console.error("❌ שגיאה בחיפוש לפי תעודת זהות:", error);
+    }
+  };
+
+  const handleSearchByDate = async () => {
+    try {
+      const res = await fetch(`http://localhost:5000/api/appointments/by-date/${searchTerm}`);
+      const data = await res.json();
+      setAppointments(data);
+      handleCloseModal();
+    } catch (error) {
+      console.error("❌ שגיאה בחיפוש לפי תאריך:", error);
+    }
+  };
+
+
+  const handleSearchByIdOrCar = async () => {
+    try {
+      const res = await fetch(`http://localhost:5000/api/appointments/search/${searchTerm}`);
+      const data = await res.json();
+      setAppointments(data);
+      handleCloseModal();
+    } catch (error) {
+      console.error("❌ שגיאה בחיפוש לפי ת\"ז או מספר רכב:", error);
+    }
+  };
+  
 
   return (
     <div>
@@ -40,10 +145,11 @@ const Appointments = () => {
           הוסף תור חדש
         </button>
         <button className="btn btn-primary me-3" onClick={() => handleShowModal("searchID")}>
-          חיפוש לפי תעודת זהות
+          חיפוש לפי ת"ז או מספר רישוי
         </button>
+
         <button className="btn btn-primary me-3" onClick={() => handleShowModal("searchDate")}>
-          בחירת תאריך להצגת תורים
+          חיפוש לפי תאריך
         </button>
       </div>
 
@@ -57,120 +163,112 @@ const Appointments = () => {
               <th>תיאור</th>
               <th>תעודת זהות</th>
               <th>שם לקוח</th>
-              <th>מספר רישוי רכב</th>
+              <th>מספר רישוי</th>
               <th>מזהה טיפול</th>
               <th>פעולה</th>
             </tr>
           </thead>
           <tbody>
-            {appointments.map((appointment) => (
-              <tr key={appointment.id}>
-                <td>{appointment.id}</td>
+          {appointments
+            ?.filter(appointment => appointment && appointment.appointmentNumber) // סינון רשומות חסרות
+            .map((appointment) => (
+              <tr key={appointment._id || appointment.treatment?._id || Math.random()}>
+                <td>{appointment.appointmentNumber}</td>
                 <td>{appointment.date}</td>
                 <td>{appointment.time}</td>
                 <td>{appointment.description}</td>
                 <td>{appointment.idNumber}</td>
                 <td>{appointment.name}</td>
                 <td>{appointment.carNumber}</td>
-                <td>{appointment.treatmentId}</td>
                 <td>
-                  <button className="btn btn-primary btn-sm" onClick={() => handleShowModal("edit", appointment)}>
+                  {appointment.treatment?.treatmentId ? (
+                    <a
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        onSelectTreatment(appointment.appointmentNumber);
+                      }}
+                      style={{
+                        textDecoration: "underline",
+                        color: "blue",
+                        background: "none",
+                        border: "none",
+                        padding: 0,
+                        cursor: "pointer"
+                      }}
+                    >
+                      {appointment.treatment.treatmentId}
+                    </a>
+                  ) : '—'}
+                </td>
+
+
+                <td>
+                  <button
+                    className="btn btn-primary btn-sm"
+                    onClick={() => handleShowModal("edit", appointment)}
+                  >
                     עריכה
                   </button>
                 </td>
               </tr>
-            ))}
+          ))}
+
           </tbody>
         </table>
       </div>
 
-      {/* === מודלים שונים לפי `modalType` === */}
-
-      {/* מודל הוספת תור */}
-      {modalType === "add" && (
+      {/* מודלים */}
+      {(modalType === "add" || modalType === "edit") && (
         <Modal isOpen={true} onClose={handleCloseModal} onSave={handleSave}>
-          <h3>הוספת תור חדש</h3>
+          <h3>{modalType === "edit" ? "עריכת תור" : "הוספת תור חדש"}</h3>
           <form>
-            <div className="form-group mb-3">
-              <label>תאריך</label>
-              <input type="date" className="form-control" required />
-            </div>
-            <div className="form-group mb-3">
-              <label>שעה</label>
-              <input type="time" className="form-control" required />
-            </div>
-            <div className="form-group mb-3">
-              <label>תיאור</label>
-              <input type="text" className="form-control" placeholder="תיאור הטיפול" required />
-            </div>
-            <div className="form-group mb-3">
-              <label>תעודת זהות</label>
-              <input type="text" className="form-control" placeholder="הזן תעודת זהות" required />
-            </div>
-            <div className="form-group mb-3">
-              <label>שם לקוח</label>
-              <input type="text" className="form-control" placeholder="הזן שם לקוח" required />
-            </div>
-            <div className="form-group mb-3">
-              <label>מספר רישוי רכב</label>
-              <input type="text" className="form-control" placeholder="הזן מספר רישוי" required />
-            </div>
+            {["date", "time", "description", "idNumber", "name", "carNumber"].map((field) => (
+              <div className="form-group mb-3" key={field}>
+                <label>{{
+                  date: "תאריך",
+                  time: "שעה",
+                  description: "תיאור",
+                  idNumber: "תעודת זהות",
+                  name: "שם לקוח",
+                  carNumber: "מספר רישוי"
+                }[field]}</label>
+                <input
+                  type={field === "date" ? "date" : field === "time" ? "time" : "text"}
+                  className="form-control"
+                  value={selectedAppointment?.[field] || ""}
+                  onChange={(e) => setSelectedAppointment({ ...selectedAppointment, [field]: e.target.value })}
+                  required
+                />
+              </div>
+            ))}
           </form>
         </Modal>
       )}
 
-      {/* מודל חיפוש תור לפי ת"ז */}
       {modalType === "searchID" && (
-        <Modal isOpen={true} onClose={handleCloseModal}>
-          <h3>חיפוש תורים לפי תעודת זהות</h3>
-          <div className="form-group mb-3">
-            <label>הזן תעודת זהות</label>
-            <input type="text" className="form-control" placeholder="תעודת זהות" required />
-          </div>
+        <Modal isOpen={true} onClose={handleCloseModal} onSave={handleSearchByIdOrCar}>
+          <h3>חיפוש לפי ת"ז או מספר רכב</h3>
+          <input
+            type="text"
+            className="form-control"
+            placeholder="חיפוש לפי ת'ז או מספר רכב"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
         </Modal>
       )}
 
-      {/* מודל חיפוש תור לפי תאריך */}
+
       {modalType === "searchDate" && (
-        <Modal isOpen={true} onClose={handleCloseModal}>
-          <h3>חיפוש תורים לפי תאריך</h3>
-          <div className="form-group mb-3">
-            <label>בחר תאריך</label>
-            <input type="date" className="form-control" required />
-          </div>
-        </Modal>
-      )}
-
-      {/* מודל עריכת תור */}
-      {modalType === "edit" && selectedAppointment && (
-        <Modal isOpen={true} onClose={handleCloseModal} onSave={handleSave}>
-          <h3>עריכת תור</h3>
-          <form>
-            <div className="form-group mb-3">
-              <label>תאריך</label>
-              <input type="date" className="form-control" defaultValue={selectedAppointment.date} required />
-            </div>
-            <div className="form-group mb-3">
-              <label>שעה</label>
-              <input type="time" className="form-control" defaultValue={selectedAppointment.time} required />
-            </div>
-            <div className="form-group mb-3">
-              <label>תיאור</label>
-              <input type="text" className="form-control" defaultValue={selectedAppointment.description} required />
-            </div>
-            <div className="form-group mb-3">
-              <label>תעודת זהות</label>
-              <input type="text" className="form-control" defaultValue={selectedAppointment.idNumber} required />
-            </div>
-            <div className="form-group mb-3">
-              <label>שם לקוח</label>
-              <input type="text" className="form-control" defaultValue={selectedAppointment.name} required />
-            </div>
-            <div className="form-group mb-3">
-              <label>מספר רישוי רכב</label>
-              <input type="text" className="form-control" defaultValue={selectedAppointment.carNumber} required />
-            </div>
-          </form>
+        <Modal isOpen={true} onClose={handleCloseModal} onSave={handleSearchByDate}>
+          <h3>חיפוש לפי תאריך</h3>
+          <input
+            type="date"
+            className="form-control"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
         </Modal>
       )}
     </div>

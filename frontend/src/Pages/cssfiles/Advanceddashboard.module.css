@@ -4,39 +4,51 @@
     flex-direction: column;
     margin: 0 auto;
     background-color: #f8f9fa;
-}
-
-.dashboardHeader {
-    position: fixed;
-    top: 0;
-    width: 100%;
-    background-color: #2f3640;
-    color: white;
-    padding: 15px 25px;
+  }
+  
+  /* 🔷 Header */
+  .dashboardHeader {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    z-index: 1000;
-}
-
-.headerh2{
-    padding-right: 570px;
-}
-
-.backBtn {
-    background-color: #007bff;
+    background-color: #2d2d2d;
     color: white;
-    padding: 10px 15px;
-    border-radius: 5px;
-    font-size: 16px;
-    transition: background-color 0.3s;
+    padding: 15px 25px;
+    border-bottom: 2px solid #444;
+    flex-wrap: wrap;
+  }
+  
+  /* 🔷 כותרת */
+  .headerh2 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: bold;
+    text-align: center;
+    flex-grow: 1;
+  }
+  
+  /* 🔷 כפתור חזור */
+  .backBtn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: none;
     border: none;
+    color: #f1f1f1;
+    font-size: 16px;
+    font-weight: bold;
     cursor: pointer;
-}
-
-.backBtn:hover {
-    background-color: #0056b3;
-}
+    transition: color 0.2s ease-in-out;
+  }
+  
+  .backBtn:hover {
+    color: #fbc531; /* צבע זהב מודרני */
+  }
+  
+  .icon {
+    font-size: 18px;
+  }
+  
 
 .sidebar {
     position: fixed;

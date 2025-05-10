@@ -1,13 +1,60 @@
-import React, { useState } from "react";
-import Modal from "./Modal"; // ייבוא רכיב ה-Modal לשימוש בהצגת חלון קופץ
+import React, { useState, useEffect } from "react";
+import Modal from "./Modal"; 
+import axios from "axios";  
 
 const Customers = () => {
   const [modalType, setModalType] = useState(null);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
+  const [customers, setCustomers] = useState([]);
+  
+  // סטייטים לטופס
+  const [name, setName] = useState('');
+  const [idNumber, setIdNumber] = useState('');
+  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
+  const [status, setStatus] = useState('פעיל');
+  const [vehicleNumber, setvehicleNumber] = useState('');
+  
+  // סטייט לשדה חיפוש
+  const [searchQuery, setSearchQuery] = useState('');
+
+  useEffect(() => {
+    fetchCustomers();
+  }, []);
+
+  // שליפת כל הלקוחות
+  const fetchCustomers = async () => {
+    try {
+      const response = await axios.get('http://localhost:5000/api/customers');
+      setCustomers(response.data);
+    } catch (error) {
+      console.error('❌ שגיאה בשליפת לקוחות:', error.message);
+    }
+  };
 
   const handleShowModal = (type, customer = null) => {
     setModalType(type);
     setSelectedCustomer(customer);
+
+    if (type === 'add') {
+      // איפוס שדות להוספה
+      setName('');
+      setIdNumber('');
+      setPhone('');
+      setEmail('');
+      setStatus('פעיל');
+      setvehicleNumber('');
+    }
+
+    if (type === 'edit' && customer) {
+      // מילוי נתונים קיימים לעריכה
+      setName(customer.name);
+      setIdNumber(customer.idNumber);
+      setPhone(customer.phone);
+      setEmail(customer.email);
+      setStatus(customer.status);
+      setvehicleNumber(customer.vehicles && customer.vehicles.length > 0 ? customer.vehicles[0] : '');
+    }
   };
 
   const handleCloseModal = () => {
@@ -15,19 +62,53 @@ const Customers = () => {
     setSelectedCustomer(null);
   };
 
-  const handleSave = () => {
-    if (modalType === "edit") {
-      alert(`הפרטים של ${selectedCustomer?.name} עודכנו בהצלחה!`);
-    } else {
-      alert("לקוח נוסף בהצלחה!");
+  // הוספה או עדכון לקוח
+  const handleSave = async () => {
+    try {
+      const customerData = {
+        name,
+        idNumber,
+        phone,
+        email,
+        status,
+        vehicleNumber: [vehicleNumber],
+      };
+
+      if (modalType === "edit" && selectedCustomer) {
+        // עריכת לקוח קיים
+        await axios.put(`http://localhost:5000/api/customers/${selectedCustomer._id}`, customerData);
+        alert("✅ פרטי הלקוח עודכנו בהצלחה!");
+      } else {
+        // הוספת לקוח חדש
+        await axios.post('http://localhost:5000/api/customers', customerData);
+        alert("✅ לקוח נוסף בהצלחה!");
+      }
+
+      handleCloseModal();
+      fetchCustomers(); // רענון טבלה אחרי כל פעולה
+
+    } catch (error) {
+      console.error('❌ שגיאה בשמירה:', error.message);
+      alert('❌ שגיאה בשמירה');
     }
-    handleCloseModal();
   };
 
-  const customers = [
-    { id: 1, name: "יונתן לוי", idNumber: "123456789", phone: "050-123-4567", email: "yonatan@example.com", status: "פעיל", carNumber: "123-45-678" },
-    { id: 2, name: "שרה כהן", idNumber: "987654321", phone: "052-987-6543", email: "sara@example.com", status: "לא פעיל", carNumber: "987-65-432" },
-  ];
+  // פונקציה לחיפוש לקוח לפי ת"ז או שם
+  const handleSearch = async () => {
+    try {
+      if (searchQuery.trim() === '') {
+        fetchCustomers();
+        return;
+      }
+
+      const response = await axios.get(`http://localhost:5000/api/customers/search?query=${searchQuery}`);
+      setCustomers(response.data);
+      handleCloseModal();
+    } catch (error) {
+      console.error('❌ שגיאה בחיפוש:', error.message);
+      alert('❌ שגיאה בחיפוש');
+    }
+  };
 
   return (
     <div>
@@ -44,6 +125,7 @@ const Customers = () => {
         </button>
       </div>
 
+      {/* טבלת הלקוחות */}
       <table className="table table-striped">
         <thead>
           <tr>
@@ -58,15 +140,19 @@ const Customers = () => {
           </tr>
         </thead>
         <tbody>
-          {customers.map((customer) => (
-            <tr key={customer.id}>
-              <td>{customer.id}</td>
-              <td>{customer.name}</td>
-              <td>{customer.idNumber}</td>
-              <td>{customer.phone}</td>
-              <td>{customer.email}</td>
-              <td className={customer.status === "פעיל" ? "text-success" : "text-danger"}>{customer.status}</td>
-              <td>{customer.carNumber}</td>
+          {customers.map((customer, index) => (
+            <tr key={customer._id}>
+              <td>{index + 1}</td>
+              <td>{customer.name || '-'}</td>
+              <td>{customer.idNumber || '-'}</td>
+              <td>{customer.phone || '-'}</td>
+              <td>{customer.email || '-'}</td>
+              <td className={customer.status === "פעיל" ? "text-success" : "text-danger"}>
+                {customer.status || '-'}
+              </td>
+              <td>
+                {customer.vehicles && customer.vehicles.length > 0 ? customer.vehicles[0] : '-'}
+              </td>
               <td>
                 <button className="btn btn-primary btn-sm" onClick={() => handleShowModal("edit", customer)}>
                   עריכה
@@ -77,88 +163,92 @@ const Customers = () => {
         </tbody>
       </table>
 
-      {/* === מודלים שונים === */}
-
-      {/* מודל הוספת לקוח חדש */}
-      {modalType === "add" && (
+      {/* מודלים */}
+      {(modalType === "add" || modalType === "edit") && (
         <Modal isOpen={true} onClose={handleCloseModal} onSave={handleSave}>
-          <h3>הוספת לקוח ורכב</h3>
+          <h3>{modalType === "edit" ? "עריכת לקוח" : "הוספת לקוח ורכב"}</h3>
           <form>
             <div className="form-group mb-3">
               <label>שם לקוח</label>
-              <input type="text" className="form-control" placeholder="הזן שם לקוח" required />
+              <input
+                type="text"
+                className="form-control"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+              />
             </div>
             <div className="form-group mb-3">
               <label>תעודת זהות</label>
-              <input type="text" className="form-control" placeholder="הזן תעודת זהות" required />
+              <input
+                type="text"
+                className="form-control"
+                value={idNumber}
+                onChange={(e) => setIdNumber(e.target.value)}
+                required
+              />
             </div>
             <div className="form-group mb-3">
               <label>מספר טלפון</label>
-              <input type="text" className="form-control" placeholder="הזן מספר טלפון" required />
+              <input
+                type="text"
+                className="form-control"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                required
+              />
             </div>
             <div className="form-group mb-3">
               <label>מייל</label>
-              <input type="email" className="form-control" placeholder="הזן מייל" required />
+              <input
+                type="email"
+                className="form-control"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
             </div>
             <div className="form-group mb-3">
               <label>סטטוס</label>
-              <select className="form-control" required>
-                <option value="active">פעיל</option>
-                <option value="inactive">לא פעיל</option>
-              </select>
-            </div>
-            <div className="form-group mb-3">
-              <label>מספר רישוי רכב</label>
-              <input type="text" className="form-control" placeholder="הזן מספר רישוי" required />
-            </div>
-          </form>
-        </Modal>
-      )}
-
-      {/* מודל חיפוש לקוח לפי ת"ז או שם */}
-      {modalType === "searchID" && (
-        <Modal isOpen={true} onClose={handleCloseModal}>
-          <h3>חיפוש לקוח לפי תעודת זהות או שם</h3>
-          <div className="form-group mb-3">
-            <label>הזן ת"ז / שם</label>
-            <input type="text" className="form-control" placeholder="תעודת זהות / שם" required />
-          </div>
-        </Modal>
-      )}
-
-      {/* מודל עריכת לקוח */}
-      {modalType === "edit" && selectedCustomer && (
-        <Modal isOpen={true} onClose={handleCloseModal} onSave={handleSave}>
-          <h3>עריכת פרטי לקוח</h3>
-          <form>
-            <div className="form-group mb-3">
-              <label>שם לקוח</label>
-              <input type="text" className="form-control" defaultValue={selectedCustomer.name} required />
-            </div>
-            <div className="form-group mb-3">
-              <label>תעודת זהות</label>
-              <input type="text" className="form-control" defaultValue={selectedCustomer.idNumber} required />
-            </div>
-            <div className="form-group mb-3">
-              <label>מספר טלפון</label>
-              <input type="text" className="form-control" defaultValue={selectedCustomer.phone} required />
-            </div>
-            <div className="form-group mb-3">
-              <label>מייל</label>
-              <input type="email" className="form-control" defaultValue={selectedCustomer.email} required />
-            </div>
-            <div className="form-group mb-3">
-              <label>סטטוס</label>
-              <select className="form-control" defaultValue={selectedCustomer.status} required>
+              <select
+                className="form-control"
+                value={status}
+                onChange={(e) => setStatus(e.target.value)}
+                required
+              >
                 <option value="פעיל">פעיל</option>
                 <option value="לא פעיל">לא פעיל</option>
               </select>
             </div>
             <div className="form-group mb-3">
               <label>מספר רישוי רכב</label>
-              <input type="text" className="form-control" defaultValue={selectedCustomer.carNumber} required />
+              <input
+                type="text"
+                className="form-control"
+                value={vehicleNumber}
+                onChange={(e) => setvehicleNumber(e.target.value)}
+                required
+              />
             </div>
           </form>
+
+        </Modal>
+      )}
+
+      {modalType === "searchID" && (
+        <Modal isOpen={true} onClose={handleCloseModal} onSave={handleSearch}>
+          <h3>חיפוש לקוח לפי תעודת זהות או שם</h3>
+          <div className="form-group mb-3">
+            <label>הזן ת"ז / שם</label>
+            <input
+              type="text"
+              className="form-control"
+              placeholder="תעודת זהות / שם"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              required
+            />
+          </div>
         </Modal>
       )}
     </div>

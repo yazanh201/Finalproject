@@ -1,5 +1,5 @@
 import React from 'react';
-import './Hero.css'; // ייבוא קובץ ה-CSS
+import './cssfiles/Hero.css'; // ייבוא קובץ ה-CSS
 import Contact from './Contact';
 
 function Hero() {

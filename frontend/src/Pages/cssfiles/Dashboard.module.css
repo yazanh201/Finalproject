@@ -6,6 +6,7 @@
   direction: rtl;
 }
 
+/* ===== Header ===== */
 .header {
   position: fixed;
   top: 0;
@@ -20,6 +21,16 @@
   z-index: 1000;
 }
 
+.navbar-toggler {
+  background-color: transparent;
+  border: none;
+  color: white;
+  font-size: 28px;
+  cursor: pointer;
+  display: none;
+}
+
+/* Title section in the header */
 .dashboardTitle {
   text-align: center;
 }
@@ -34,7 +45,28 @@
   font-size: 14px;
 }
 
-.advancedDashboardBtn, .logoutBtn {
+/* Button group in header */
+.navbar-collapse {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.navbar-collapse.show {
+  display: flex;
+  flex-direction: column;
+  background-color: #2d2d2d;
+  position: absolute;
+  top: 70px;
+  right: 0;
+  width: 100%;
+  padding: 15px;
+  z-index: 999;
+}
+
+/* Header buttons */
+.advancedDashboardBtn,
+.logoutBtn {
   background-color: #0097e6;
   color: white;
   padding: 10px 15px;
@@ -42,24 +74,29 @@
   font-size: 16px;
   border: none;
   cursor: pointer;
-
+  transition: background-color 0.2s ease-in-out;
 }
 
 .logoutBtn {
   background-color: #e84118;
 }
 
+.advancedDashboardBtn:hover,
+.logoutBtn:hover {
+  opacity: 0.9;
+}
+
+/* ===== Sidebar ===== */
 .mainWrapper {
   display: flex;
   flex-grow: 1;
   margin-top: 70px;
 }
 
-/* 📌 Sidebar - תפריט צדדי קבוע */
 .sidebar {
   position: fixed;
   right: 0;
-  top: 70px; /* מרווח מה-Header */
+  top: 70px;
   width: 250px;
   height: calc(100vh - 70px);
   background-color: #333;
@@ -69,7 +106,6 @@
   direction: rtl;
 }
 
-/* כפתורי הניווט בתוך ה-Sidebar */
 .navList {
   list-style: none;
   padding: 0;
@@ -99,7 +135,7 @@
   background-color: #555;
 }
 
-/* 📌 עיצוב התוכן המרכזי */
+/* ===== Main Content ===== */
 .mainContent {
   flex-grow: 1;
   margin-right: 260px;
@@ -109,13 +145,22 @@
   text-align: center;
 }
 
-/* 📱 התאמה רספונסיבית */
+/* ===== Responsive ===== */
 @media (max-width: 768px) {
-  .sidebar {
-    width: 200px;
+  .navbar-toggler {
+    display: block;
   }
+
+  .navbar-collapse {
+    display: none;
+  }
+
   .mainContent {
     margin-right: 210px;
+  }
+
+  .sidebar {
+    width: 200px;
   }
 }
 
@@ -123,8 +168,50 @@
   .sidebar {
     width: 180px;
   }
+
   .mainContent {
     margin-right: 190px;
     padding: 15px;
   }
+
+  .dashboardTitle h4 {
+    font-size: 18px;
+  }
+
+  .dashboardTitle h5 {
+    font-size: 12px;
+  }
 }
+
+
+.headerActions {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.headerLink,
+.headerLinkLogout {
+  display: flex;
+  align-items: center;
+  color: #f1f1f1;
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: bold;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.2s ease-in-out;
+}
+
+.headerLink:hover,
+.headerLinkLogout:hover {
+  color: #fbc531; /* צבע זהב יפה */
+}
+
+.icon {
+  margin-left: 5px;
+  font-size: 18px;
+}
+
+

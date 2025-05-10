@@ -1,13 +1,40 @@
-import React, { useState } from "react";
-import Modal from "./Modal"; // ייבוא רכיב ה-Modal להצגת חלון קופץ
+import React, { useEffect, useState } from "react";
+import Modal from "./Modal";
 
 const Employees = () => {
+  const [employees, setEmployees] = useState([]);
   const [modalType, setModalType] = useState(null);
-  const [selectedEmployee, setSelectedEmployee] = useState(null);
+  const [selectedEmployee, setSelectedEmployee] = useState({
+    idNumber: "",
+    name: "",
+    position: "",
+    email: "",
+    phone: "",
+    status: "פעיל",
+  });
+
+  // שליפת עובדים מהשרת
+  useEffect(() => {
+    fetch("http://localhost:5000/api/employees")
+      .then((res) => res.json())
+      .then((data) => setEmployees(data))
+      .catch((err) => console.error("❌ שגיאה בשליפת עובדים:", err));
+  }, []);
 
   const handleShowModal = (type, employee = null) => {
     setModalType(type);
-    setSelectedEmployee(employee);
+    if (type === "add") {
+      setSelectedEmployee({
+        idNumber: "",
+        name: "",
+        position: "",
+        email: "",
+        phone: "",
+        status: "פעיל",
+      });
+    } else if (type === "edit" && employee) {
+      setSelectedEmployee(employee);
+    }
   };
 
   const handleCloseModal = () => {
@@ -15,19 +42,38 @@ const Employees = () => {
     setSelectedEmployee(null);
   };
 
-  const handleSave = () => {
-    if (modalType === "edit") {
-      alert(`העובד ${selectedEmployee?.fullName} עודכן בהצלחה!`);
-    } else {
-      alert("העובד נוסף בהצלחה!");
-    }
-    handleCloseModal();
-  };
+  const handleSave = async () => {
+    try {
+      const method = modalType === "edit" ? "PUT" : "POST";
+      const url =
+        modalType === "edit"
+          ? `http://localhost:5000/api/employees/${selectedEmployee._id}`
+          : "http://localhost:5000/api/employees";
 
-  const employees = [
-    { id: "5001", idNumber: "123456789", fullName: "יוסי כהן", role: "מכונאי", email: "yossi@example.com", phone: "050-123-4567", status: "פעיל" },
-    { id: "5002", idNumber: "987654321", fullName: "דנה לוי", role: "מנהלת משרד", email: "dana@example.com", phone: "052-987-6543", status: "פעיל" },
-  ];
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(selectedEmployee),
+      });
+
+      const data = await res.json();
+
+      if (modalType === "edit") {
+        setEmployees((prev) =>
+          prev.map((emp) => (emp._id === data._id ? data : emp))
+        );
+        alert("✅ עובד עודכן בהצלחה!");
+      } else {
+        setEmployees((prev) => [data, ...prev]); // ⬅️ data במקום data.employee
+        alert("✅ עובד נוסף בהצלחה!");
+      }
+
+      handleCloseModal();
+    } catch (err) {
+      console.error("❌ שגיאה בשמירת עובד:", err);
+      alert("❌ שגיאה בשמירת עובד");
+    }
+  };
 
   return (
     <div>
@@ -39,35 +85,32 @@ const Employees = () => {
         <button className="btn btn-primary me-3" onClick={() => handleShowModal("add")}>
           הוסף עובד חדש
         </button>
-        <button className="btn btn-primary me-3" onClick={() => handleShowModal("search")}>
-          חיפוש לפי תעודת זהות או שם
-        </button>
       </div>
 
       <div className="table-responsive">
         <table className="table table-striped">
           <thead>
             <tr>
-              <th>מזהה עובד</th>
-              <th>תעודת זהות</th>
+              <th>ת.ז</th>
               <th>שם מלא</th>
               <th>תפקיד</th>
               <th>אימייל</th>
-              <th>מספר טלפון</th>
+              <th>טלפון</th>
               <th>סטטוס</th>
               <th>פעולה</th>
             </tr>
           </thead>
           <tbody>
             {employees.map((employee) => (
-              <tr key={employee.id}>
-                <td>{employee.id}</td>
+              <tr key={employee._id}>
                 <td>{employee.idNumber}</td>
                 <td>{employee.fullName}</td>
                 <td>{employee.role}</td>
                 <td>{employee.email}</td>
                 <td>{employee.phone}</td>
-                <td className={employee.status === "פעיל" ? "text-success" : "text-danger"}>{employee.status}</td>
+                <td className={employee.status === "פעיל" ? "text-success" : "text-danger"}>
+                  {employee.status}
+                </td>
                 <td>
                   <button className="btn btn-primary btn-sm" onClick={() => handleShowModal("edit", employee)}>
                     עריכה
@@ -79,83 +122,37 @@ const Employees = () => {
         </table>
       </div>
 
-      {/* === מודלים שונים לפי `modalType` === */}
-
-      {/* מודל הוספת עובד */}
-      {modalType === "add" && (
+      {/* === מודל הוספה / עריכה === */}
+      {(modalType === "add" || modalType === "edit") && selectedEmployee && (
         <Modal isOpen={true} onClose={handleCloseModal} onSave={handleSave}>
-          <h3>הוספת עובד חדש</h3>
+          <h3>{modalType === "edit" ? "עריכת עובד" : "הוספת עובד חדש"}</h3>
           <form>
-            <div className="form-group mb-3">
-              <label>שם מלא</label>
-              <input type="text" className="form-control" placeholder="שם העובד" required />
-            </div>
-            <div className="form-group mb-3">
-              <label>תעודת זהות</label>
-              <input type="text" className="form-control" placeholder="תעודת זהות" required />
-            </div>
-            <div className="form-group mb-3">
-              <label>תפקיד</label>
-              <input type="text" className="form-control" placeholder="תפקיד העובד" required />
-            </div>
-            <div className="form-group mb-3">
-              <label>אימייל</label>
-              <input type="email" className="form-control" placeholder="אימייל העובד" required />
-            </div>
-            <div className="form-group mb-3">
-              <label>מספר טלפון</label>
-              <input type="text" className="form-control" placeholder="מספר טלפון" required />
-            </div>
+            {[
+              { label: "תעודת זהות", key: "idNumber" },
+              { label: "שם מלא", key: "fullName" },
+              { label: "תפקיד", key: "role" },
+              { label: "אימייל", key: "email", type: "email" },
+              { label: "טלפון", key: "phone" },
+            ].map(({ label, key, type = "text" }) => (
+              <div className="form-group mb-3" key={key}>
+                <label>{label}</label>
+                <input
+                  type={type}
+                  className="form-control"
+                  value={selectedEmployee[key] || ""}
+                  onChange={(e) => setSelectedEmployee({ ...selectedEmployee, [key]: e.target.value })}
+                  required
+                />
+              </div>
+            ))}
+
             <div className="form-group mb-3">
               <label>סטטוס</label>
-              <select className="form-control">
-                <option value="פעיל">פעיל</option>
-                <option value="לא פעיל">לא פעיל</option>
-              </select>
-            </div>
-          </form>
-        </Modal>
-      )}
-
-      {/* מודל חיפוש עובד לפי שם/תעודת זהות */}
-      {modalType === "search" && (
-        <Modal isOpen={true} onClose={handleCloseModal}>
-          <h3>חיפוש עובד</h3>
-          <div className="form-group mb-3">
-            <label>תעודת זהות או שם</label>
-            <input type="text" className="form-control" placeholder="הזן תעודת זהות או שם" required />
-          </div>
-        </Modal>
-      )}
-
-      {/* מודל עריכת עובד */}
-      {modalType === "edit" && selectedEmployee && (
-        <Modal isOpen={true} onClose={handleCloseModal} onSave={handleSave}>
-          <h3>עריכת עובד</h3>
-          <form>
-            <div className="form-group mb-3">
-              <label>שם מלא</label>
-              <input type="text" className="form-control" defaultValue={selectedEmployee.fullName} required />
-            </div>
-            <div className="form-group mb-3">
-              <label>תעודת זהות</label>
-              <input type="text" className="form-control" defaultValue={selectedEmployee.idNumber} required />
-            </div>
-            <div className="form-group mb-3">
-              <label>תפקיד</label>
-              <input type="text" className="form-control" defaultValue={selectedEmployee.role} required />
-            </div>
-            <div className="form-group mb-3">
-              <label>אימייל</label>
-              <input type="email" className="form-control" defaultValue={selectedEmployee.email} required />
-            </div>
-            <div className="form-group mb-3">
-              <label>מספר טלפון</label>
-              <input type="text" className="form-control" defaultValue={selectedEmployee.phone} required />
-            </div>
-            <div className="form-group mb-3">
-              <label>סטטוס</label>
-              <select className="form-control" defaultValue={selectedEmployee.status}>
+              <select
+                className="form-control"
+                value={selectedEmployee.status}
+                onChange={(e) => setSelectedEmployee({ ...selectedEmployee, status: e.target.value })}
+              >
                 <option value="פעיל">פעיל</option>
                 <option value="לא פעיל">לא פעיל</option>
               </select>

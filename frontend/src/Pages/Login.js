@@ -1,83 +1,91 @@
-import React, { useState } from "react"; // ייבוא React וה-hook useState לניהול state מקומי
-import { useNavigate } from "react-router-dom"; // ייבוא useNavigate לניווט בין דפים
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 
-
 const Login = () => {
-  // state עבור שם המשתמש והסיסמה
-  const [username, setUsername] = useState(""); // מאחסן את שם המשתמש שהמשתמש מכניס
-  const [password, setPassword] = useState(""); // מאחסן את הסיסמה שהמשתמש מכניס
-  const navigate = useNavigate(); // hook לניווט בין דפים
+  const [username, setUsername] = useState(""); // קלט שם משתמש
+  const [password, setPassword] = useState(""); // קלט סיסמה
+  const [error, setError] = useState(""); // הודעת שגיאה
+  const navigate = useNavigate();
 
-  // פונקציה שמטפלת באירוע ההתחברות כאשר המשתמש לוחץ על הכפתור
-  const handleLogin = (e) => {
-    e.preventDefault(); // מונע רענון של הדף (ברירת המחדל של טופס)
+  // פונקציה שמבצעת התחברות לשרת
+  const handleLogin = async (e) => {
+    e.preventDefault();
 
-    // בדיקת שם משתמש וסיסמה
-    if (username === "admin" && password === "1234") {
-      // אם שם המשתמש והסיסמה תואמים
-      localStorage.setItem("isLoggedIn", "true"); // שומר מצב התחברות ב-localStorage (אפשרות בסיסית)
-      localStorage.setItem("role", "admin"); //
-      navigate("/dashboard"); // מעביר את המשתמש לדף ה-Dashboard
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, password }),
+      });
 
-    }
-    else if (username === "employee" && password === "1234") {
-      localStorage.setItem("isLoggedIn", "true"); // שו��ר מצב התחברות ב-localStorage (אפשרות ב��י��י��)
-      localStorage.setItem("role", "employee"); //
-      navigate("/dashboard"); // מעבי�� את המשתמש לד�� ה-Dashboard
-    }
-    
-    else {
-      // אם שם המשתמש או הסיסמה שגויים
-      alert("שם משתמש או סיסמה שגויים!"); // מציג הודעת שגיאה
+      const data = await response.json();
+
+      console.log("Token:", data.token);
+      console.log("Role:", data.role);
+
+      if (!response.ok) {
+        setError(data.message || "שגיאה בהתחברות");
+        return;
+      }
+
+      // שמירת טוקן ו־role ב-localStorage
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("role", data.role);
+      localStorage.setItem("isLoggedIn", "true");
+
+      // ניווט לדשבורד
+      navigate("/dashboard");
+
+    } catch (err) {
+      setError("שגיאת רשת. נסה שוב מאוחר יותר.");
+      console.error("Login error:", err);
     }
   };
 
   return (
     <>
-    <Header /> 
-    <div className="container d-flex justify-content-center align-items-center vh-100">
-      {/* הקופסה המרכזית של הטופס */}
-      <div className="card p-4 shadow-lg" style={{ width: "100%", maxWidth: "400px" }}>
-        {/* כותרת הטופס */}
-        <h2 className="text-center mb-4">התחברות</h2>
-        {/* טופס ההתחברות */}
-        <form onSubmit={handleLogin}>
-          {/* שדה להזנת שם משתמש */}
-          <div className="mb-3">
-            <label htmlFor="username" className="form-label">
-              שם משתמש
-            </label>
-            <input
-              type="text" // סוג השדה: טקסט
-              id="username" // מזהה ייחודי לשדה
-              className="form-control" // מחלקת Bootstrap לעיצוב שדות
-              value={username} // הערך הנוכחי של שם המשתמש (state)
-              onChange={(e) => setUsername(e.target.value)} // מעדכן את ה-state עם הערך שהמשתמש מזין
-              required // מוודא שהשדה חייב להיות מלא
-            />
-          </div>
-          {/* שדה להזנת סיסמה */}
-          <div className="mb-3">
-            <label htmlFor="password" className="form-label">
-              סיסמה
-            </label>
-            <input
-              type="password" // סוג השדה: סיסמה
-              id="password" // מזהה ייחודי לשדה
-              className="form-control" // מחלקת Bootstrap לעיצוב שדות
-              value={password} // הערך הנוכחי של הסיסמה (state)
-              onChange={(e) => setPassword(e.target.value)} // מעדכן את ה-state עם הערך שהמשתמש מזין
-              required // מוודא שהשדה חייב להיות מלא
-            />
-          </div>
-          {/* כפתור התחברות */}
-          <button type="submit" className="btn btn-primary w-100">
-            התחבר
-          </button>
-        </form>
+      <Header />
+      <div className="container d-flex justify-content-center align-items-center vh-100">
+        <div className="card p-4 shadow-lg" style={{ width: "100%", maxWidth: "400px" }}>
+          <h2 className="text-center mb-4">התחברות</h2>
+          <form onSubmit={handleLogin}>
+            <div className="mb-3">
+              <label htmlFor="username" className="form-label">שם משתמש</label>
+              <input
+                type="text"
+                id="username"
+                className="form-control"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="mb-3">
+              <label htmlFor="password" className="form-label">סיסמה</label>
+              <input
+                type="password"
+                id="password"
+                className="form-control"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
+
+            {error && (
+              <div className="alert alert-danger text-center" role="alert">
+                {error}
+              </div>
+            )}
+
+            <button type="submit" className="btn btn-primary w-100">התחבר</button>
+          </form>
+        </div>
       </div>
-    </div>
     </>
   );
 };
