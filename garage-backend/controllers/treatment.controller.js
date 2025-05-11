@@ -93,10 +93,11 @@ const confirmArrivalAndAddTreatment = async (req, res) => {
     const appointment = await Appointment.findById(appointmentId);
     if (!appointment) return res.status(404).json({ message: "❌ תור לא נמצא" });
 
-    // שלב 2: טיפול חדש
+    // שלב 2: יצירת מספר רץ חדש לטיפול
     const lastTreatment = await Treatment.findOne().sort({ treatmentNumber: -1 });
     const nextTreatmentNumber = lastTreatment ? lastTreatment.treatmentNumber + 1 : 6001;
 
+    // שלב 3: יצירת טיפול חדש עם כל השדות החדשים
     const treatment = new Treatment({
       treatmentNumber: nextTreatmentNumber,
       treatmentId: nextTreatmentNumber.toString(),
@@ -104,13 +105,17 @@ const confirmArrivalAndAddTreatment = async (req, res) => {
       date: appointment.date,
       carPlate: appointment.carNumber,
       customerName: appointment.name,
-      description: appointment.description,
-      repairTypeId: null // ← נעדכן אחרי שניצור את ה־RepairType
+      description: appointment.description || "",
+      treatmentType: "",     // ניתן לעדכן ידנית לאחר מכן
+      workerName: "",        // שם העובד - ניתן לעדכן בהמשך
+      images: [],            // ברירת מחדל – ללא תמונות
+      cost: 0,               // ברירת מחדל – 0 עד לעדכון
+      repairTypeId: null     // נעדכן לאחר יצירת RepairType
     });
 
     await treatment.save();
 
-    // שלב 3: יצירת RepairType חדש
+    // שלב 4: יצירת RepairType חדש וקישור לטיפול
     const lastRepairType = await RepairType.findOne().sort({ repairId: -1 });
     const nextRepairId = lastRepairType ? lastRepairType.repairId + 1 : 7001;
 
@@ -123,14 +128,15 @@ const confirmArrivalAndAddTreatment = async (req, res) => {
 
     await repairType.save();
 
-    // שלב 4: עדכון הטיפול עם repairTypeId
+    // שלב 5: עדכון טיפול עם repairTypeId
     treatment.repairTypeId = nextRepairId;
     await treatment.save();
 
-    // שלב 5: עדכון התור עם הטיפול
+    // שלב 6: עדכון התור עם מזהה הטיפול
     appointment.treatment = treatment._id;
     await appointment.save();
 
+    // תגובה סופית
     res.status(201).json({
       message: "✅ טיפול וסוג טיפול נוצרו בהצלחה",
       treatment,
@@ -146,6 +152,18 @@ const confirmArrivalAndAddTreatment = async (req, res) => {
   }
 };
 
+const getTreatmentByObjectId = async (req, res) => {
+  try {
+    const treatment = await Treatment.findById(req.params.id);
+    if (!treatment) return res.status(404).json({ message: 'טיפול לא נמצא' });
+    res.json(treatment);
+  } catch (err) {
+    res.status(500).json({ message: 'שגיאה בשליפה לפי מזהה', error: err.message });
+  }
+};
+
+
+
 
 module.exports = {
   getAllTreatments,
@@ -156,4 +174,5 @@ module.exports = {
   addTreatment,
   updateTreatment,
   confirmArrivalAndAddTreatment,
+  getTreatmentByObjectId,
 };

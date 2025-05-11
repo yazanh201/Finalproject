@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from "react";
 import Modal from "./Modal";  
+import { useNavigate } from "react-router-dom";
+
 
 
 
 const TreatmentsTable = ({ filterAppointment, filterTreatmentNumber, onNavigateToRepair, onNavigateToAppointment }) => {
+  const navigate = useNavigate(); // ✅ שימוש
   const [modalType, setModalType] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [treatments, setTreatments] = useState([]);
@@ -149,46 +152,23 @@ const TreatmentsTable = ({ filterAppointment, filterTreatmentNumber, onNavigateT
 
       <div className="table-responsive">
         <table className="table table-striped">
-          <thead>
-            <tr>
-              <th>מזהה טיפול</th>
-              <th>תאריך</th>
-              <th>עלות</th>
-              <th>מזהה עובד</th>
-              <th>סוג טיפול</th>
-              <th>רכב</th>
-              <th>מזהה תור</th>
-              <th>חשבונית</th>
-              <th>פעולה</th>
-            </tr>
-          </thead>
-          <tbody>
-            {treatments.map((treatment) => (
-              <tr key={treatment._id}>
-                <td>{treatment.treatmentId}</td>
-                <td>{treatment.date}</td>
-                <td>{treatment.cost}</td>
-                <td>{treatment.workerId}</td>
-                <td>
-                  {treatment.repairTypeId ? (
-                    <a
-                      href="#"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        if (typeof onNavigateToRepair === "function") {
-                          onNavigateToRepair(treatment.repairTypeId);
-                        }
-                      }}
-                      style={{ textDecoration: "underline", color: "blue" }}
-                    >
-                      {treatment.repairTypeId}
-                    </a>
-                  ) : (
-                    <span style={{ color: "gray" }}>לא משויך</span>
-                  )}
-                </td>
-                <td>{treatment.carPlate}</td>
-                <td>
+        <thead>
+          <tr>
+            <th>מזהה טיפול</th>
+            <th>תאריך</th>
+            <th>מזהה תור</th>
+            <th>מספר רכב</th>
+            <th>שם לקוח</th>
+            <th>צפייה</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {treatments.map((treatment) => (
+            <tr key={treatment._id}>
+              <td>{treatment.treatmentId}</td>
+              <td>{treatment.date}</td>
+              <td>
                   {treatment.appointmentNumber ? (
                     <a
                       href="#"
@@ -206,18 +186,22 @@ const TreatmentsTable = ({ filterAppointment, filterTreatmentNumber, onNavigateT
                     <span style={{ color: "gray" }}>—</span>
                   )}
                 </td>
-                <td>{treatment.invoiceId}</td>
-                <td>
-                  <button
-                    className="btn btn-primary btn-sm"
-                    onClick={() => handleShowModal("edit", treatment)}
-                  >
-                    עריכה
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
+              <td>{treatment.carPlate}</td>
+              <td>{treatment.customerName || "—"}</td>
+              <td>
+                <button
+                  className="btn btn-outline-secondary btn-sm"
+                  onClick={() => navigate(`/treatment/${treatment._id}`)}
+                  title="צפייה בפרטי הטיפול"
+                >
+                  👁️
+                </button>
+              </td>
+
+            </tr>
+          ))}
+        </tbody>
+
         </table>
       </div>
 
@@ -276,7 +260,6 @@ const TreatmentsTable = ({ filterAppointment, filterTreatmentNumber, onNavigateT
           />
         </Modal>
       )}
-
     </div>
   );
 };
