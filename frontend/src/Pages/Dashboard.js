@@ -154,8 +154,8 @@ const Dashboard = () => {
           <ul className={styles.navList}>
             {role === "admin" && (
               <>
-                <li className={styles.navItem}><button className={styles.sidebarBtn} onClick={() => setActiveView("cars")}>רכבים</button></li>
                 <li className={styles.navItem}><button className={styles.sidebarBtn} onClick={() => setActiveView("Customers")}>לקוחות</button></li>
+                <li className={styles.navItem}><button className={styles.sidebarBtn} onClick={() => setActiveView("cars")}>רכבים</button></li>
                 <li className={styles.navItem}><button className={styles.sidebarBtn} onClick={() => setActiveView("Inquiries")}>פניות</button></li>
                 <li className={styles.navItem}><button className={styles.sidebarBtn} onClick={() => setActiveView("CarOrders")}>הזמנות לרכבים</button></li>
                 <li className={styles.navItem}><button className={styles.sidebarBtn} onClick={() => setActiveView("Appointments")}>תורים</button></li>

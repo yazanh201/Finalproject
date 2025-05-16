@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from "react";
 import Modal from "./Modal"; 
 import axios from "axios";  
+import { useNavigate } from "react-router-dom";
+
 
 const Customers = () => {
+  const navigate = useNavigate();
   const [modalType, setModalType] = useState(null);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [customers, setCustomers] = useState([]);
@@ -14,6 +17,10 @@ const Customers = () => {
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState('פעיל');
   const [vehicleNumber, setvehicleNumber] = useState('');
+
+const [phonePrefix, setPhonePrefix] = useState('052');
+const [phoneSuffix, setPhoneSuffix] = useState('');
+
   
   // סטייט לשדה חיפוש
   const [searchQuery, setSearchQuery] = useState('');
@@ -47,13 +54,21 @@ const Customers = () => {
     }
 
     if (type === 'edit' && customer) {
-      // מילוי נתונים קיימים לעריכה
       setName(customer.name);
       setIdNumber(customer.idNumber);
-      setPhone(customer.phone);
+
+      const fullPhone = customer.phone || '';
+      if (fullPhone.length === 10) {
+        setPhonePrefix(fullPhone.substring(0, 3));
+        setPhoneSuffix(fullPhone.substring(3));
+      } else {
+        setPhonePrefix('');
+        setPhoneSuffix('');
+      }
+
       setEmail(customer.email);
       setStatus(customer.status);
-      setvehicleNumber(customer.vehicles && customer.vehicles.length > 0 ? customer.vehicles[0] : '');
+      setvehicleNumber(customer.vehicles?.[0] || '');
     }
   };
 
@@ -64,34 +79,73 @@ const Customers = () => {
 
   // הוספה או עדכון לקוח
   const handleSave = async () => {
-    try {
-      const customerData = {
-        name,
-        idNumber,
-        phone,
-        email,
-        status,
-        vehicleNumber: [vehicleNumber],
-      };
+  try {
+    // אימותים
+    const idRegex = /^\d{9}$/;
+    const carRegex = /^\d{1,9}$/;
+    const nameRegex = /^[\u0590-\u05FFa-zA-Z\s]{2,}$/;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-      if (modalType === "edit" && selectedCustomer) {
-        // עריכת לקוח קיים
-        await axios.put(`http://localhost:5000/api/customers/${selectedCustomer._id}`, customerData);
-        alert("✅ פרטי הלקוח עודכנו בהצלחה!");
-      } else {
-        // הוספת לקוח חדש
-        await axios.post('http://localhost:5000/api/customers', customerData);
-        alert("✅ לקוח נוסף בהצלחה!");
-      }
 
-      handleCloseModal();
-      fetchCustomers(); // רענון טבלה אחרי כל פעולה
-
-    } catch (error) {
-      console.error('❌ שגיאה בשמירה:', error.message);
-      alert('❌ שגיאה בשמירה');
+    if (!nameRegex.test(name)) {
+      alert("❌ שם לקוח חייב להכיל לפחות 2 אותיות, ללא מספרים");
+      return;
     }
-  };
+
+    if (!idRegex.test(idNumber)) {
+      alert("❌ תעודת זהות חייבת להכיל בדיוק 9 ספרות");
+      return;
+    }
+
+    if (!carRegex.test(vehicleNumber)) {
+      alert("❌ מספר רכב חייב להכיל עד 9 ספרות בלבד");
+      return;
+    }
+
+    if (email && !emailRegex.test(email)) {
+      alert("❌ כתובת מייל אינה תקינה");
+      return;
+    }
+
+    const fullPhone = phonePrefix + phoneSuffix;
+    const phoneRegex = /^05[0-9]{8}$/;
+
+    if (!phoneRegex.test(fullPhone)) {
+      alert("❌ מספר טלפון לא תקין. יש להזין קידומת חוקית ו-7 ספרות.");
+      return;
+    }
+    const customerData = {
+      name,
+      idNumber,
+      phone: fullPhone, // ✅ עכשיו זה נשלח כמו שצריך
+      email,
+      status,
+      vehicleNumber: [vehicleNumber],
+    };
+
+    if (modalType === "edit" && selectedCustomer) {
+      await axios.put(`http://localhost:5000/api/customers/${selectedCustomer._id}`, customerData);
+      alert("✅ פרטי הלקוח עודכנו בהצלחה!");
+    } else {
+      await axios.post('http://localhost:5000/api/customers', customerData);
+      alert("✅ לקוח נוסף בהצלחה!");
+    }
+
+    handleCloseModal();
+    fetchCustomers();
+
+  } catch (error) {
+  console.error('❌ שגיאה בשמירה:', error.message);
+
+  if (error.response && error.response.status === 400) {
+    alert(error.response.data.message); // יציג את ההודעה הברורה
+  } else {
+    alert('❌ שגיאה בשמירה');
+  }
+}
+
+};
+
 
   // פונקציה לחיפוש לקוח לפי ת"ז או שם
   const handleSearch = async () => {
@@ -107,6 +161,29 @@ const Customers = () => {
     } catch (error) {
       console.error('❌ שגיאה בחיפוש:', error.message);
       alert('❌ שגיאה בחיפוש');
+    }
+  };
+
+
+
+    const handleAddCar = async () => {
+    try {
+      if (!vehicleNumber || vehicleNumber.length < 5) {
+        alert("❌ הזן מספר רכב חוקי");
+        return;
+      }
+
+      // שליחת בקשה לשרת להוספת הרכב ללקוח
+      const res = await axios.put(`http://localhost:5000/api/customers/${selectedCustomer._id}/add-car`, {
+        vehicleNumber,
+      });
+
+      alert("✅ רכב נוסף ללקוח בהצלחה!");
+      handleCloseModal();
+      fetchCustomers();
+    } catch (error) {
+      console.error("❌ שגיאה בהוספת רכב:", error.message);
+      alert("❌ שגיאה בהוספת רכב");
     }
   };
 
@@ -135,7 +212,7 @@ const Customers = () => {
             <th>מספר טלפון</th>
             <th>מייל</th>
             <th>סטטוס</th>
-            <th>מספר רישוי רכב</th>
+            <th>רכבים</th>
             <th>פעולה</th>
           </tr>
         </thead>
@@ -151,11 +228,20 @@ const Customers = () => {
                 {customer.status || '-'}
               </td>
               <td>
-                {customer.vehicles && customer.vehicles.length > 0 ? customer.vehicles[0] : '-'}
+                <span
+                  style={{ color: 'blue', textDecoration: 'underline', cursor: 'pointer' }}
+                  onClick={() => navigate(`/customer-vehicles/${customer._id}`)}
+                >
+                  רכבים
+                </span>
               </td>
+
               <td>
-                <button className="btn btn-primary btn-sm" onClick={() => handleShowModal("edit", customer)}>
+                <button className="btn btn-primary btn-sm me-2" onClick={() => handleShowModal("edit", customer)}>
                   עריכה
+                </button>
+                <button className="btn btn-success btn-sm me-2" onClick={() => handleShowModal("addCar", customer)}>
+                  הוסף רכב
                 </button>
               </td>
             </tr>
@@ -169,14 +255,18 @@ const Customers = () => {
           <h3>{modalType === "edit" ? "עריכת לקוח" : "הוספת לקוח ורכב"}</h3>
           <form>
             <div className="form-group mb-3">
-              <label>שם לקוח</label>
+              <label>שם לקוח מלא</label>
               <input
                 type="text"
                 className="form-control"
                 value={name}
-                onChange={(e) => setName(e.target.value)}
+                onChange={(e) => {
+                  const onlyLetters = e.target.value.replace(/[^א-תa-zA-Z\s]/g, '');
+                  setName(onlyLetters);
+                }}
                 required
               />
+
             </div>
             <div className="form-group mb-3">
               <label>תעודת זהות</label>
@@ -184,19 +274,44 @@ const Customers = () => {
                 type="text"
                 className="form-control"
                 value={idNumber}
-                onChange={(e) => setIdNumber(e.target.value)}
+                onChange={(e) => {
+                  const onlyDigits = e.target.value.replace(/\D/g, '');
+                  setIdNumber(onlyDigits);
+                }}
+                maxLength={9}
                 required
               />
+
             </div>
             <div className="form-group mb-3">
               <label>מספר טלפון</label>
-              <input
-                type="text"
-                className="form-control"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                required
-              />
+              <div className="d-flex gap-2">
+                <select
+                  className="form-select"
+                  style={{ maxWidth: "100px" }}
+                  value={phonePrefix}
+                  onChange={(e) => setPhonePrefix(e.target.value)}
+                  required
+                >
+                  <option value="050">050</option>
+                  <option value="052">052</option>
+                  <option value="053">053</option>
+                  <option value="054">054</option>
+                  <option value="055">055</option>
+                  <option value="058">058</option>
+                </select>
+                <input
+                  type="text"
+                  className="form-control"
+                  value={phoneSuffix}
+                  onChange={(e) => {
+                    const onlyDigits = e.target.value.replace(/\D/g, '');
+                    setPhoneSuffix(onlyDigits);
+                  }}
+                  maxLength={7}
+                  required
+                />
+              </div>
             </div>
             <div className="form-group mb-3">
               <label>מייל</label>
@@ -226,9 +341,14 @@ const Customers = () => {
                 type="text"
                 className="form-control"
                 value={vehicleNumber}
-                onChange={(e) => setvehicleNumber(e.target.value)}
+                onChange={(e) => {
+                  const onlyDigits = e.target.value.replace(/\D/g, '');
+                  setvehicleNumber(onlyDigits);
+                }}
+                maxLength={9}
                 required
               />
+
             </div>
           </form>
 
@@ -246,6 +366,23 @@ const Customers = () => {
               placeholder="תעודת זהות / שם"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
+              required
+            />
+          </div>
+        </Modal>
+      )}
+
+      {modalType === "addCar" && selectedCustomer && (
+        <Modal isOpen={true} onClose={handleCloseModal} onSave={handleAddCar}>
+          <h4>הוספת רכב ללקוח: {selectedCustomer.name}</h4>
+          <div className="form-group mb-3">
+            <label>מספר רכב חדש</label>
+            <input
+              type="text"
+              className="form-control"
+              value={vehicleNumber}
+              onChange={(e) => setvehicleNumber(e.target.value.replace(/\D/g, ""))}
+              maxLength={9}
               required
             />
           </div>

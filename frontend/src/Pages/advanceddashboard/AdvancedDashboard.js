@@ -6,8 +6,7 @@ import DashboardOverview from "./DashboardOverview";
 import DashboardTables from "./DashboardTables";
 import MessageModal from "./MessageModal";
 import MonthlyAppointments from "../tabels/MonthlyAppointments";
-
-
+import NewCustomers from "../tabels/NewCustomers";
 
 
 const AdvancedDashboard = () => {
@@ -28,28 +27,71 @@ const AdvancedDashboard = () => {
     const [phoneNumber, setPhoneNumber] = useState("");
     const [sendToAll, setSendToAll] = useState(false);
     const [recommendedCars, setRecommendedCars] = useState([]);
+    const [monthlyAppointmentCount, setMonthlyAppointmentCount] = useState(0);
+    const [newCustomersCount, setNewCustomersCount] = useState(0);
+
 
     useEffect(() => {
-        setStats([
-            { title: "סה״כ תורים לחודש", value: 25, key: "appointments" },
-            { title: "רכבים בטיפול", value: 12, key: "carsUnderMaintenance" },
-            { title: "לקוחות חדשים", value: 8, key: "newCustomers" },
-            { title: "הכנסות החודש (₪)", value: 12000, key: "income" },
-            { title: "טיפולים שהתעכבו", value: 2, key: "delayedTreatments" },
-        ]);
+        const fetchNewCustomers = async () => {
+            try {
+            const res = await fetch("http://localhost:5000/api/customers/new-this-month");
+            const data = await res.json();
+            setNewCustomersCount(data.length); // ✅ שמירת כמות לקוחות חדשים
+            } catch (error) {
+            console.error("❌ שגיאה בשליפת לקוחות חדשים:", error);
+            }
+        };
 
-        setNotifications([
-            { message: "🔧 רכב חדש נכנס לטיפול", type: "carsUnderMaintenance" },
-            { message: "📅 לקוח קבע תור חדש למחר", type: "appointments" },
-            { message: "💰 התקבל תשלום עבור טיפול", type: "income" },
-            { message: "⚠️ עיכוב בטיפול ללקוח מסוים", type: "delayedTreatments" },
-        ]);
+        fetchNewCustomers();
+        }, []);
 
-        setDelayedTreatments([
-            { רכב: "יונדאי i20", סיבה: "מחכים לחלפים", איחור: "3 ימים", לוחית: "123-45-678" },
-            { רכב: "טויוטה קורולה", סיבה: "חוסר כוח אדם", איחור: "יום אחד", לוחית: "987-65-432" },
-        ]);
-    }, []);
+    useEffect(() => {
+        const fetchMonthlyAppointments = async () => {
+            try {
+            const response = await fetch("http://localhost:5000/api/appointments/month");
+            const data = await response.json();
+            setMonthlyAppointmentCount(data.length); // ✅ מעדכן רק פעם אחת
+            } catch (error) {
+            console.error("❌ שגיאה בשליפת תורים חודשיים:", error);
+            }
+        };
+
+        fetchMonthlyAppointments();
+        }, []); // ✅ רק בעת עלייה
+
+
+    useEffect(() => {
+  setStats([
+    { title: "סה״כ תורים לחודש", value: monthlyAppointmentCount, key: "appointments" },
+    { title: "רכבים בטיפול", value: 12, key: "carsUnderMaintenance" },
+    { title: "לקוחות חדשים", value: newCustomersCount, key: "newCustomers" },
+    { title: "הכנסות החודש (₪)", value: 12000, key: "income" },
+    { title: "טיפולים שהתעכבו", value: 2, key: "delayedTreatments" },
+  ]);
+
+  setNotifications([
+    { message: "🔧 רכב חדש נכנס לטיפול", type: "carsUnderMaintenance" },
+    { message: "📅 לקוח קבע תור חדש למחר", type: "appointments" },
+    { message: "💰 התקבל תשלום עבור טיפול", type: "income" },
+    { message: "⚠️ עיכוב בטיפול ללקוח מסוים", type: "delayedTreatments" },
+  ]);
+
+  setDelayedTreatments([
+    {
+      car: "יונדאי i20",
+      reason: "מחכים לחלפים",
+      delay: "3 ימים",
+      plate: "123-45-678"
+    },
+    {
+      car: "טויוטה קורולה",
+      reason: "חוסר כוח אדם",
+      delay: "יום אחד",
+      plate: "987-65-432"
+    },
+  ]);
+}, [monthlyAppointmentCount,newCustomersCount]); // ✅ כך תופעל גם לפי העדכון מהשרת
+
 
     // 🔹 חישוב רכבים מומלצים לטיפול
     useEffect(() => {
@@ -84,62 +126,67 @@ const AdvancedDashboard = () => {
     }, []);
 
     const showTable = (key) => {
-        let data = [];
-        let title = "";
-        switch (key) {
-            case "recommendedCars":
-                data = recommendedCars;
-                title = "רכבים מומלצים לבדיקה";
-                break;
-            case "newCustomers":
-                data = [
-                    { name: "ישראל כהן", phone: "050-1234567", joined: "15/03/2025" },
-                    { name: "מיכל לוי", phone: "052-9876543", joined: "18/03/2025" },
-                ];
-                title = "לקוחות חדשים";
-                break;
+    let data = [];
+    let title = "";
 
-            case "todayAppointments":
-        fetch("http://localhost:5000/api/appointments")
-            .then(res => res.json())
-            .then(data => {
-            const today = new Date().toISOString().slice(0, 10);
-            const todaysAppointments = data.filter(a => a.date === today);
-            setTableTitle("תורים להיום");
-            setTableData(todaysAppointments.map(a => ({
-                "מזהה תור": a.appointmentNumber,
-                "שם": a.name,
-                "ת'ז": a.idNumber,
-                "מספר רכב": a.carNumber,
-                "שעה": a.time,
-                "תיאור": a.description,
-                _id: a._id,
-                treatmentId: a.treatment?.treatmentId
-            })));
-            setSelectedTable("todayAppointments");
-            });
-        break;
-                
-            case "carsUnderMaintenance":
-                data = delayedTreatments;
-                title = "רכבים בטיפול";
-                break;
-            case "appointments":
-                setSelectedTable("monthlyAppointments");
-                break;
+    switch (key) {
+        case "recommendedCars":
+            data = recommendedCars;
+            title = "רכבים מומלצים לבדיקה";
+            setSelectedTable(key);
+            break;
 
-            case "delayedTreatments":
-                data = delayedTreatments;
-                title = "טיפולים שהתעכבו";
-                break;
-            default:
-                data = [];
-        }
+        case "newCustomers":
+            setSelectedTable("newCustomers");
+            return;
 
-        setSelectedTable(key);
-        setTableData(data);
-        setTableTitle(title);
-    };
+        case "todayAppointments":
+            fetch("http://localhost:5000/api/appointments")
+                .then(res => res.json())
+                .then(data => {
+                    const today = new Date().toISOString().slice(0, 10);
+                    const todaysAppointments = data.filter(a => a.date === today);
+                    setTableTitle("תורים להיום");
+                    setTableData(todaysAppointments.map(a => ({
+                        "מזהה תור": a.appointmentNumber,
+                        "שם": a.name,
+                        "ת'ז": a.idNumber,
+                        "מספר רכב": a.carNumber,
+                        "שעה": a.time,
+                        "תיאור": a.description,
+                        _id: a._id,
+                        treatmentId: a.treatment?.treatmentId
+                    })));
+                    setSelectedTable("todayAppointments");
+                });
+            return; // ← חשוב: לא להמשיך הלאה
+
+        case "carsUnderMaintenance":
+            data = delayedTreatments;
+            title = "רכבים בטיפול";
+            setSelectedTable(key);
+            break;
+
+        case "appointments":
+            setSelectedTable("monthlyAppointments");
+            return; // ← אין צורך ב-tableData או tableTitle
+
+        case "delayedTreatments":
+            data = delayedTreatments;
+            title = "טיפולים שהתעכבו";
+            setSelectedTable(key);
+            break;
+
+        default:
+            data = [];
+            setSelectedTable(null);
+            return;
+    }
+
+    setTableData(data);
+    setTableTitle(title);
+};
+
 
 
     const handleConfirmArrival = async (value) => {
@@ -205,22 +252,21 @@ const AdvancedDashboard = () => {
                     onNotificationClick={showTable}
                 />
 
-                {/* טבלת ברירת מחדל כללית */}
-                <DashboardTables
+                {selectedTable === "monthlyAppointments" ? (
+                    <MonthlyAppointments onClose={() => setSelectedTable(null)} />
+                ) : selectedTable === "newCustomers" ? (
+                    <NewCustomers onClose={() => setSelectedTable(null)} />
+                ) : (
+                    <DashboardTables
                     selectedTable={selectedTable}
                     tableTitle={tableTitle}
                     tableData={tableData}
                     tableHeaders={tableHeaders}
                     onClose={() => setSelectedTable(null)}
                     onConfirmArrival={handleConfirmArrival}
-                />
-
-                {/* ✅ טבלה מיוחדת לשליפת תורים מהחודש הנוכחי */}
-                {selectedTable === "monthlyAppointments" && (
-                    <MonthlyAppointments onClose={() => setSelectedTable(null)} />
+                    />
                 )}
             </main>
-
 
 
             <MessageModal

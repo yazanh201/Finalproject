@@ -8,6 +8,7 @@ const Appointments = ({ onSelectTreatment, filterAppointmentNumber }) => {
   const [modalType, setModalType] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [appointments, setAppointments] = useState([]);
+  
 
   const [selectedAppointment, setSelectedAppointment] = useState({
     date: "",
@@ -163,6 +164,7 @@ const Appointments = ({ onSelectTreatment, filterAppointmentNumber }) => {
               <th>תיאור</th>
               <th>תעודת זהות</th>
               <th>שם לקוח</th>
+              <th>טלפון</th>
               <th>מספר רישוי</th>
               <th>מזהה טיפול</th>
               <th>פעולה</th>
@@ -179,6 +181,7 @@ const Appointments = ({ onSelectTreatment, filterAppointmentNumber }) => {
                 <td>{appointment.description}</td>
                 <td>{appointment.idNumber}</td>
                 <td>{appointment.name}</td>
+                <td>{appointment.phoneNumber || "—"}</td>
                 <td>{appointment.carNumber}</td>
                 <td>
                   {appointment.treatment?.treatmentId ? (
@@ -223,7 +226,7 @@ const Appointments = ({ onSelectTreatment, filterAppointmentNumber }) => {
         <Modal isOpen={true} onClose={handleCloseModal} onSave={handleSave}>
           <h3>{modalType === "edit" ? "עריכת תור" : "הוספת תור חדש"}</h3>
           <form>
-            {["date", "time", "description", "idNumber", "name", "carNumber"].map((field) => (
+            {["date", "time", "description", "idNumber", "name", "carNumber", "phoneNumber"].map((field) => (
               <div className="form-group mb-3" key={field}>
                 <label>{{
                   date: "תאריך",
@@ -231,17 +234,19 @@ const Appointments = ({ onSelectTreatment, filterAppointmentNumber }) => {
                   description: "תיאור",
                   idNumber: "תעודת זהות",
                   name: "שם לקוח",
-                  carNumber: "מספר רישוי"
+                  carNumber: "מספר רישוי",
+                  phoneNumber: "טלפון" // ✅ חדש
                 }[field]}</label>
                 <input
                   type={field === "date" ? "date" : field === "time" ? "time" : "text"}
                   className="form-control"
                   value={selectedAppointment?.[field] || ""}
                   onChange={(e) => setSelectedAppointment({ ...selectedAppointment, [field]: e.target.value })}
-                  required
+                  required={field !== "phoneNumber"} // טלפון לא חובה, רק אם תרצה
                 />
               </div>
             ))}
+
           </form>
         </Modal>
       )}
