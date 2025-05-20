@@ -3,20 +3,24 @@ const mongoose = require("mongoose");
 const treatmentSchema = new mongoose.Schema({
   treatmentNumber: Number,
   treatmentId: String,
-  appointmentNumber: Number,
   date: String,
   cost: Number,
   carPlate: String,
-  invoiceId: String,
+  invoiceFile: String,
+  description: String,
+  treatmentType: String,
+  workerName: String,
+  customerName: String,
+  images: [String],
+  repairTypeId: Number,
 
-  // 🆕 שדות חדשים לפי בקשתך
-  description: String,              // תיאור הטיפול
-  treatmentType: String,           // סוג טיפול בטקסט
-  workerName: String,              // שם העובד שביצע את הטיפול
-  customerName: String,            // שם הלקוח
-  images: [String],                // כתובות של תמונות (מחרוזות)
+  // ✅ חדש: סטטוס
+  status: {
+    type: String,
+    enum: ['בהמתנה', 'הסתיים'],
+    default: 'בהמתנה'
+  }
 
-  repairTypeId: Number             // מזהה של סוג טיפול (אם צריך לשמור אותו)
 }, {
   timestamps: true
 });

@@ -1,10 +1,13 @@
 const express = require('express');
 const router = express.Router();
+const upload = require('../upload.middleware');
+const controller = require('../controllers/treatment.controller'); // שים לב ל־
+
 
 const {
   getAllTreatments,
-  getTreatmentById,              // שליפה לפי treatmentNumber
-  getTreatmentByObjectId,       // ✅ שליפה לפי _id של MongoDB
+  getTreatmentById,
+  getTreatmentByObjectId,
   getTreatmentsByAppointmentNumber,
   getTreatmentsByDate,
   getTreatmentsByCarPlate,
@@ -15,19 +18,29 @@ const {
 
 // 📥 שליפות
 router.get('/', getAllTreatments);
-router.get('/by-id/:treatmentId', getTreatmentById);            // לפי treatmentNumber
-router.get('/:id', getTreatmentByObjectId);                     // ✅ לפי _id (לצורך תצוגת פרטי טיפול)
+router.get('/by-id/:treatmentId', getTreatmentById);
+router.get('/check', controller.checkTreatmentByPlate);
+router.get('/:id', getTreatmentByObjectId);
 router.get('/by-appointment/:appointmentNumber', getTreatmentsByAppointmentNumber);
 router.get('/by-date/:date', getTreatmentsByDate);
 router.get('/by-car/:carPlate', getTreatmentsByCarPlate);
 
-// ➕ הוספה
-router.post('/', addTreatment);
+
+
+// ➕ הוספה עם העלאת קבצים (חשבונית + תמונות)
+router.post(
+  '/',
+  upload.fields([
+    { name: 'invoice', maxCount: 1 },
+    { name: 'images', maxCount: 10 }
+  ]),
+  addTreatment
+);
 
 // ✏️ עדכון
 router.put('/:id', updateTreatment);
 
-// ✅ יצירת טיפול אוטומטי מתוך תור מאושר
+// ✅ יצירת טיפול אוטומטי מתוך תור
 router.post('/confirm-arrival', confirmArrivalAndAddTreatment);
 
 module.exports = router;

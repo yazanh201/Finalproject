@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const path = require('path');
 require('dotenv').config();
 
 // ייבוא ראוטים
@@ -11,27 +12,23 @@ const appointmentRoutes = require('./routes/appointment.routes');
 const treatmentRoutes = require('./routes/treatment.routes');
 const repairTypeRoutes = require("./routes/repairtype.routes");
 const employeeRoutes = require("./routes/employee.routes");
-const authRoutes = require('./routes/auth.routes'); // ייבוא
+const authRoutes = require('./routes/auth.routes');
 const carOrderRoutes = require('./routes/carOrder.routes');
-
-
-
-
-
-
-
 
 // יצירת אפליקציה
 const app = express();
 
 // אמצעי עזר
 app.use(cors());
-app.use(express.json()); // חשוב מאוד!
+app.use(express.json());
+
+// 🖼️ שירות קבצים סטטיים מתוך uploads
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // חיבור למסד נתונים
-mongoose.connect(process.env.MONGO_URI, { })
-.then(() => console.log('✅ מחובר ל-MongoDB'))
-.catch((error) => console.error('❌ שגיאה בחיבור ל-MongoDB:', error));
+mongoose.connect(process.env.MONGO_URI, {})
+  .then(() => console.log('✅ מחובר ל-MongoDB'))
+  .catch((error) => console.error('❌ שגיאה בחיבור ל-MongoDB:', error));
 
 // שימוש בנתיבים
 app.use('/api/customers', customerRoutes);
@@ -41,14 +38,8 @@ app.use('/api/appointments', appointmentRoutes);
 app.use('/api/treatments', treatmentRoutes);
 app.use("/api/repairtypes", repairTypeRoutes);
 app.use("/api/employees", employeeRoutes);
-app.use('/api/auth', authRoutes); // חיבור
+app.use('/api/auth', authRoutes);
 app.use('/api/carorders', carOrderRoutes);
-
-
-
-
-
-
 
 
 // מסלול ראשי לבדיקה

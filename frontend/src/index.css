@@ -17,8 +17,8 @@ code {
   position: fixed;
   bottom: 20px;
   right: 20px;
-  background: linear-gradient(135deg, #6e8efb, #a777e3);
-  color: white;
+  background: linear-gradient(135deg, white);
+  color:green;
   border: none;
   padding: 15px;
   border-radius: 50%;
@@ -62,7 +62,7 @@ code {
 
 /* 🔹 כותרת הצ'אט */
 .chat-header {
-  background: linear-gradient(135deg, #6e8efb, #a777e3);
+  background: linear-gradient(135deg, blue);
   color: white;
   padding: 12px 15px;
   display: flex;
@@ -137,7 +137,7 @@ input {
 }
 
 button {
-  background: linear-gradient(135deg, #6e8efb, #a777e3);
+  background: linear-gradient(135deg,rgb(0, 145, 255));
   color: white;
   padding: 10px;
 }
