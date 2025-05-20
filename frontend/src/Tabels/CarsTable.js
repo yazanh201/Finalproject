@@ -11,12 +11,13 @@ const CarsTable = () => {
   const [vehicleNumber, setvehicleNumber] = useState('');
   const [owner, setOwner] = useState('');
   const [ownerID, setOwnerID] = useState('');
-  const [brand, setBrand] = useState('');
   const [model, setModel] = useState('');
   const [year, setYear] = useState('');
   const [color, setColor] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [mileage, setMileage] = useState('');
+  const [maker, setMaker] = useState('');
+
 
 
   useEffect(() => {
@@ -36,30 +37,17 @@ const CarsTable = () => {
     setModalType(type);
     setSelectedCar(car);
 
-    if (type === 'add') {
-      // איפוס שדות
-      setvehicleNumber('');
-      setOwner('');
-      setOwnerID('');
-      setBrand('');
-      setModel('');
-      setYear('');
-      setColor('');
-      setMileage('');
-
-    }
-
     if (type === 'edit' && car) {
-      // מילוי שדות לעריכה
-      setvehicleNumber(car.vehicleNumber);
-      setOwner(car.owner);
-      setOwnerID(car.ownerID);
-      setBrand(car.brand);
-      setModel(car.model);
-      setYear(car.year);
-      setColor(car.color);
-      setMileage(car.mileage || '');
-    }
+    setvehicleNumber(car.vehicleNumber);
+    setOwner(car.ownerName);
+    setOwnerID(car.ownerIdNumber);
+    setMaker(car.manufacturer || ''); // ✅ שורה קריטית
+    setModel(car.model);
+    setYear(car.year);
+    setColor(car.color);
+    setMileage(car.mileage || '');
+  }
+
   };
 
   const handleCloseModal = () => {
@@ -68,51 +56,90 @@ const CarsTable = () => {
   };
 
   const handleSave = async () => {
-    try {
-      if (!vehicleNumber.trim()) {
-        alert('❌ חובה להזין מספר רכב!');
-        return;
-      }
-  
-      let carData;
-  
-      if (modalType === "edit" && selectedCar) {
-        // בעריכה - שולחים שמות רגילים
-        carData = {
-          vehicleNumber,
-          owner,
-          ownerID,
-          brand,
-          model,
-          year,
-          color,
-          mileage,
-        };
-        await axios.put(`http://localhost:5000/api/cars/${selectedCar._id}`, carData);
-        alert("✅ פרטי הרכב עודכנו בהצלחה!");
-      } else {
-        // בהוספה - שולחים שמות תואמים למודל
-        carData = {
-          vehicleNumber: vehicleNumber,
-          ownerName: owner,
-          ownerIdNumber: ownerID,
-          manufacturer: brand,
-          model,
-          year,
-          color,
-          mileage,
-        };
-        await axios.post('http://localhost:5000/api/cars', carData);
-        alert("✅ רכב נוסף בהצלחה!");
-      }
-  
-      handleCloseModal();
-      fetchCars();
-    } catch (error) {
-      console.error('❌ שגיאה בשמירה:', error.message);
-      alert('❌ שגיאה בשמירה');
+  try {
+    const currentYear = new Date().getFullYear();
+
+    // ✅ אימות מספר רכב
+    if (!vehicleNumber.trim()) {
+      alert("❌ חובה להזין מספר רכב!");
+      return;
     }
-  };
+
+    // ✅ אימות שם בעלים
+    if (modalType === "add" && !owner.trim()) {
+      alert("❌ חובה להזין שם בעל הרכב!");
+      return;
+    }
+
+    // ✅ אימות תעודת זהות
+    if (modalType === "add" && (!ownerID || !/^\d{9}$/.test(ownerID))) {
+      alert("❌ תעודת זהות חייבת להכיל בדיוק 9 ספרות");
+      return;
+    }
+
+    // ✅ אימות יצרן (brand)
+    if (!maker || maker.trim().length < 2) {
+      alert("❌ יש לבחור יצרן רכב");
+      return;
+    }
+
+    // ✅ אימות דגם
+    if (!model || model.trim().length < 1) {
+      alert("❌ חובה להזין דגם הרכב");
+      return;
+    }
+
+    // ✅ אימות שנת ייצור
+    if (!year || isNaN(year) || year < 1950 || year > currentYear) {
+      alert(`❌ שנת ייצור לא חוקית. יש להזין שנה בין 1950 ל-${currentYear}`);
+      return;
+    }
+
+    // ✅ אימות צבע (רשות – אפשר לשפר בעתיד)
+    if (!color || color.trim().length < 2) {
+      alert("❌ חובה להזין צבע הרכב");
+      return;
+    }
+
+    // ✅ אימות קילומטראז'
+    if (!mileage || isNaN(mileage) || mileage < 0) {
+      alert("❌ קילומטראז' חייב להיות מספר חיובי בלבד");
+      return;
+    }
+
+    let carData;
+
+    if (modalType === "edit" && selectedCar) {
+      // ✏️ בעריכה - שמות שדות פשוטים
+      carData = {
+        vehicleNumber,
+        owner,
+        ownerID,
+        manufacturer: maker,
+        model,
+        year,
+        color,
+        mileage,
+      };
+
+      await axios.put(`http://localhost:5000/api/cars/${selectedCar._id}`, carData);
+      alert("✅ פרטי הרכב עודכנו בהצלחה!");
+
+    } else {
+      alert("❌ לא ניתן להוסיף רכב בדף זה.");
+      return;
+}
+
+
+    handleCloseModal();
+    fetchCars();
+
+  } catch (error) {
+    console.error('❌ שגיאה בשמירה:', error.message);
+    alert('❌ שגיאה בשמירה');
+  }
+};
+
   
   
 
@@ -132,6 +159,13 @@ const CarsTable = () => {
     }
   };
 
+  const carMakers = [
+  "טויוטה", "יונדאי", "קיה", "מאזדה", "פורד", "סובארו", "שברולט",
+  "פיאט", "אאודי", "ב.מ.וו", "מרצדס", "וולוו", "פיג'ו", "סיטרואן",
+  "סקודה", "ניסאן", "רנו", "הונדה", "לקסוס"
+];
+
+
 
   return (
     <div>
@@ -140,7 +174,6 @@ const CarsTable = () => {
       </div>
 
       <div className="d-flex mb-3">
-        <button className="btn btn-primary me-3" onClick={() => handleShowModal("add")}>הוסף רכב</button>
         <button className="btn btn-primary me-3" onClick={() => handleShowModal("search")}>חיפוש לפי מספר רכב או ת.ז</button>
       </div>
 
@@ -184,50 +217,26 @@ const CarsTable = () => {
 
 
       {/* מודלים */}
-      {(modalType === "add" || modalType === "edit") && (
+      {modalType === "edit" && (
         <Modal isOpen={true} onClose={handleCloseModal} onSave={handleSave}>
         <h3>{modalType === "edit" ? "עריכת רכב" : "הוספת רכב חדש"}</h3>
         <form>
-          <div className="form-group mb-3">
-            <label>מספר רכב</label>
-            <input
-              type="text"
-              className="form-control"
-              value={vehicleNumber || ''}
-              onChange={(e) => setvehicleNumber(e.target.value)}
-              required
-            />
-          </div>
-          <div className="form-group mb-3">
-            <label>שם בעל הרכב</label>
-            <input
-              type="text"
-              className="form-control"
-              value={owner || ''}
-              onChange={(e) => setOwner(e.target.value)}
-              required
-            />
-          </div>
-          <div className="form-group mb-3">
-            <label>תעודת זהות</label>
-            <input
-              type="text"
-              className="form-control"
-              value={ownerID || ''}
-              onChange={(e) => setOwnerID(e.target.value)}
-              required
-            />
-          </div>
+
           <div className="form-group mb-3">
             <label>יצרן</label>
-            <input
-              type="text"
+            <select
               className="form-control"
-              value={brand || ''}
-              onChange={(e) => setBrand(e.target.value)}
+              value={maker}
+              onChange={(e) => setMaker(e.target.value)}
               required
-            />
+            >
+              <option value="">בחר יצרן</option>
+              {carMakers.map((m, i) => (
+                <option key={i} value={m}>{m}</option>
+              ))}
+            </select>
           </div>
+
           <div className="form-group mb-3">
             <label>דגם</label>
             <input

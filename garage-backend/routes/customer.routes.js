@@ -2,8 +2,15 @@
 const express = require('express');
 const router = express.Router();
 
-// ייבוא הפונקציות מ-controller
-const { addCustomer, getAllCustomers, searchCustomer, updateCustomer } = require('../controllers/customer.controller');
+// ✅ ייבוא כל הפונקציות כולל addCarToCustomer ו־getNewCustomersThisMonth
+const {
+  addCustomer,
+  getAllCustomers,
+  searchCustomer,
+  updateCustomer,
+  getNewCustomersThisMonth,
+  addCarToCustomer
+} = require('../controllers/customer.controller');
 
 /**
  * 📌 POST /api/customers
@@ -28,6 +35,18 @@ router.get('/search', searchCustomer);
  * עדכון פרטי לקוח לפי מזהה
  */
 router.put('/:id', updateCustomer);
+
+/**
+ * 📌 PUT /api/customers/:id/add-car
+ * הוספת רכב ללקוח קיים
+ */
+router.put("/:id/add-car", addCarToCustomer);
+
+/**
+ * 📌 GET /api/customers/new-this-month
+ * שליפת לקוחות שהצטרפו החודש
+ */
+router.get("/new-this-month", getNewCustomersThisMonth);
 
 // ייצוא ה-router לשימוש בקובץ server.js
 module.exports = router;

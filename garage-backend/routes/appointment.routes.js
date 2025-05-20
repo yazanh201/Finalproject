@@ -8,35 +8,20 @@ const {
   getByCarNumber,
   updateAppointment,
   getByIdOrCar,
-  getAppointmentByNumber 
+  getAppointmentByNumber,
+  getAppointmentsThisMonth // ✅
 } = require('../controllers/appointment.controller');
 
-// POST - הוספת תור
 router.post('/', addAppointment);
-
-// GET - כל התורים
 router.get('/', getAppointments);
-
-// GET - לפי ת"ז
 router.get('/by-id/:idNumber', getByIdNumber);
-
-// GET - לפי תאריך
 router.get('/by-date/:date', getByDate);
-
-// PUT - עדכון תור
 router.put('/:id', updateAppointment);
-
-// GET - לפי מספר רכב
 router.get('/by-car/:carNumber', getByCarNumber);
-
 router.get('/search/:term', getByIdOrCar);
-
-// GET - לפי מזהה תור (appointmentNumber)
 router.get('/by-number/:appointmentNumber', getAppointmentByNumber);
 
-
-
-
-
+// ✅ חדש – שליפת תורים של החודש הנוכחי
+router.get('/month', getAppointmentsThisMonth);
 
 module.exports = router;

@@ -13,7 +13,10 @@ import RecommendedCars from './recommendations/RecommendedCars';
 import ChatBot from "./components/ChatBot";
 import TreatmentsTable from "./Tabels/TreatmentsTable";
 import TreatmentDetails from './components/TreatmentDetails';
+
 import CreateTreatment from './components/CreateTreatment';
+import CustomerVehicles from './components/CustomerVehicles';
+
 
 
 
@@ -30,6 +33,7 @@ function App() {
         <Route path="/RecommendedCars" element={<RecommendedCars />} /> 
         <Route path="/treatment/:id" element={<TreatmentDetails />} />
         <Route path="/treatments" element={<TreatmentsTable />} />
+        <Route path="/customer-vehicles/:customerId" element={<CustomerVehicles />} />
         <Route path="/AdvancedDashboard" element={<AdvancedDashboard />} />
         <Route path="/create-treatment" element={<CreateTreatment />} />
 

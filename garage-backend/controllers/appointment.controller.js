@@ -18,6 +18,7 @@ const addAppointment = async (req, res) => {
       name: req.body.name,
       carNumber: req.body.carNumber,
       appointmentNumber: nextAppointmentNumber,
+      phoneNumber: req.body.phoneNumber,
       treatment: null // 🛑 אין טיפול עדיין – יתווסף לאחר אישור הגעה
     });
 
@@ -117,16 +118,19 @@ const getAppointmentByNumber = async (req, res) => {
 const getAppointmentsThisMonth = async (req, res) => {
   try {
     const now = new Date();
-    const monthAgo = new Date();
-    monthAgo.setMonth(now.getMonth() - 1);
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
 
     const appointments = await Appointment.find({
-      date: { $gte: monthAgo, $lte: now }
-    }).sort({ date: -1 });
+      date: {
+        $gte: startOfMonth.toISOString().slice(0, 10),
+        $lte: endOfMonth.toISOString().slice(0, 10),
+      }
+    }).sort({ date: 1, time: 1 });
 
     res.json(appointments);
   } catch (error) {
-    res.status(500).json({ message: '❌ שגיאה בשליפת תורים לחודש', error: error.message });
+    res.status(500).json({ message: '❌ שגיאה בשליפת תורים של החודש הנוכחי', error: error.message });
   }
 };
 

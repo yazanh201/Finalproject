@@ -8,6 +8,7 @@ const {
   searchVehicle,
   updateVehicle,
   deleteVehicle,
+  getCarsByCustomer,
 } = require('../controllers/vehicle.controller');
 
 /**
@@ -39,6 +40,13 @@ router.put('/:id', updateVehicle);
  * מחיקת רכב לפי מזהה
  */
 router.delete('/:id', deleteVehicle);
+
+/**
+ * 📌 GET /api/cars/by-customer/:customerId
+ * שליפת רכבים של לקוח מסוים לפי מזהה
+ */
+router.get('/by-customer/:customerId', getCarsByCustomer);
+
 
 // ייצוא הראוטר
 module.exports = router;

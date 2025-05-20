@@ -8,11 +8,12 @@ import DashboardOverview from "./DashboardOverview";
 import DashboardTables from "./DashboardTables";
 import MessageModal from "./MessageModal";
 import MonthlyAppointments from "../tabels/MonthlyAppointments";
+import NewCustomers from "../tabels/NewCustomers";
 
 const AdvancedDashboard = () => {
   const navigate = useNavigate();
+  const webcamRef = useRef(null);
 
-  // כלל המשתנים של המצב
   const [stats, setStats] = useState([]);
   const [notifications, setNotifications] = useState([]);
   const [delayedTreatments, setDelayedTreatments] = useState([]);
@@ -24,87 +25,36 @@ const AdvancedDashboard = () => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [sendToAll, setSendToAll] = useState(false);
   const [recommendedCars, setRecommendedCars] = useState([]);
-
+  const [monthlyAppointmentCount, setMonthlyAppointmentCount] = useState(0);
+  const [newCustomersCount, setNewCustomersCount] = useState(0);
   const [showCameraPanel, setShowCameraPanel] = useState(false);
   const [image, setImage] = useState(null);
   const [plate, setPlate] = useState("");
   const [loading, setLoading] = useState(false);
-  const webcamRef = useRef(null);
 
-  const goToDashboard = () => {
-    navigate("/dashboard");
-  };
-
-  const capturePhoto = () => {
-    const screenshot = webcamRef.current.getScreenshot();
-    setImage(screenshot);
-  };
-
-  
- const submitPhoto = async () => {
-  if (!image || !image.startsWith("data:image")) {
-    alert("❌ אין תמונה לשליחה. ודא שצילמת תמונה קודם.");
-    return;
-  }
-
-  setLoading(true);
-
-  try {
-    console.log("📤 שולח תמונה לשרת לזיהוי לוחית...");
-    const blob = await (await fetch(image)).blob();
-    const formData = new FormData();
-    formData.append("image", blob, "plate.png");
-
-    // 1. שליחת התמונה לשרת לזיהוי מספר רכב
-    const detectRes = await axios.post("http://localhost:3300/api/plate-detect", formData);
-    let { plateNumber } = detectRes.data;
-
-    if (!plateNumber) throw new Error("לא זוהתה לוחית מהשרת.");
-
-    // 2. ניקוי הלוחית מכל תווים לא מספריים
-    const cleanedPlate = plateNumber.replace(/[^\d]/g, "");
-    setPlate(cleanedPlate);
-
-    // 3. בקשת בדיקה לפי מספר רכב בלבד (בלי תאריך)
-    const checkRes = await axios.get("http://localhost:5000/api/treatments/check", {
-      params: { plate: cleanedPlate }
-    });
-
-    const { exists, customerName, idNumber, workerName } = checkRes.data;
-
-    if (exists) {
-      console.log("✅ טיפול נמצא:", { plateNumber: cleanedPlate, customerName, idNumber, workerName });
-
-      // 4. ניווט לטופס טיפול עם הנתונים
-      navigate("/create-treatment", {
-        state: {
-          plateNumber: cleanedPlate,
-          customerName,
-          idNumber,
-          workerName
-        }
-      });
-    } else {
-      alert("🚫 לא נמצא טיפול פתוח לרכב זה.");
-    }
-
-  } catch (err) {
-    console.error("❌ שגיאה בזיהוי או בבדיקת טיפול:", err);
-    alert("❌ לא הצלחנו לזהות מספר רכב או לבדוק טיפול.");
-  } finally {
-    setLoading(false);
-  }
-};
-
-
-
-
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [customersRes, appointmentsRes] = await Promise.all([
+          fetch("http://localhost:5000/api/customers/new-this-month"),
+          fetch("http://localhost:5000/api/appointments/month")
+        ]);
+        const customersData = await customersRes.json();
+        const appointmentsData = await appointmentsRes.json();
+        setNewCustomersCount(customersData.length);
+        setMonthlyAppointmentCount(appointmentsData.length);
+      } catch (error) {
+        console.error("❌ Error loading stats:", error);
+      }
+    };
+    fetchData();
+  }, []);
 
   useEffect(() => {
     setStats([
-      { title: "סה״כ תורים לחודש", value: 25, key: "appointments" },
+      { title: "סה״כ תורים לחודש", value: monthlyAppointmentCount, key: "appointments" },
       { title: "רכבים בטיפול", value: 12, key: "carsUnderMaintenance" },
-      { title: "לקוחות חדשים", value: 8, key: "newCustomers" },
+      { title: "לקוחות חדשים", value: newCustomersCount, key: "newCustomers" },
       { title: "הכנסות החודש (₪)", value: 12000, key: "income" },
       { title: "טיפולים שהתעכבו", value: 2, key: "delayedTreatments" },
     ]);
@@ -120,11 +70,10 @@ const AdvancedDashboard = () => {
       { רכב: "יונדאי i20", סיבה: "מחכים לחלפים", איחור: "3 ימים", לוחית: "123-45-678" },
       { רכב: "טויוטה קורולה", סיבה: "חוסר כוח אדם", איחור: "יום אחד", לוחית: "987-65-432" },
     ]);
-  }, []);
+  }, [monthlyAppointmentCount, newCustomersCount]);
 
   useEffect(() => {
     const today = new Date();
-
     const cars = [
       { id: 1, owner: "ישראל כהן", plateNumber: "123-45-678", lastServiceDate: "2025-08-10", lastKm: 20000, avgMonthlyKm: 2000 },
       { id: 2, owner: "דני לוי", plateNumber: "987-65-432", lastServiceDate: "2023-06-15", lastKm: 45000, avgMonthlyKm: 1800 },
@@ -133,39 +82,30 @@ const AdvancedDashboard = () => {
 
     const filteredCars = cars.map((car) => {
       const lastServiceDate = new Date(car.lastServiceDate);
-      const monthsSinceService =
-        (today.getFullYear() - lastServiceDate.getFullYear()) * 12 +
-        (today.getMonth() - lastServiceDate.getMonth());
+      const monthsSinceService = (today.getFullYear() - lastServiceDate.getFullYear()) * 12 +
+                                  (today.getMonth() - lastServiceDate.getMonth());
       const estimatedKm = car.lastKm + monthsSinceService * car.avgMonthlyKm;
       const needsService = monthsSinceService >= 6 || estimatedKm - car.lastKm >= 15000;
-      return needsService
-        ? {
-            "מספר רכב": car.plateNumber,
-            "בעלים": car.owner,
-            "קילומטרים משוערים": estimatedKm.toLocaleString(),
-            "חודשים מהטיפול האחרון": monthsSinceService,
-          }
-        : null;
-    }).filter(car => car !== null);
+      return needsService ? {
+        "מספר רכב": car.plateNumber,
+        "בעלים": car.owner,
+        "קילומטרים משוערים": estimatedKm.toLocaleString(),
+        "חודשים מהטיפול האחרון": monthsSinceService
+      } : null;
+    }).filter(Boolean);
 
     setRecommendedCars(filteredCars);
   }, []);
 
   const showTable = (key) => {
-    let data = [];
-    let title = "";
     switch (key) {
       case "recommendedCars":
-        data = recommendedCars;
-        title = "רכבים מומלצים לבדיקה";
+        setTableData(recommendedCars);
+        setTableTitle("רכבים מומלצים לבדיקה");
         break;
       case "newCustomers":
-        data = [
-          { name: "ישראל כהן", phone: "050-1234567", joined: "15/03/2025" },
-          { name: "מיכל לוי", phone: "052-9876543", joined: "18/03/2025" },
-        ];
-        title = "לקוחות חדשים";
-        break;
+        setSelectedTable("newCustomers");
+        return;
       case "todayAppointments":
         fetch("http://localhost:5000/api/appointments")
           .then(res => res.json())
@@ -187,23 +127,20 @@ const AdvancedDashboard = () => {
           });
         return;
       case "carsUnderMaintenance":
-        data = delayedTreatments;
-        title = "רכבים בטיפול";
+      case "delayedTreatments":
+        setTableData(delayedTreatments);
+        setTableTitle(key === "carsUnderMaintenance" ? "רכבים בטיפול" : "טיפולים שהתעכבו");
         break;
       case "appointments":
         setSelectedTable("monthlyAppointments");
         return;
-      case "delayedTreatments":
-        data = delayedTreatments;
-        title = "טיפולים שהתעכבו";
-        break;
       default:
-        data = [];
+        setTableData([]);
+        setSelectedTable(null);
+        return;
     }
 
     setSelectedTable(key);
-    setTableData(data);
-    setTableTitle(title);
   };
 
   const handleConfirmArrival = async (value) => {
@@ -214,7 +151,6 @@ const AdvancedDashboard = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ appointmentId })
       });
-
       const data = await res.json();
       if (res.ok) {
         alert("✅ טיפול נוסף!");
@@ -224,6 +160,56 @@ const AdvancedDashboard = () => {
       }
     } catch (error) {
       alert("❌ שגיאה בחיבור לשרת");
+    }
+  };
+
+  const capturePhoto = () => {
+    const screenshot = webcamRef.current.getScreenshot();
+    setImage(screenshot);
+  };
+
+  const submitPhoto = async () => {
+    if (!image || !image.startsWith("data:image")) {
+      alert("❌ אין תמונה לשליחה. ודא שצילמת תמונה קודם.");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const blob = await (await fetch(image)).blob();
+      const formData = new FormData();
+      formData.append("image", blob, "plate.png");
+
+      const detectRes = await axios.post("http://localhost:3300/api/plate-detect", formData);
+      let { plateNumber } = detectRes.data;
+      if (!plateNumber) throw new Error("לא זוהתה לוחית מהשרת.");
+
+      const cleanedPlate = plateNumber.replace(/[^\d]/g, "");
+      setPlate(cleanedPlate);
+
+      const checkRes = await axios.get("http://localhost:5000/api/treatments/check", {
+        params: { plate: cleanedPlate }
+      });
+
+      const { exists, customerName, idNumber, workerName } = checkRes.data;
+      if (exists) {
+        navigate("/create-treatment", {
+          state: {
+            plateNumber: cleanedPlate,
+            customerName,
+            idNumber,
+            workerName
+          }
+        });
+      } else {
+        alert("🚫 לא נמצא טיפול פתוח לרכב זה.");
+      }
+    } catch (err) {
+      console.error("❌ שגיאה בזיהוי או בבדיקת טיפול:", err);
+      alert("❌ לא הצלחנו לזהות מספר רכב או לבדוק טיפול.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -239,7 +225,7 @@ const AdvancedDashboard = () => {
     <div className={styles.dashboardContainer}>
       <header className={styles.dashboardHeader}>
         <h2 className={styles.headerTitle}>לוח ניהול מתקדם</h2>
-        <button className={styles.backBtn} onClick={goToDashboard}>
+        <button className={styles.backBtn} onClick={() => navigate("/dashboard")}>
           <FaArrowLeft className={styles.icon} /> חזור לדשבורד
         </button>
       </header>
@@ -261,21 +247,22 @@ const AdvancedDashboard = () => {
           onNotificationClick={showTable}
         />
 
-        <DashboardTables
-          selectedTable={selectedTable}
-          tableTitle={tableTitle}
-          tableData={tableData}
-          tableHeaders={tableHeaders}
-          onClose={() => setSelectedTable(null)}
-          onConfirmArrival={handleConfirmArrival}
-        />
-
-        {selectedTable === "monthlyAppointments" && (
+        {selectedTable === "monthlyAppointments" ? (
           <MonthlyAppointments onClose={() => setSelectedTable(null)} />
+        ) : selectedTable === "newCustomers" ? (
+          <NewCustomers onClose={() => setSelectedTable(null)} />
+        ) : (
+          <DashboardTables
+            selectedTable={selectedTable}
+            tableTitle={tableTitle}
+            tableData={tableData}
+            tableHeaders={tableHeaders}
+            onClose={() => setSelectedTable(null)}
+            onConfirmArrival={handleConfirmArrival}
+          />
         )}
       </main>
 
-      {/* 🎥 מצלמה בצד */}
       {showCameraPanel && (
         <div style={{
           position: "fixed",
@@ -300,7 +287,6 @@ const AdvancedDashboard = () => {
               <button style={{ marginTop: 10 }} onClick={capturePhoto}>📷 צלם</button>
             </>
           )}
-
           {image && (
             <>
               <img src={image} alt="צולם" width={280} />
@@ -310,9 +296,7 @@ const AdvancedDashboard = () => {
               <button onClick={() => setImage(null)}>🔄 צלם שוב</button>
             </>
           )}
-
           {plate && <p style={{ marginTop: 10 }}>🔢 לוחית שזוהתה: <strong>{plate}</strong></p>}
-
           <button style={{ marginTop: 10 }} onClick={() => {
             setShowCameraPanel(false);
             setImage(null);

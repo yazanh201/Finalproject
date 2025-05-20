@@ -15,10 +15,11 @@ const vehicleSchema = new mongoose.Schema({
     type: String,
     required: false,
   },
-  manufacturer: {    // ✅ שינוי קטן - מ-brand ל-manufacturer
+  manufacturer: {
     type: String,
-    required: false,
-  },
+    trim: true,
+},
+
   model: {
     type: String,
     required: false,

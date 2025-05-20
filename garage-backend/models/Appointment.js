@@ -30,9 +30,13 @@ const appointmentSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  phoneNumber: {                     // ✅ השדה החדש
+    type: String,
+    required: false
+  },
   treatment: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Treatment' // קישור ישיר למסמך בטבלת טיפולים
+    ref: 'Treatment'
   }
 }, {
   timestamps: true

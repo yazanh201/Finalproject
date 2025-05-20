@@ -1,20 +1,22 @@
 const Vehicle = require('../models/Vehicle');
+const Customer = require("../models/Customer");
 
 // 📌 הוספת רכב חדש
 const addVehicle = async (req, res) => {
   try {
-    const { vehicleNumber, owner, ownerID, brand, model, year, color, mileage } = req.body;
+    const { vehicleNumber, ownerName, ownerIdNumber, manufacturer, model, year, color, mileage } = req.body;
 
     const newVehicle = new Vehicle({
-        vehicleNumber: vehicleNumber || '',
-        owner: owner || '',
-        ownerID: ownerID || '',
-        brand: brand || '',
-        model: model || '',
-        year: year || 0,
-        color: color || '',
-        mileage: mileage || 0,
-      });
+      vehicleNumber: vehicleNumber || '',
+      ownerName: ownerName || '',
+      ownerIdNumber: ownerIdNumber || '',
+      manufacturer: manufacturer || '',
+      model: model || '',
+      year: year || 0,
+      color: color || '',
+      mileage: mileage || 0,
+    });
+
 
     await newVehicle.save();
 
@@ -44,7 +46,8 @@ const searchVehicle = async (req, res) => {
     const vehicles = await Vehicle.find({
       $or: [
         { vehicleNumber: { $regex: query, $options: 'i' } },
-        { ownerID: { $regex: query, $options: 'i' } },
+        { ownerIdNumber: { $regex: query, $options: 'i' } },
+        { ownerName: { $regex: query, $options: 'i' } }, // נוסיף גם שם לחיפוש חכם
       ],
     });
 
@@ -54,6 +57,7 @@ const searchVehicle = async (req, res) => {
     res.status(500).json({ message: '❌ שגיאה בשרת', error: error.message });
   }
 };
+
 
 // 📌 עדכון פרטי רכב לפי ID
 const updateVehicle = async (req, res) => {
@@ -92,6 +96,22 @@ const deleteVehicle = async (req, res) => {
   }
 };
 
+
+const getCarsByCustomer = async (req, res) => {
+  try {
+    const customerId = req.params.customerId;
+    const customer = await Customer.findById(customerId);
+    if (!customer) return res.status(404).json({ message: "לקוח לא נמצא" });
+
+    const cars = await Vehicle.find({ vehicleNumber: { $in: customer.vehicles } });
+    res.json(cars);
+  } catch (error) {
+    console.error("❌ שגיאה בשליפת רכבים לפי לקוח:", error.message);
+    res.status(500).json({ message: "שגיאה בשרת", error: error.message });
+  }
+};
+
+
 // 📤 ייצוא הפונקציות
 module.exports = {
   addVehicle,
@@ -99,4 +119,5 @@ module.exports = {
   searchVehicle,
   updateVehicle,
   deleteVehicle,
+  getCarsByCustomer,
 };
