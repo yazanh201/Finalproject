@@ -1,0 +1,271 @@
+.dashboardContainer {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: #f4f6f9;
+  direction: rtl;
+}
+
+/* ===== Header ===== */
+.header {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  height: 70px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #2d2d2d;
+  color: white;
+  padding: 10px 20px;
+  z-index: 1000;
+}
+
+.navbar-toggler {
+  background-color: transparent;
+  border: none;
+  color: white;
+  font-size: 28px;
+  cursor: pointer;
+  display: none;
+}
+
+/* Title section in the header */
+.dashboardTitle {
+  text-align: center;
+}
+
+.dashboardTitle h4 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.dashboardTitle h5 {
+  margin: 0;
+  font-size: 14px;
+}
+
+/* Button group in header */
+.navbar-collapse {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.navbar-collapse.show {
+  display: flex;
+  flex-direction: column;
+  background-color: #2d2d2d;
+  position: absolute;
+  top: 70px;
+  right: 0;
+  width: 100%;
+  padding: 15px;
+  z-index: 999;
+}
+
+/* Header buttons */
+.advancedDashboardBtn,
+.logoutBtn {
+  background-color: #0097e6;
+  color: white;
+  padding: 10px 15px;
+  border-radius: 5px;
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.logoutBtn {
+  background-color: #e84118;
+}
+
+.advancedDashboardBtn:hover,
+.logoutBtn:hover {
+  opacity: 0.9;
+}
+
+/* ===== Sidebar ===== */
+.mainWrapper {
+  display: flex;
+  flex-grow: 1;
+  margin-top: 70px;
+}
+
+.sidebar {
+  position: fixed;
+  right: 0;
+  top: 70px;
+  width: 250px;
+  height: calc(100vh - 70px);
+  background-color: #333;
+  padding-top: 20px;
+  overflow-y: auto;
+  box-shadow: -2px 0 10px rgba(0, 0, 0, 0.2);
+  direction: rtl;
+}
+
+.navList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.navItem {
+  padding: 10px 15px;
+  border-bottom: 1px solid #444;
+  text-align: right;
+}
+
+.sidebarBtn {
+  width: 100%;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 16px;
+  padding: 12px 15px;
+  cursor: pointer;
+  transition: 0.3s;
+  font-weight: bold;
+  text-align: right;
+}
+
+.sidebarBtn:hover {
+  background-color: #555;
+}
+
+/* ===== Main Content ===== */
+.mainContent {
+  flex-grow: 1;
+  margin-right: 260px;
+  padding: 30px;
+  background-color: #f8f9fa;
+  min-height: 100vh;
+  text-align: center;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+  .navbar-toggler {
+    display: block;
+  }
+
+  .navbar-collapse {
+    display: none;
+  }
+
+  .mainContent {
+    margin-right: 210px;
+  }
+
+  .sidebar {
+    width: 200px;
+  }
+}
+
+@media (max-width: 500px) {
+  .sidebar {
+    width: 180px;
+  }
+
+  .mainContent {
+    margin-right: 190px;
+    padding: 15px;
+  }
+
+  .dashboardTitle h4 {
+    font-size: 18px;
+  }
+
+  .dashboardTitle h5 {
+    font-size: 12px;
+  }
+}
+
+
+.headerActions {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.headerLink,
+.headerLinkLogout {
+  display: flex;
+  align-items: center;
+  color: #f1f1f1;
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: bold;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.2s ease-in-out;
+}
+
+.headerLink:hover,
+.headerLinkLogout:hover {
+  color: #fbc531; /* צבע זהב יפה */
+}
+
+.icon {
+  margin-left: 5px;
+  font-size: 18px;
+}
+
+
+.dropdownWrapper {
+  position: relative;
+  display: inline-block;
+  z-index: 1000;
+}
+
+.dropdownMenu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 8px;
+  background-color: #2d2d2d; /* כמו ה־header שלך */
+  border-radius: 10px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+  min-width: 200px;
+  z-index: 1000;
+  direction: rtl;
+  overflow: hidden;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dropdownItem {
+  background: none;
+  color: #f1f1f1;
+  padding: 10px 22px;
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
+  text-align: right;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: inherit;
+  width: 100%;
+  transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out;
+}
+
+.dropdownItem:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #fbc531;
+}

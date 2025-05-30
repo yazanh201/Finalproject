@@ -1,0 +1,143 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+/* 🔵 כפתור צ'אט צף */
+.chat-toggle {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: linear-gradient(135deg, white);
+  color:green;
+  border: none;
+  padding: 15px;
+  border-radius: 50%;
+  font-size: 24px;
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.chat-toggle:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.3);
+}
+
+/* 🟣 חלון הצ'אט */
+.chat-container {
+  position: fixed;
+  bottom: 80px;
+  right: 20px;
+  width: 360px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 15px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+/* ✨ אנימציה לפתיחת הצ'אט */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 🔹 כותרת הצ'אט */
+.chat-header {
+  background: linear-gradient(135deg, blue);
+  color: white;
+  padding: 12px 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 16px;
+  border-radius: 15px 15px 0 0;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.close-btn:hover {
+  color: #ffcccc;
+}
+
+/* 🗨️ תיבת הצ'אט */
+.chat-box {
+  height: 320px;
+  overflow-y: auto;
+  padding: 15px;
+  background: #f1f1f1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* 💬 הודעת משתמש */
+.user-msg {
+  align-self: flex-end;
+  background: #007bff;
+  color: white;
+  padding: 10px;
+  border-radius: 12px;
+  max-width: 75%;
+  word-wrap: break-word;
+  text-align: right;
+  font-size: 14px;
+  animation: slideUp 0.3s ease-in-out;
+}
+
+/* 🤖 הודעת בוט */
+.bot-msg {
+  align-self: flex-start;
+  background: #e5e5ea;
+  color: black;
+  padding: 10px;
+  border-radius: 12px;
+  max-width: 75%;
+  word-wrap: break-word;
+  text-align: left;
+  font-size: 14px;
+  animation: slideUp 0.3s ease-in-out;
+}
+
+/* 🔤 תיבת הקלט */
+.input-container {
+  display: flex;
+  padding: 10px;
+  background: white;
+  border-top: 1px solid #ddd;
+}
+
+input {
+  flex: 1;
+  padding: 10px;
+}
+
+button {
+  background: linear-gradient(135deg,rgb(0, 145, 255));
+  color: white;
+  padding: 10px;
+}

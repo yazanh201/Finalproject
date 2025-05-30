@@ -1,0 +1,6 @@
+ultralytics==8.0.204
+opencv-python
+easyocr
+Flask
+flask-cors
+numpy
