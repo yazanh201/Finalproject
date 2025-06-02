@@ -1,0 +1,37 @@
+.chartContainer {
+  background-color: white;
+  border-radius: 15px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  width: 100%;
+  max-width: 650px; /* שומר על רוחב נוח */
+  margin: 20px auto;
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.chartContainer:hover {
+  transform: scale(1.02);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+.chartTitle {
+  font-size: 1.5rem;
+  color: #333;
+  margin-bottom: 15px;
+  font-weight: bold;
+}
+
+.recharts-cartesian-grid line {
+  stroke: #e0e0e0; /* קווים עדינים לגריד */
+}
+
+.recharts-tooltip-label {
+  color: #555;
+  font-weight: bold;
+}
+
+.recharts-legend-wrapper {
+  margin-top: 10px;
+}
+

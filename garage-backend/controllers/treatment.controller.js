@@ -157,7 +157,7 @@ const confirmArrivalAndAddTreatment = async (req, res) => {
       images: [],
       cost: 0,
       repairTypeId: null,
-      status: 'בהמתנה'
+      status: 'בטיפול'
     });
 
     await treatment.save();

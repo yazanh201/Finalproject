@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import styles from "../cssfiles/Advanceddashboard.module.css";
+import useNotifications from "../advanceddashboard/useNotifications";
 
 const TodayAppointments = ({ onClose }) => {
   const [appointments, setAppointments] = useState([]);
+  const { addNotification } = useNotifications(); // 📢 קרא ל-hook
 
   useEffect(() => {
     fetchTodayAppointments();
@@ -22,31 +24,27 @@ const TodayAppointments = ({ onClose }) => {
 
   const handleConfirmArrival = async (appointment) => {
     const appointmentId = appointment._id;
-
     try {
-      // עדכון ל"הגיע"
       const res = await fetch(`http://localhost:5000/api/appointments/appointments/${appointmentId}/confirm-arrival`, {
         method: "POST",
         headers: { "Content-Type": "application/json" }
       });
-
       const data = await res.json();
       if (!res.ok) {
         alert("❌ שגיאה בעדכון סטטוס: " + data.message);
         return;
       }
 
-      // פתיחת טיפול אוטומטי
       const treatmentRes = await fetch("http://localhost:5000/api/treatments/confirm-arrival", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ appointmentId })
       });
-
       const treatmentData = await treatmentRes.json();
       if (treatmentRes.ok) {
         alert("✅ טיפול נוסף והסטטוס עודכן להגעה!");
         fetchTodayAppointments();
+        addNotification("newTreatment", { appointmentId, message: "✅ טיפול נוסף נוצר בעקבות אישור הגעה!" }); // 📢 קריאה ישירה
       } else {
         alert("❌ שגיאה ביצירת טיפול: " + treatmentData.message);
       }
@@ -101,18 +99,8 @@ const TodayAppointments = ({ onClose }) => {
               <td>{a.time}</td>
               <td>{a.description}</td>
               <td>
-                <button
-                  className="btn btn-primary me-3"
-                  onClick={() => handleConfirmArrival(a)}
-                >
-                 הגיע ✅ 
-                </button>
-                <button
-                  className="btn btn-primary me-3"
-                  onClick={() => handleRejectArrival(a)}
-                >
-                 לא הגיע ❌
-                </button>
+                <button className="btn btn-primary me-3" onClick={() => handleConfirmArrival(a)}> הגיע ✅ </button>
+                <button className="btn btn-primary me-3" onClick={() => handleRejectArrival(a)}> לא הגיע ❌ </button>
               </td>
             </tr>
           ))}

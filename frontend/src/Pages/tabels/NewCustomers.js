@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import DashboardTables from "../advanceddashboard/DashboardTables"; // ודא שזה הנתיב הנכון
 import styles from "../cssfiles/Advanceddashboard.module.css";
 
 const NewCustomers = ({ onClose }) => {
@@ -18,31 +19,24 @@ const NewCustomers = ({ onClose }) => {
     fetchNewCustomers();
   }, []);
 
+  // הכנת headers תואמים בדיוק לכותרות שלך
+  const tableHeaders = ["שם", "טלפון", "ת\"ז", "תאריך הרשמה"];
+
+  // יצירת tableData בפורמט מתאים בדיוק כמו שהטבלה דורשת
+  const tableData = customers.map(c => ({
+    "שם": c.name,
+    "טלפון": c.phone,
+    "ת\"ז": c.idNumber,
+    "תאריך הרשמה": new Date(c.createdAt).toLocaleDateString()
+  }));
+
   return (
-    <div className={styles.tableSection}>
-      <h3>👥 לקוחות חדשים החודש</h3>
-      <button className={styles.closeTable} onClick={onClose}>❌ סגור</button>
-      <table>
-        <thead>
-          <tr>
-            <th>שם</th>
-            <th>טלפון</th>
-            <th>ת"ז</th>
-            <th>תאריך הרשמה</th>
-          </tr>
-        </thead>
-        <tbody>
-          {customers.map((c, idx) => (
-            <tr key={idx}>
-              <td>{c.name}</td>
-              <td>{c.phone}</td>
-              <td>{c.idNumber}</td>
-              <td>{new Date(c.createdAt).toLocaleDateString()}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <DashboardTables
+      tableTitle="👥 לקוחות חדשים החודש"
+      tableHeaders={tableHeaders}
+      tableData={tableData}
+      onClose={onClose}
+    />
   );
 };
 

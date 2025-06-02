@@ -19,12 +19,12 @@
   }
   
   /* 🔷 כותרת */
-  .headerh2 {
-    margin: 0;
+  .headerTitle {
     font-size: 22px;
     font-weight: bold;
     text-align: center;
     flex-grow: 1;
+    margin-right: 180px;
   }
   
   /* 🔷 כפתור חזור */
@@ -51,29 +51,56 @@
   
 
 .sidebar {
-    position: fixed;
-    right: 0;
-    top: 60px;
-    width: 250px;
-    height: calc(100vh - 60px);
-    background-color: #2f3640;
-    color: white;
-    padding-top: 20px;
-    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.2);
+  position: fixed;
+  right: 0;
+  top: 0; /* מגדיר שה-sidebar יתחיל מהחלק העליון של הדף */
+  width: 250px;
+  height: 100vh; /* גובה מלא של חלון הדפדפן */
+  background-color: #2d2d2d;
+  color: white;
+  padding-top: 80px; /* התאמה לגובה ה-header שלך */
+  box-shadow: -2px 0 10px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 1000; /* כדי להיות מעל שאר התוכן */
 }
 
+.navList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.navItem {
+  padding: 10px 15px;
+  border-bottom: 1px solid #444;
+  text-align: right;
+}
+
+.sidebarBtn {
+  width: 100%;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 18px;
+  padding: 12px 15px;
+  cursor: pointer;
+  transition: 0.3s;
+  font-weight: bold;
+  text-align: right;
+  margin-left: 50px;
+}
+
+.sidebarBtn:hover {
+  background-color: #555;
+}
+
+
 .sendMessageBtn {
-    width: 90%;
-    margin: 10px auto;
-    padding: 12px;
-    background-color: #0097e6;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    font-size: 16px;
-    cursor: pointer;
-    text-align: center;
-    margin-right: 10px;
+  padding: 10px 15px;
+  border-bottom: 1px solid #444;
+  text-align: right;
 }
 
 .sendMessageBtn:hover {
