@@ -8,7 +8,9 @@ const useNotifications = () => {
     const now = Date.now();
     const valid = saved.filter(n => now - n.timestamp < 12 * 60 * 60 * 1000);
     setActiveNotifications(valid);
-  }, []);
+    localStorage.setItem("activeNotifications", JSON.stringify(valid)); // ← הוספה
+    }, []);
+
 
   const addNotification = (type, data) => {
     const saved = JSON.parse(localStorage.getItem("activeNotifications")) || [];

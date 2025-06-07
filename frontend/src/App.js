@@ -9,7 +9,6 @@ import Dashboard from './Pages/Dashboard';
 import PrivateRoute from './PrivateRoute';
 import About from './Pages/About';
 import AdvancedDashboard from "./Pages/advanceddashboard/AdvancedDashboard"; 
-import RecommendedCars from './recommendations/RecommendedCars';
 import ChatBot from "./components/ChatBot";
 import TreatmentsTable from "./Tabels/TreatmentsTable";
 import TreatmentDetails from './components/TreatmentDetails';
@@ -27,7 +26,6 @@ function App() {
         <Route path="/Services" element={<Services />} />
         <Route path='/Login' element={<Login />} />
         <Route path="/About" element={<About />} />
-        <Route path="/RecommendedCars" element={<RecommendedCars />} /> 
         <Route path="/AppointmentForm" element={<NewAppointmentForm />} />
         <Route path="/appointments/edit/:id" element={<NewAppointmentForm />} /> {/* 🔥 הוספת נתיב עריכה */}
         <Route path="/treatment/:id" element={<TreatmentDetails />} />

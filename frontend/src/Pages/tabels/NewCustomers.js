@@ -20,15 +20,16 @@ const NewCustomers = ({ onClose }) => {
   }, []);
 
   // הכנת headers תואמים בדיוק לכותרות שלך
-  const tableHeaders = ["שם", "טלפון", "ת\"ז", "תאריך הרשמה"];
+  const tableHeaders = ["שם", "טלפון", "ת\"ז", "מספר רכב"];
 
   // יצירת tableData בפורמט מתאים בדיוק כמו שהטבלה דורשת
   const tableData = customers.map(c => ({
     "שם": c.name,
     "טלפון": c.phone,
     "ת\"ז": c.idNumber,
-    "תאריך הרשמה": new Date(c.createdAt).toLocaleDateString()
+     "מספר רכב": c.vehicles[0] || "—"
   }));
+
 
   return (
     <DashboardTables

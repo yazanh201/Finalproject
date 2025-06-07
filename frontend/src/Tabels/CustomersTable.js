@@ -187,6 +187,18 @@ const [phoneSuffix, setPhoneSuffix] = useState('');
     }
   };
 
+  const formatPhone = (phone) => {
+    // הסר כל תו שהוא לא ספרה
+    const digits = phone.replace(/\D/g, '');
+    
+    // אם מתחיל ב־0, החלף ב־972
+    if (digits.startsWith("0")) {
+      return "972" + digits.slice(1);
+    }
+
+    return digits;
+  };
+
   return (
     <div>
       <div className="text-center">
@@ -222,7 +234,15 @@ const [phoneSuffix, setPhoneSuffix] = useState('');
               <td>{index + 1}</td>
               <td>{customer.name || '-'}</td>
               <td>{customer.idNumber || '-'}</td>
-              <td>{customer.phone || '-'}</td>
+                <td>
+                  <a
+                    href={`https://wa.me/${formatPhone(customer.phone)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {customer.phone}
+                  </a>
+                </td>
               <td>{customer.email || '-'}</td>
               <td className={customer.status === "פעיל" ? "text-success" : "text-danger"}>
                 {customer.status || '-'}
@@ -286,6 +306,17 @@ const [phoneSuffix, setPhoneSuffix] = useState('');
             <div className="form-group mb-3">
               <label>מספר טלפון</label>
               <div className="d-flex gap-2">
+                <input
+                  type="text"
+                  className="form-control"
+                  value={phoneSuffix}
+                  onChange={(e) => {
+                    const onlyDigits = e.target.value.replace(/\D/g, '');
+                    setPhoneSuffix(onlyDigits);
+                  }}
+                  maxLength={7}
+                  required
+                />
                 <select
                   className="form-select"
                   style={{ maxWidth: "100px" }}
@@ -300,17 +331,6 @@ const [phoneSuffix, setPhoneSuffix] = useState('');
                   <option value="055">055</option>
                   <option value="058">058</option>
                 </select>
-                <input
-                  type="text"
-                  className="form-control"
-                  value={phoneSuffix}
-                  onChange={(e) => {
-                    const onlyDigits = e.target.value.replace(/\D/g, '');
-                    setPhoneSuffix(onlyDigits);
-                  }}
-                  maxLength={7}
-                  required
-                />
               </div>
             </div>
             <div className="form-group mb-3">

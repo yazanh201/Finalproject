@@ -14,11 +14,12 @@ import ArrivedCars from "../tabels/ArrivedCars";
 import CompletedTreatments from "../tabels/CompletedTreatments";
 import useNotifications from "./useNotifications";
 import CarsUnderService from "../tabels/CarsUnderService"; // ודא נתיב נכון
-
+import RecommendedCars from "../tabels/RecommendedCars";
 
 const AdvancedDashboard = () => {
   const navigate = useNavigate();
-  const webcamRef = useRef(null);
+  const tableRef = useRef(null);
+
 
   const [stats, setStats] = useState([]);
   const [delayedTreatments, setDelayedTreatments] = useState([]);
@@ -29,7 +30,6 @@ const AdvancedDashboard = () => {
   const [message, setMessage] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [sendToAll, setSendToAll] = useState(false);
-  const [recommendedCars, setRecommendedCars] = useState([]);
   const [monthlyAppointmentCount, setMonthlyAppointmentCount] = useState(0);
   const [newCustomersCount, setNewCustomersCount] = useState(0);
   const [dynamicTableHeaders, setDynamicTableHeaders] = useState([]);
@@ -77,59 +77,40 @@ const AdvancedDashboard = () => {
 ]);
   }, [monthlyAppointmentCount, newCustomersCount,carsInServiceCount]);
 
-  useEffect(() => {
-    const today = new Date();
-    const cars = [
-      { id: 1, owner: "ישראל כהן", plateNumber: "123-45-678", lastServiceDate: "2025-08-10", lastKm: 20000, avgMonthlyKm: 2000 },
-      { id: 2, owner: "דני לוי", plateNumber: "987-65-432", lastServiceDate: "2023-06-15", lastKm: 45000, avgMonthlyKm: 1800 },
-      { id: 3, owner: "מיכל לוי", plateNumber: "789-12-345", lastServiceDate: "2023-10-01", lastKm: 30000, avgMonthlyKm: 2200 },
-    ];
-
-    const filteredCars = cars.map((car) => {
-      const lastServiceDate = new Date(car.lastServiceDate);
-      const monthsSinceService = (today.getFullYear() - lastServiceDate.getFullYear()) * 12 +
-        (today.getMonth() - lastServiceDate.getMonth());
-      const estimatedKm = car.lastKm + monthsSinceService * car.avgMonthlyKm;
-      const needsService = monthsSinceService >= 6 || estimatedKm - car.lastKm >= 15000;
-      return needsService ? {
-        "מספר רכב": car.plateNumber,
-        "בעלים": car.owner,
-        "קילומטרים משוערים": estimatedKm.toLocaleString(),
-        "חודשים מהטיפול האחרון": monthsSinceService
-      } : null;
-    }).filter(Boolean);
-
-    setRecommendedCars(filteredCars);
-  }, []);
-
   const showTable = (key) => {
     switch (key) {
       case "recommendedCars":
-        setTableData(recommendedCars);
-        setTableTitle("רכבים מומלצים לבדיקה");
+        setSelectedTable("recommendedCars");
         break;
       case "newCustomers":
         setSelectedTable("newCustomers");
-        return;
+        break;
       case "todayAppointments":
         setSelectedTable("todayAppointments");
-        return;
-      case "carsUnderService": // 🚀 המפתח החדש
-        setSelectedTable("carsUnderService"); // הפעלת הקומפוננטה החדשה
-        return;
+        break;
+      case "carsUnderService":
+        setSelectedTable("carsUnderService");
+        break;
       case "delayedTreatments":
         setTableData(delayedTreatments);
         setTableTitle("טיפולים שהתעכבו");
+        setSelectedTable("delayedTreatments");
         break;
       case "appointments":
         setSelectedTable("monthlyAppointments");
-        return;
+        break;
       default:
         setTableData([]);
         setSelectedTable(null);
-        return;
+        break;
     }
+
+    // גלילה לטבלה אחרי שינוי selectedTable
+    setTimeout(() => {
+      tableRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, 300);
   };
+
 
 
 
@@ -215,26 +196,34 @@ const handleNotificationClick = (type, data) => {
             onNotificationClick={(type, data) => handleNotificationClick(type, data)}
           />
 
-          {selectedTable === "monthlyAppointments" ? (
-            <MonthlyAppointments onClose={() => setSelectedTable(null)} />
-          ) : selectedTable === "newCustomers" ? (
-            <NewCustomers onClose={() => setSelectedTable(null)} />
-          ) : selectedTable === "todayAppointments" ? (
-            <TodayAppointments onClose={() => setSelectedTable(null)} />
-          ) : selectedTable === "arrivedCars" ? (
-            <ArrivedCars onClose={() => setSelectedTable(null)} />
-          ) : selectedTable === "completedTreatments" ? (
-            <CompletedTreatments onClose={() => setSelectedTable(null)} />
-          ) : selectedTable === "carsUnderService" ? (  // 🚀 הוספה כאן
-            <CarsUnderService  onClose={() => setSelectedTable(null)} />
-          ) : (
+          <div ref={tableRef}>
+            {selectedTable === "monthlyAppointments" ? (
+              <MonthlyAppointments onClose={() => setSelectedTable(null)} />
+            ) : selectedTable === "newCustomers" ? (
+              <NewCustomers onClose={() => setSelectedTable(null)} />
+            ) : selectedTable === "todayAppointments" ? (
+              <TodayAppointments onClose={() => setSelectedTable(null)} />
+            ) : selectedTable === "arrivedCars" ? (
+              <ArrivedCars onClose={() => setSelectedTable(null)} />
+            ) : selectedTable === "completedTreatments" ? (
+              <CompletedTreatments onClose={() => setSelectedTable(null)} />
+            ) : selectedTable === "carsUnderService" ? (
+              <CarsUnderService onClose={() => setSelectedTable(null)} />
+            ) : selectedTable === "recommendedCars" ? (
+              <RecommendedCars onClose={() => setSelectedTable(null)} />
+            ) : (
               <DashboardTables
                 tableTitle={tableTitle}
                 tableData={tableData}
-                tableHeaders={selectedTable === "dynamic" ? dynamicTableHeaders : tableHeaders[selectedTable]}
+                tableHeaders={
+                  selectedTable === "dynamic"
+                    ? dynamicTableHeaders
+                    : tableHeaders[selectedTable]
+                }
                 onClose={() => setSelectedTable(null)}
               />
             )}
+          </div>
 
 
 
