@@ -15,6 +15,7 @@ const DashboardTables = ({ selectedTable, tableTitle, tableData, tableHeaders, o
             {(tableHeaders[selectedTable] || []).map((header, idx) => (
               <th key={idx}>{header}</th>
             ))}
+            {selectedTable === "todayAppointments" && <th>פעולה</th>}
           </tr>
         </thead>
 
@@ -22,8 +23,6 @@ const DashboardTables = ({ selectedTable, tableTitle, tableData, tableHeaders, o
           {tableData.map((row, idx) => (
             <tr key={idx}>
               {(tableHeaders[selectedTable] || []).map((headerKey, i) => {
-                if (selectedTable === "todayAppointments" && headerKey === "פעולה") return null;
-
                 const entryKey = Object.keys(row).find(
                   k => k === headerKey || k.toLowerCase() === headerKey.toLowerCase()
                 );

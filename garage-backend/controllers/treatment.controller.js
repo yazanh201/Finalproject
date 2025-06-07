@@ -55,6 +55,7 @@ const getTreatmentsByCarPlate = async (req, res) => {
 };
 
 // הוספת טיפול חדש
+// הוספת טיפול חדש
 const addTreatment = async (req, res) => {
   try {
     const last = await Treatment.findOne().sort({ treatmentNumber: -1 });
@@ -64,7 +65,7 @@ const addTreatment = async (req, res) => {
     const invoiceFile = req.files?.invoice?.[0]?.filename || '';
     const images = req.files?.images?.map(f => f.filename) || [];
 
-    const {
+    let {
       date,
       cost,
       carPlate,
@@ -72,8 +73,18 @@ const addTreatment = async (req, res) => {
       workerName,
       customerName,
       repairTypeId,
-      status
+      status,
+      treatmentServices // ✅ נוספה שורה זו
     } = req.body;
+
+    // ✅ עיבוד treatmentServices אם הוא מחרוזת (כמו שמתקבל מ־FormData)
+    if (treatmentServices && typeof treatmentServices === 'string') {
+      try {
+        treatmentServices = JSON.parse(treatmentServices);
+      } catch (err) {
+        return res.status(400).json({ message: "פורמט לא תקין של treatmentServices", error: err.message });
+      }
+    }
 
     const treatment = new Treatment({
       treatmentNumber: nextNumber,
@@ -87,7 +98,8 @@ const addTreatment = async (req, res) => {
       customerName,
       images,
       repairTypeId: isNaN(Number(repairTypeId)) ? null : Number(repairTypeId),
-      status
+      status,
+      treatmentServices // ✅ שמירה במסד הנתונים
     });
 
     await treatment.save();
@@ -101,9 +113,31 @@ const addTreatment = async (req, res) => {
 // עדכון טיפול
 const updateTreatment = async (req, res) => {
   try {
-    const updated = await Treatment.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    res.json(updated);
+    const treatment = await Treatment.findById(req.params.id);
+    if (!treatment) return res.status(404).json({ message: "טיפול לא נמצא" });
+
+    treatment.date = req.body?.date || treatment.date;
+    treatment.cost = isNaN(Number(req.body?.cost)) ? treatment.cost : Number(req.body.cost);
+    treatment.carPlate = req.body?.carPlate || treatment.carPlate;
+    treatment.description = req.body?.description || treatment.description;
+    treatment.workerName = req.body?.workerName || treatment.workerName;
+    treatment.customerName = req.body?.customerName || treatment.customerName;
+    treatment.status = req.body?.status || treatment.status;
+    treatment.repairTypeId = req.body?.repairTypeId || treatment.repairTypeId;
+    treatment.workerId = req.body?.workerId || treatment.workerId;
+    treatment.idNumber = req.body?.idNumber || treatment.idNumber;
+
+    if (req.files?.invoice?.[0]) {
+      treatment.invoiceFile = req.files.invoice[0].filename;
+    }
+    if (req.files?.images?.length) {
+      treatment.images = req.files.images.map(file => file.filename);
+    }
+
+    await treatment.save();
+    res.json({ message: "✅ הטיפול עודכן בהצלחה", treatment });
   } catch (err) {
+    console.error("❌ שגיאה בעדכון טיפול:", err);
     res.status(500).json({ message: "❌ שגיאה בעדכון טיפול", error: err.message });
   }
 };
@@ -179,9 +213,7 @@ const getTreatmentByObjectId = async (req, res) => {
   }
 };
 
-// ✅ בדיקה לפי מספר רכב ותאריך (לטעינה אוטומטית)
-
-
+// בדיקה לפי מספר רכב
 const checkTreatmentByPlate = async (req, res) => {
   const { plate } = req.query;
   if (!plate) return res.status(400).json({ message: 'חובה לציין plate' });
@@ -189,7 +221,6 @@ const checkTreatmentByPlate = async (req, res) => {
   try {
     const cleanedPlate = plate.replace(/[^\d]/g, "");
 
-    // חיפוש טיפול עם לוחית מדויקת
     const treatment = await Treatment.findOne({ carPlate: cleanedPlate });
 
     if (!treatment) {
@@ -197,7 +228,6 @@ const checkTreatmentByPlate = async (req, res) => {
       return res.json({ exists: false });
     }
 
-    // חיפוש לקוח לפי vehicles (מערך רכבים)
     const client = await Client.findOne({
       vehicles: { $in: [cleanedPlate] }
     });
@@ -209,6 +239,7 @@ const checkTreatmentByPlate = async (req, res) => {
 
     return res.json({
       exists: true,
+      treatmentId: treatment._id,
       customerName: client.name,
       idNumber: client.idNumber,
       workerName: treatment.workerName || ''
@@ -220,8 +251,6 @@ const checkTreatmentByPlate = async (req, res) => {
   }
 };
 
-
-
 module.exports = {
   getAllTreatments,
   getTreatmentById,
@@ -232,5 +261,5 @@ module.exports = {
   updateTreatment,
   confirmArrivalAndAddTreatment,
   getTreatmentByObjectId,
-  checkTreatmentByPlate, // ✅ הוספת פונקציה
+  checkTreatmentByPlate
 };

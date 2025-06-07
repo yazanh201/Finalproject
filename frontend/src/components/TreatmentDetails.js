@@ -1,23 +1,24 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import "./TreatmentDetails.css";
+import "./cssfiles/TreatmentDetails.css";
 
 const TreatmentDetails = () => {
   const { id } = useParams();
   const [treatment, setTreatment] = useState(null);
-  console.log("📦 טיפול ID:", id);
 
   const BASE_URL = "http://localhost:5000/uploads/";
   const BASE_API_URL = "http://localhost:5000/";
 
   useEffect(() => {
     fetch(`${BASE_API_URL}api/treatments/${id}`)
-      .then(res => res.json())
+      .then((res) => res.json())
       .then(setTreatment)
-      .catch(err => console.error("❌ שגיאה בשליפת טיפול:", err));
+      .catch((err) => console.error("❌ שגיאה בשליפת טיפול:", err));
   }, [id]);
 
-  if (!treatment) return <div className="text-center mt-5">טוען פרטי טיפול...</div>;
+  if (!treatment) {
+    return <div className="text-center mt-5">טוען פרטי טיפול...</div>;
+  }
 
   return (
     <div className="treatment-container">
@@ -37,6 +38,40 @@ const TreatmentDetails = () => {
             <div>{treatment.description || "—"}</div>
           </div>
         </div>
+
+        {Array.isArray(treatment.treatmentServices) && treatment.treatmentServices.length > 0 && (
+          <div className="mt-4">
+            <h4>שירותים שבוצעו:</h4>
+            {treatment.treatmentServices.map((category, idx) => {
+              let options = category?.selectedOptions;
+
+              // אם selectedOptions הוא מחרוזת – ננסה לפענח אותו
+              if (typeof options === "string") {
+                try {
+                  options = JSON.parse(options);
+                } catch (err) {
+                  console.warn("⚠️ שגיאה בפענוח selectedOptions:", options);
+                  options = [];
+                }
+              }
+
+              return (
+                <div key={idx} className="mb-2">
+                  <strong>{category?.category || "ללא קטגוריה"}:</strong>
+                  {Array.isArray(options) && options.length > 0 ? (
+                    <ul>
+                      {options.map((option, i) => (
+                        <li key={i}>{option}</li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <div className="text-muted">— אין שירותים נבחרים</div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
 
         {treatment.invoiceFile && (
           <>

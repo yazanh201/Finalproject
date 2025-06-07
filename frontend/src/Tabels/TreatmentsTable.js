@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
-import Modal from "./Modal";  
+import Modal from "./Modal";
 import { useNavigate } from "react-router-dom";
 
-
-
-
-const TreatmentsTable = ({ filterAppointment, filterTreatmentNumber, onNavigateToRepair, onNavigateToAppointment }) => {
-  const navigate = useNavigate(); // ✅ שימוש
+const TreatmentsTable = ({
+  filterAppointment,
+  filterTreatmentNumber,
+  onNavigateToRepair,
+  onNavigateToAppointment
+}) => {
+  const navigate = useNavigate();
   const [modalType, setModalType] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [treatments, setTreatments] = useState([]);
@@ -20,37 +22,23 @@ const TreatmentsTable = ({ filterAppointment, filterTreatmentNumber, onNavigateT
     invoiceId: ""
   });
 
-  // שליפת טיפולים מהשרת
   useEffect(() => {
     let url = "http://localhost:5000/api/treatments";
-  
+
     if (filterTreatmentNumber) {
       url = `http://localhost:5000/api/treatments/by-id/${filterTreatmentNumber}`;
     } else if (filterAppointment) {
       url = `http://localhost:5000/api/treatments/by-appointment/${filterAppointment}`;
     }
-  
+
     fetch(url)
-      .then(res => res.json())
-      .then(data => {
+      .then((res) => res.json())
+      .then((data) => {
         const result = Array.isArray(data) ? data : [data];
         setTreatments(result);
       })
-      .catch(err => console.error("❌ שגיאה בשליפת טיפולים:", err));
+      .catch((err) => console.error("❌ שגיאה בשליפת טיפולים:", err));
   }, [filterAppointment, filterTreatmentNumber]);
-  
-  
-  
-
-  const fetchTreatments = async () => {
-    try {
-      const res = await fetch("http://localhost:5000/api/treatments");
-      const data = await res.json();
-      setTreatments(data);
-    } catch (error) {
-      console.error("❌ שגיאה בשליפת טיפולים:", error);
-    }
-  };
 
   const handleShowModal = (type, treatment = null) => {
     setModalType(type);
@@ -87,7 +75,7 @@ const TreatmentsTable = ({ filterAppointment, filterTreatmentNumber, onNavigateT
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(selectedTreatment),
+        body: JSON.stringify(selectedTreatment)
       });
 
       const data = await res.json();
@@ -108,10 +96,11 @@ const TreatmentsTable = ({ filterAppointment, filterTreatmentNumber, onNavigateT
     }
   };
 
-
   const handleSearchByDate = async () => {
     try {
-      const res = await fetch(`http://localhost:5000/api/treatments/by-date/${searchTerm}`);
+      const res = await fetch(
+        `http://localhost:5000/api/treatments/by-date/${searchTerm}`
+      );
       const data = await res.json();
       setTreatments(data);
       handleCloseModal();
@@ -119,10 +108,12 @@ const TreatmentsTable = ({ filterAppointment, filterTreatmentNumber, onNavigateT
       console.error("❌ שגיאה בחיפוש לפי תאריך:", error);
     }
   };
-  
+
   const handleSearchByCar = async () => {
     try {
-      const res = await fetch(`http://localhost:5000/api/treatments/by-car/${searchTerm}`);
+      const res = await fetch(
+        `http://localhost:5000/api/treatments/by-car/${searchTerm}`
+      );
       const data = await res.json();
       setTreatments(data);
       handleCloseModal();
@@ -130,7 +121,6 @@ const TreatmentsTable = ({ filterAppointment, filterTreatmentNumber, onNavigateT
       console.error("❌ שגיאה בחיפוש לפי רכב:", error);
     }
   };
-  
 
   return (
     <div>
@@ -152,23 +142,23 @@ const TreatmentsTable = ({ filterAppointment, filterTreatmentNumber, onNavigateT
 
       <div className="table-responsive">
         <table className="table table-striped">
-        <thead>
-          <tr>
-            <th>מזהה טיפול</th>
-            <th>תאריך</th>
-            <th>מזהה תור</th>
-            <th>מספר רכב</th>
-            <th>שם לקוח</th>
-            <th>צפייה</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {treatments.map((treatment) => (
-            <tr key={treatment._id}>
-              <td>{treatment.treatmentId}</td>
-              <td>{treatment.date}</td>
-              <td>
+          <thead>
+            <tr>
+              <th>מזהה טיפול</th>
+              <th>תאריך</th>
+              <th>מזהה תור</th>
+              <th>מספר רכב</th>
+              <th>שם לקוח</th>
+              <th>צפייה</th>
+              <th>עריכה</th>
+            </tr>
+          </thead>
+          <tbody>
+            {treatments.map((treatment) => (
+              <tr key={treatment._id}>
+                <td>{treatment.treatmentId}</td>
+                <td>{treatment.date}</td>
+                <td>
                   {treatment.appointmentNumber ? (
                     <a
                       href="#"
@@ -186,22 +176,45 @@ const TreatmentsTable = ({ filterAppointment, filterTreatmentNumber, onNavigateT
                     <span style={{ color: "gray" }}>—</span>
                   )}
                 </td>
-              <td>{treatment.carPlate}</td>
-              <td>{treatment.customerName || "—"}</td>
-              <td>
-                <button
-                  className="btn btn-outline-secondary btn-sm"
-                  onClick={() => navigate(`/treatment/${treatment._id}`)}
-                  title="צפייה בפרטי הטיפול"
-                >
-                  👁️
-                </button>
-              </td>
-
-            </tr>
-          ))}
-        </tbody>
-
+                <td>{treatment.carPlate}</td>
+                <td>{treatment.customerName || "—"}</td>
+                <td>
+                  <button
+                    className="btn btn-outline-secondary btn-sm"
+                    onClick={() => navigate(`/treatment/${treatment._id}`)}
+                    title="צפייה בפרטי הטיפול"
+                  >
+                    👁️
+                  </button>
+                </td>
+                <td>
+                  <button
+                    className="btn btn-outline-secondary btn-sm"
+                    onClick={() =>
+                      navigate("/create-treatment", {
+                        state: {
+                          plateNumber: treatment.carPlate,
+                          customerName: treatment.customerName,
+                          idNumber: treatment.idNumber || "",
+                          workerName: treatment.workerName || "",
+                          cost: treatment.cost || "",
+                          date: treatment.date || "",
+                          description: treatment.description || "",
+                          status: treatment.status || "",
+                          treatmentId: treatment._id || "",
+                          repairTypeId: treatment.typeId || "",
+                          workerId: treatment.workerId || ""
+                        }
+                      })
+                    }
+                    title="עריכת טיפול"
+                  >
+                    ✏️
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
         </table>
       </div>
 
@@ -216,7 +229,7 @@ const TreatmentsTable = ({ filterAppointment, filterTreatmentNumber, onNavigateT
               { key: "typeId", label: "סוג טיפול" },
               { key: "carPlate", label: "מספר רכב" },
               { key: "appointmentNumber", label: "מזהה תור" },
-              { key: "invoiceId", label: "מזהה חשבונית" },
+              { key: "invoiceId", label: "מזהה חשבונית" }
             ].map(({ key, label, type = "text" }) => (
               <div className="form-group mb-3" key={key}>
                 <label>{label}</label>
@@ -246,7 +259,6 @@ const TreatmentsTable = ({ filterAppointment, filterTreatmentNumber, onNavigateT
           />
         </Modal>
       )}
-
 
       {modalType === "searchCar" && (
         <Modal isOpen={true} onClose={handleCloseModal} onSave={handleSearchByCar}>

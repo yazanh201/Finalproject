@@ -1,23 +1,67 @@
-import React, { useState, useEffect } from 'react';
-import './createtreatment.css';
-import { useLocation } from 'react-router-dom';
+import React, { useState } from 'react';
+import './cssfiles/createtreatment.css';
+import { useLocation, useNavigate } from 'react-router-dom';
+
+const repairOptions = {
+  "שירות כללי": [
+    "החלפת שמן מנוע",
+    "החלפת פלאגים",
+    "החלפת מסנן שמן",
+    "החלפת מסנן אוויר",
+    "בדיקת נוזל בלמים",
+    "בדיקת רצועות",
+    "בדיקת נוזל קירור",
+    "בדיקת בלמים",
+    "החלפת רפידות בלם",
+    "החלפת דיסקים"
+  ],
+  "בדיקת מנוע ותיבת הילוכים": [
+    "בדיקת מנוע כללית",
+    "החלפת שמן מנוע",
+    "החלפת טיימינג",
+    "החלפת רצועת אביזרים",
+    "בדיקת תיבת הילוכים אוטומטית",
+    "החלפת שמן גיר",
+    "בדיקת לחץ שמן מנוע",
+    "בדיקת נזילות מהמנוע או הגיר"
+  ],
+  "טיפול חשמל": [
+    "בדיקת מצבר ומתח",
+    "החלפת מצבר",
+    "בדיקת טעינה של האלטרנטור",
+    "החלפת פיוזים",
+    "תיקון תאורה פנימית / חיצונית",
+    "תיקון חלונות חשמליים",
+    "בדיקת מערכת הנעה",
+    "בדיקת תקלות במחשב הרכב"
+  ]
+};
 
 const CreateTreatment = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const state = location.state || {};
 
+  const allowedStatuses = ['בטיפול', 'ממתין לחלקים', 'בעיכוב', 'הסתיים'];
+  const initialStatus = allowedStatuses.includes(state.status) ? state.status : 'בטיפול';
+
   const [form, setForm] = useState({
-    date: new Date().toISOString().split("T")[0],
-    cost: '',
+    date: state.date || new Date().toISOString().split("T")[0],
+    cost: state.cost || '',
     carPlate: state.plateNumber || '',
-    description: '',
+    description: state.description || '',
     workerName: state.workerName || '',
     customerName: state.customerName || '',
     images: [],
     invoiceFile: null,
-    repairTypeId: '',
-    status: 'בהמתנה'
+    repairTypeId: state.repairTypeId || '',
+    status: initialStatus,
+    treatmentId: state.treatmentId || '',
+    workerId: state.workerId || '',
+    idNumber: state.idNumber || ''
   });
+
+  const [treatmentServices, setTreatmentServices] = useState([]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -33,42 +77,81 @@ const CreateTreatment = () => {
     setForm((prev) => ({ ...prev, images: files }));
   };
 
+  const handleCategoryChange = (e) => {
+    const category = e.target.value;
+    const exists = treatmentServices.find((s) => s.category === category);
+    if (!exists && category) {
+      setTreatmentServices((prev) => [...prev, { category, selectedOptions: [] }]);
+    }
+  };
+
+  const handleChecklistChange = (category, task) => {
+    setTreatmentServices((prev) =>
+      prev.map((service) =>
+        service.category === category
+          ? {
+              ...service,
+              selectedOptions: service.selectedOptions.includes(task)
+                ? service.selectedOptions.filter((t) => t !== task)
+                : [...service.selectedOptions, task]
+            }
+          : service
+      )
+    );
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const formData = new FormData();
 
+    const isEdit = form.treatmentId && form.treatmentId.trim() !== "";
+    const url = isEdit
+      ? `/api/treatments/${form.treatmentId}`
+      : '/api/treatments';
+    const method = isEdit ? 'PUT' : 'POST';
+
+    const formData = new FormData();
     for (const key in form) {
       if (key === "images") {
         form.images.forEach((img) => formData.append("images", img));
       } else if (key === "invoiceFile" && form.invoiceFile) {
         formData.append("invoice", form.invoiceFile);
-      } else {
+      } else if (key !== "treatmentId") {
         formData.append(key, form[key]);
       }
     }
 
+    formData.append("treatmentServices", JSON.stringify(treatmentServices));
+
     try {
-      const response = await fetch('/api/treatments', {
-        method: 'POST',
+      const response = await fetch(url, {
+        method,
         body: formData
       });
 
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || 'שגיאה בשמירה');
 
-      alert('✅ הטיפול נשמר בהצלחה!');
-      setForm({
-        date: new Date().toISOString().split("T")[0],
-        cost: '',
-        carPlate: '',
-        description: '',
-        workerName: '',
-        customerName: '',
-        images: [],
-        invoiceFile: null,
-        repairTypeId: '',
-        status: 'בהמתנה'
-      });
+      alert(`✅ הטיפול ${isEdit ? 'עודכן בהצלחה' : 'נשמר בהצלחה'}!`);
+      if (!isEdit) {
+        setForm({
+          date: new Date().toISOString().split("T")[0],
+          cost: '',
+          carPlate: '',
+          description: '',
+          workerName: '',
+          customerName: '',
+          images: [],
+          invoiceFile: null,
+          repairTypeId: '',
+          status: 'בטיפול',
+          treatmentId: '',
+          workerId: '',
+          idNumber: ''
+        });
+        setTreatmentServices([]);
+      } else {
+        navigate(-1);
+      }
     } catch (err) {
       console.error(err);
       alert(`❌ שגיאה: ${err.message}`);
@@ -94,17 +177,51 @@ const CreateTreatment = () => {
 
             <div className="col-md-6">
               <label className="form-label">עלות</label>
-              <input type="number" name="cost" className="form-control" value={form.cost} onChange={handleChange} required />
+              <input type="number" name="cost" className="form-control" value={form.cost} onChange={handleChange} />
 
               <label className="form-label mt-3">שם עובד</label>
               <input type="text" name="workerName" className="form-control" value={form.workerName} onChange={handleChange} required />
 
               <label className="form-label mt-3">סטטוס</label>
-              <select name="status" className="form-control" value={form.status} onChange={handleChange}>
-                <option value="בהמתנה">בהמתנה</option>
+              <select name="status" className="form-control" value={form.status} onChange={handleChange} required>
+                <option value="בטיפול">בטיפול</option>
+                <option value="ממתין לחלקים">ממתין לחלקים</option>
+                <option value="בעיכוב">בעיכוב</option>
                 <option value="הסתיים">הסתיים</option>
               </select>
             </div>
+
+            <div className="col-md-6">
+              <label className="form-label mt-3">בחר קטגוריה להוספה</label>
+              <select className="form-control" onChange={handleCategoryChange}>
+                <option value="">בחר קטגוריה</option>
+                {Object.keys(repairOptions).map((cat) => (
+                  <option key={cat} value={cat}>{cat}</option>
+                ))}
+              </select>
+            </div>
+
+            {treatmentServices.map(({ category, selectedOptions }) => (
+              <div className="col-12" key={category}>
+                <label className="form-label mt-3">{`משימות בקטגוריה: ${category}`}</label>
+                <div className="form-check-list">
+                  {repairOptions[category]?.map((task) => (
+                    <div className="check-option" key={task}>
+                      <label htmlFor={`${category}-${task}`}>
+                        <input
+                          className="form-check-input"
+                          type="checkbox"
+                          checked={selectedOptions.includes(task)}
+                          onChange={() => handleChecklistChange(category, task)}
+                          id={`${category}-${task}`}
+                        />
+                        <span className="check-label">{task}</span>
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
 
             <div className="col-12">
               <label className="form-label">תיאור הטיפול</label>
@@ -123,8 +240,7 @@ const CreateTreatment = () => {
 
             <div className="col-12 text-center mt-4">
               <button type="submit" className="btn btn-success mx-2 px-4">שמור ושלח</button>
-              <button type="button" className="btn btn-outline-primary mx-2 px-4">שמור כטיוטה</button>
-              <button type="button" className="btn btn-secondary mx-2 px-4">ביטול</button>
+              <button type="button" className="btn btn-secondary mx-2 px-4" onClick={() => navigate(-1)}>ביטול</button>
             </div>
           </div>
         </form>

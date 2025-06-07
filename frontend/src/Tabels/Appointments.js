@@ -2,13 +2,13 @@ import React, { useState, useEffect } from "react";
 import Modal from "./Modal";
 import { useNavigate } from "react-router-dom";
 
-
 const Appointments = ({ onSelectTreatment, filterAppointmentNumber }) => {
-  const navigate = useNavigate(); // ☑️ בתוך הקומפוננטה
+  const navigate = useNavigate();
   const [modalType, setModalType] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [appointments, setAppointments] = useState([]);
-  
+  const [availableTimes, setAvailableTimes] = useState([]);
+  const [selectedDate, setSelectedDate] = useState("");
 
   const [selectedAppointment, setSelectedAppointment] = useState({
     date: "",
@@ -17,7 +17,9 @@ const Appointments = ({ onSelectTreatment, filterAppointmentNumber }) => {
     idNumber: "",
     name: "",
     carNumber: "",
-    treatmentId: ""
+    phoneNumber: "",
+    treatmentId: "",
+    arrivalStatus: ""
   });
 
   useEffect(() => {
@@ -33,7 +35,13 @@ const Appointments = ({ onSelectTreatment, filterAppointmentNumber }) => {
       fetchAppointments();
     }
   }, [filterAppointmentNumber]);
-  
+
+  const fetchAvailableTimes = async (date) => {
+    if (!date) return;
+    const res = await fetch(`http://localhost:5000/api/appointments/available-times/${date}`);
+    const data = await res.json();
+    setAvailableTimes(data);
+  };
 
   const fetchAppointments = async () => {
     try {
@@ -55,10 +63,14 @@ const Appointments = ({ onSelectTreatment, filterAppointmentNumber }) => {
         idNumber: "",
         name: "",
         carNumber: "",
-        treatmentId: ""
+        phoneNumber: "",
+        treatmentId: "",
+        arrivalStatus: ""
       });
     } else if (type === "edit" && appointment) {
       setSelectedAppointment(appointment);
+      setSelectedDate(appointment.date);
+      fetchAvailableTimes(appointment.date);
     } else {
       setSearchTerm("");
     }
@@ -122,7 +134,6 @@ const Appointments = ({ onSelectTreatment, filterAppointmentNumber }) => {
     }
   };
 
-
   const handleSearchByIdOrCar = async () => {
     try {
       const res = await fetch(`http://localhost:5000/api/appointments/search/${searchTerm}`);
@@ -133,7 +144,6 @@ const Appointments = ({ onSelectTreatment, filterAppointmentNumber }) => {
       console.error("❌ שגיאה בחיפוש לפי ת\"ז או מספר רכב:", error);
     }
   };
-  
 
   return (
     <div>
@@ -148,7 +158,6 @@ const Appointments = ({ onSelectTreatment, filterAppointmentNumber }) => {
         <button className="btn btn-primary me-3" onClick={() => handleShowModal("searchID")}>
           חיפוש לפי ת"ז או מספר רישוי
         </button>
-
         <button className="btn btn-primary me-3" onClick={() => handleShowModal("searchDate")}>
           חיפוש לפי תאריך
         </button>
@@ -167,14 +176,13 @@ const Appointments = ({ onSelectTreatment, filterAppointmentNumber }) => {
               <th>טלפון</th>
               <th>מספר רישוי</th>
               <th>מזהה טיפול</th>
+              <th>סטטוס הגעה</th>
               <th>פעולה</th>
             </tr>
           </thead>
           <tbody>
-          {appointments
-            ?.filter(appointment => appointment && appointment.appointmentNumber) // סינון רשומות חסרות
-            .map((appointment) => (
-              <tr key={appointment._id || appointment.treatment?._id || Math.random()}>
+            {appointments?.filter(a => a?.appointmentNumber).map((appointment) => (
+              <tr key={appointment._id}>
                 <td>{appointment.appointmentNumber}</td>
                 <td>{appointment.date}</td>
                 <td>{appointment.time}</td>
@@ -191,37 +199,31 @@ const Appointments = ({ onSelectTreatment, filterAppointmentNumber }) => {
                         e.preventDefault();
                         onSelectTreatment(appointment.appointmentNumber);
                       }}
-                      style={{
-                        textDecoration: "underline",
-                        color: "blue",
-                        background: "none",
-                        border: "none",
-                        padding: 0,
-                        cursor: "pointer"
-                      }}
+                      style={{ textDecoration: "underline", color: "blue", cursor: "pointer" }}
                     >
                       {appointment.treatment.treatmentId}
                     </a>
                   ) : '—'}
                 </td>
-
-
+                <td>{appointment.arrivalStatus || "בהמתנה"}</td>
                 <td>
                   <button
                     className="btn btn-primary btn-sm"
-                    onClick={() => handleShowModal("edit", appointment)}
+                    onClick={() =>
+                      navigate(`/appointments/edit/${appointment._id}`, {
+                        state: appointment
+                      })
+                    }
                   >
                     עריכה
                   </button>
                 </td>
               </tr>
-          ))}
-
+            ))}
           </tbody>
         </table>
       </div>
 
-      {/* מודלים */}
       {(modalType === "add" || modalType === "edit") && (
         <Modal isOpen={true} onClose={handleCloseModal} onSave={handleSave}>
           <h3>{modalType === "edit" ? "עריכת תור" : "הוספת תור חדש"}</h3>
@@ -235,18 +237,17 @@ const Appointments = ({ onSelectTreatment, filterAppointmentNumber }) => {
                   idNumber: "תעודת זהות",
                   name: "שם לקוח",
                   carNumber: "מספר רישוי",
-                  phoneNumber: "טלפון" // ✅ חדש
+                  phoneNumber: "טלפון"
                 }[field]}</label>
                 <input
                   type={field === "date" ? "date" : field === "time" ? "time" : "text"}
                   className="form-control"
                   value={selectedAppointment?.[field] || ""}
                   onChange={(e) => setSelectedAppointment({ ...selectedAppointment, [field]: e.target.value })}
-                  required={field !== "phoneNumber"} // טלפון לא חובה, רק אם תרצה
+                  required={field !== "phoneNumber"}
                 />
               </div>
             ))}
-
           </form>
         </Modal>
       )}
@@ -263,7 +264,6 @@ const Appointments = ({ onSelectTreatment, filterAppointmentNumber }) => {
           />
         </Modal>
       )}
-
 
       {modalType === "searchDate" && (
         <Modal isOpen={true} onClose={handleCloseModal} onSave={handleSearchByDate}>

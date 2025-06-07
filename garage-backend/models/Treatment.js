@@ -1,5 +1,11 @@
 const mongoose = require("mongoose");
 
+// Subschema for treatment checklist
+const treatmentServiceSchema = new mongoose.Schema({
+  category: String,
+  selectedOptions: [String]
+}, { _id: false });
+
 const treatmentSchema = new mongoose.Schema({
   treatmentNumber: Number,
   treatmentId: String,
@@ -14,11 +20,14 @@ const treatmentSchema = new mongoose.Schema({
   images: [String],
   repairTypeId: Number,
 
-  // ✅ חדש: סטטוס
+  // ✅ NEW: Checklist grouped by categories
+  treatmentServices: [treatmentServiceSchema],
+
+  // ✅ Status field
   status: {
     type: String,
-    enum: ['בהמתנה', 'הסתיים'],
-    default: 'בהמתנה'
+    enum: ['בטיפול', 'הסתיים', 'ממתין לחלקים', 'בעיכוב'],
+    default: 'בטיפול'
   }
 
 }, {

@@ -2,13 +2,12 @@ import React, { useState, useEffect, useRef } from "react";
 import styles from "../cssfiles/Advanceddashboard.module.css";
 import { useNavigate } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
-import Webcam from "react-webcam";
-import axios from "axios";
 import DashboardOverview from "./DashboardOverview";
 import DashboardTables from "./DashboardTables";
 import MessageModal from "./MessageModal";
 import MonthlyAppointments from "../tabels/MonthlyAppointments";
 import NewCustomers from "../tabels/NewCustomers";
+import TodayAppointments from "../tabels/TodayAppointments";
 
 const AdvancedDashboard = () => {
   const navigate = useNavigate();
@@ -27,10 +26,7 @@ const AdvancedDashboard = () => {
   const [recommendedCars, setRecommendedCars] = useState([]);
   const [monthlyAppointmentCount, setMonthlyAppointmentCount] = useState(0);
   const [newCustomersCount, setNewCustomersCount] = useState(0);
-  const [showCameraPanel, setShowCameraPanel] = useState(false);
-  const [image, setImage] = useState(null);
-  const [plate, setPlate] = useState("");
-  const [loading, setLoading] = useState(false);
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -98,123 +94,35 @@ const AdvancedDashboard = () => {
   }, []);
 
   const showTable = (key) => {
-    switch (key) {
-      case "recommendedCars":
-        setTableData(recommendedCars);
-        setTableTitle("רכבים מומלצים לבדיקה");
-        break;
-      case "newCustomers":
-        setSelectedTable("newCustomers");
-        return;
-      case "todayAppointments":
-        fetch("http://localhost:5000/api/appointments")
-          .then(res => res.json())
-          .then(data => {
-            const today = new Date().toISOString().slice(0, 10);
-            const todaysAppointments = data.filter(a => a.date === today);
-            setTableTitle("תורים להיום");
-            setTableData(todaysAppointments.map(a => ({
-              "מזהה תור": a.appointmentNumber,
-              "שם": a.name,
-              "ת'ז": a.idNumber,
-              "מספר רכב": a.carNumber,
-              "שעה": a.time,
-              "תיאור": a.description,
-              _id: a._id,
-              treatmentId: a.treatment?.treatmentId
-            })));
-            setSelectedTable("todayAppointments");
-          });
-        return;
-      case "carsUnderMaintenance":
-      case "delayedTreatments":
-        setTableData(delayedTreatments);
-        setTableTitle(key === "carsUnderMaintenance" ? "רכבים בטיפול" : "טיפולים שהתעכבו");
-        break;
-      case "appointments":
-        setSelectedTable("monthlyAppointments");
-        return;
-      default:
-        setTableData([]);
-        setSelectedTable(null);
-        return;
-    }
-
-    setSelectedTable(key);
-  };
-
-  const handleConfirmArrival = async (value) => {
-    const [, appointmentId] = value.split("-");
-    try {
-      const res = await fetch("http://localhost:5000/api/treatments/confirm-arrival", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ appointmentId })
-      });
-      const data = await res.json();
-      if (res.ok) {
-        alert("✅ טיפול נוסף!");
-        showTable("todayAppointments");
-      } else {
-        alert("❌ שגיאה: " + data.message);
-      }
-    } catch (error) {
-      alert("❌ שגיאה בחיבור לשרת");
-    }
-  };
-
-  const capturePhoto = () => {
-    const screenshot = webcamRef.current.getScreenshot();
-    setImage(screenshot);
-  };
-
-  const submitPhoto = async () => {
-    if (!image || !image.startsWith("data:image")) {
-      alert("❌ אין תמונה לשליחה. ודא שצילמת תמונה קודם.");
+  switch (key) {
+    case "recommendedCars":
+      setTableData(recommendedCars);
+      setTableTitle("רכבים מומלצים לבדיקה");
+      break;
+    case "newCustomers":
+      setSelectedTable("newCustomers");
       return;
-    }
+    case "todayAppointments":
+      setSelectedTable("todayAppointments"); // שינוי כאן – רק קובע את הטבלה, ללא fetch
+      return;
+    case "carsUnderMaintenance":
+    case "delayedTreatments":
+      setTableData(delayedTreatments);
+      setTableTitle(key === "carsUnderMaintenance" ? "רכבים בטיפול" : "טיפולים שהתעכבו");
+      break;
+    case "appointments":
+      setSelectedTable("monthlyAppointments");
+      return;
+    default:
+      setTableData([]);
+      setSelectedTable(null);
+      return;
+  }
 
-    setLoading(true);
-
-    try {
-      const blob = await (await fetch(image)).blob();
-      const formData = new FormData();
-      formData.append("image", blob, "plate.png");
-
-      const detectRes = await axios.post("http://localhost:3300/api/plate-detect", formData);
-      let { plateNumber } = detectRes.data;
-      if (!plateNumber) throw new Error("לא זוהתה לוחית מהשרת.");
-
-      const cleanedPlate = plateNumber.replace(/[^\d]/g, "");
-      setPlate(cleanedPlate);
-
-      const checkRes = await axios.get("http://localhost:5000/api/treatments/check", {
-        params: { plate: cleanedPlate }
-      });
-
-      const { exists, customerName, idNumber, workerName } = checkRes.data;
-      if (exists) {
-        navigate("/create-treatment", {
-          state: {
-            plateNumber: cleanedPlate,
-            customerName,
-            idNumber,
-            workerName
-          }
-        });
-      } else {
-        alert("🚫 לא נמצא טיפול פתוח לרכב זה.");
-      }
-    } catch (err) {
-      console.error("❌ שגיאה בזיהוי או בבדיקת טיפול:", err);
-      alert("❌ לא הצלחנו לזהות מספר רכב או לבדוק טיפול.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  setSelectedTable(key);
+};
 
   const tableHeaders = {
-    todayAppointments: ["מזהה תור", "שם", "ת'ז", "מספר רכב", "שעה", "תיאור", "פעולה"],
     recommendedCars: ["מספר רכב", "בעלים", "קילומטרים משוערים", "חודשים מהטיפול האחרון"],
     newCustomers: ["שם", "טלפון", "תאריך הצטרפות"],
     carsUnderMaintenance: ["רכב", "סיבה", "איחור", "לוחית"],
@@ -235,8 +143,6 @@ const AdvancedDashboard = () => {
         <button className={styles.sendMessageBtn} onClick={() => showTable("recommendedCars")}>🚗 רכבים מומלצים</button>
         <button className={styles.sendMessageBtn}>הורדת דוח חודשי</button>
         <button className={styles.sendMessageBtn} onClick={() => showTable("todayAppointments")}>📅 תורים להיום</button>
-        <button className={styles.sendMessageBtn} onClick={() => navigate("/create-treatment")}>➕ הוספת טיפול חדש</button>
-        <button className={styles.sendMessageBtn} onClick={() => setShowCameraPanel(prev => !prev)}>📷 הפעל מצלמה</button>
       </aside>
 
       <main className={styles.mainContent}>
@@ -251,6 +157,8 @@ const AdvancedDashboard = () => {
           <MonthlyAppointments onClose={() => setSelectedTable(null)} />
         ) : selectedTable === "newCustomers" ? (
           <NewCustomers onClose={() => setSelectedTable(null)} />
+        ) : selectedTable === "todayAppointments" ? (
+          <TodayAppointments onClose={() => setSelectedTable(null)} />
         ) : (
           <DashboardTables
             selectedTable={selectedTable}
@@ -258,53 +166,9 @@ const AdvancedDashboard = () => {
             tableData={tableData}
             tableHeaders={tableHeaders}
             onClose={() => setSelectedTable(null)}
-            onConfirmArrival={handleConfirmArrival}
           />
         )}
       </main>
-
-      {showCameraPanel && (
-        <div style={{
-          position: "fixed",
-          top: "80px",
-          right: "20px",
-          backgroundColor: "#fff",
-          padding: "20px",
-          border: "2px solid #ccc",
-          borderRadius: "10px",
-          zIndex: 1000,
-          width: "320px"
-        }}>
-          <h4>📸 מצלמה</h4>
-          {!image && (
-            <>
-              <Webcam
-                ref={webcamRef}
-                screenshotFormat="image/jpeg"
-                width={280}
-                videoConstraints={{ facingMode: "environment" }}
-              />
-              <button style={{ marginTop: 10 }} onClick={capturePhoto}>📷 צלם</button>
-            </>
-          )}
-          {image && (
-            <>
-              <img src={image} alt="צולם" width={280} />
-              <button style={{ marginTop: 10 }} onClick={submitPhoto} disabled={loading}>
-                {loading ? "⏳ שולח..." : "✅ שלח לזיהוי"}
-              </button>
-              <button onClick={() => setImage(null)}>🔄 צלם שוב</button>
-            </>
-          )}
-          {plate && <p style={{ marginTop: 10 }}>🔢 לוחית שזוהתה: <strong>{plate}</strong></p>}
-          <button style={{ marginTop: 10 }} onClick={() => {
-            setShowCameraPanel(false);
-            setImage(null);
-            setPlate("");
-          }}>❌ סגור</button>
-        </div>
-      )}
-
       <MessageModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

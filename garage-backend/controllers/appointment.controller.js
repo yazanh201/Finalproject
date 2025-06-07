@@ -1,15 +1,14 @@
+// controllers/appointment.controller.js
 
-// הוספת תור
 const Appointment = require('../models/Appointment');
 const Treatment = require('../models/Treatment');
 
+// הוספת תור
 const addAppointment = async (req, res) => {
   try {
-    // 🔢 קביעת מזהה תור חדש
     const lastAppointment = await Appointment.findOne().sort({ appointmentNumber: -1 });
     const nextAppointmentNumber = lastAppointment ? lastAppointment.appointmentNumber + 1 : 5001;
 
-    // ✅ יצירת תור חדש בלבד (בלי טיפול כרגע)
     const appointment = new Appointment({
       date: req.body.date,
       time: req.body.time,
@@ -19,7 +18,8 @@ const addAppointment = async (req, res) => {
       carNumber: req.body.carNumber,
       appointmentNumber: nextAppointmentNumber,
       phoneNumber: req.body.phoneNumber,
-      treatment: null // 🛑 אין טיפול עדיין – יתווסף לאחר אישור הגעה
+      treatment: null,
+      arrivalStatus: "בהמתנה"
     });
 
     await appointment.save();
@@ -35,14 +35,13 @@ const addAppointment = async (req, res) => {
 const getAppointments = async (req, res) => {
   try {
     const appointments = await Appointment.find()
-      .populate('treatment') // מצרף את הטיפול לפי הקישור
+      .populate('treatment')
       .sort({ date: 1, time: 1 });
     res.json(appointments);
   } catch (error) {
     res.status(500).json({ message: '❌ שגיאה בשליפת תורים', error: error.message });
   }
 };
-
 
 // חיפוש לפי ת"ז
 const getByIdNumber = async (req, res) => {
@@ -64,16 +63,15 @@ const getByDate = async (req, res) => {
   }
 };
 
-
+// חיפוש לפי מספר רכב
 const getByCarNumber = async (req, res) => {
-    try {
-      const appointments = await Appointment.find({ carNumber: req.params.carNumber });
-      res.json(appointments);
-    } catch (error) {
-      res.status(500).json({ message: '❌ שגיאה בחיפוש לפי מספר רכב', error: error.message });
-    }
-  };
-  
+  try {
+    const appointments = await Appointment.find({ carNumber: req.params.carNumber });
+    res.json(appointments);
+  } catch (error) {
+    res.status(500).json({ message: '❌ שגיאה בחיפוש לפי מספר רכב', error: error.message });
+  }
+};
 
 // עדכון תור
 const updateAppointment = async (req, res) => {
@@ -85,23 +83,23 @@ const updateAppointment = async (req, res) => {
   }
 };
 
+// חיפוש לפי ת"ז או מספר רכב
 const getByIdOrCar = async (req, res) => {
-    try {
-      const search = req.params.term;
-      const results = await Appointment.find({
-        $or: [
-          { idNumber: search },
-          { carNumber: search }
-        ]
-      });
-      res.json(results);
-    } catch (error) {
-      res.status(500).json({ message: "❌ שגיאה בחיפוש", error: error.message });
-    }
-  };
+  try {
+    const search = req.params.term;
+    const results = await Appointment.find({
+      $or: [
+        { idNumber: search },
+        { carNumber: search }
+      ]
+    });
+    res.json(results);
+  } catch (error) {
+    res.status(500).json({ message: "❌ שגיאה בחיפוש", error: error.message });
+  }
+};
 
-
-  // שליפה לפי appointmentNumber
+// שליפה לפי appointmentNumber
 const getAppointmentByNumber = async (req, res) => {
   try {
     const appointment = await Appointment.findOne({ appointmentNumber: req.params.appointmentNumber }).populate("treatment");
@@ -114,7 +112,7 @@ const getAppointmentByNumber = async (req, res) => {
   }
 };
 
-// שליפת תורים של החודש האחרון
+// תורים של החודש הנוכחי
 const getAppointmentsThisMonth = async (req, res) => {
   try {
     const now = new Date();
@@ -134,8 +132,45 @@ const getAppointmentsThisMonth = async (req, res) => {
   }
 };
 
+// שליפת שעות פנויות לפי תאריך
+const availableTimes = ["08:00", "10:00", "12:00", "14:00", "16:00"];
 
+const getAvailableTimes = async (req, res) => {
+  try {
+    const date = req.params.date;
+    const appointments = await Appointment.find({ date }).select("time");
+    const takenTimes = appointments.map(a => a.time);
+    const freeTimes = availableTimes.filter(time => !takenTimes.includes(time));
+    res.json(freeTimes);
+  } catch (error) {
+    console.error("❌ שגיאה בשליפת שעות פנויות:", error);
+    res.status(500).json({ message: "❌ שגיאה בשליפת שעות פנויות" });
+  }
+};
 
+// אישור הגעה
+const confirmArrival = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updated = await Appointment.findByIdAndUpdate(id, { arrivalStatus: "הגיע" }, { new: true });
+    res.json({ message: "סטטוס עודכן להגעה", appointment: updated });
+  } catch (error) {
+    res.status(500).json({ message: "❌ שגיאה בעדכון סטטוס", error: error.message });
+  }
+};
+
+// דחיית הגעה
+const rejectArrival = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updated = await Appointment.findByIdAndUpdate(id, { arrivalStatus: "לא הגיע" }, { new: true });
+    res.json({ message: "סטטוס עודכן לדחייה", appointment: updated });
+  } catch (error) {
+    res.status(500).json({ message: "❌ שגיאה בעדכון סטטוס", error: error.message });
+  }
+};
+
+// ייצוא כל הפונקציות
 module.exports = {
   addAppointment,
   getAppointments,
@@ -146,4 +181,7 @@ module.exports = {
   getByIdOrCar,
   getAppointmentByNumber,
   getAppointmentsThisMonth,
+  getAvailableTimes,
+  confirmArrival,
+  rejectArrival,
 };

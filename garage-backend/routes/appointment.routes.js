@@ -8,7 +8,10 @@ const {
   getByCarNumber,
   updateAppointment,
   getByIdOrCar,
+  getAvailableTimes,
   getAppointmentByNumber,
+  rejectArrival,
+  confirmArrival,
   getAppointmentsThisMonth // ✅
 } = require('../controllers/appointment.controller');
 
@@ -20,6 +23,11 @@ router.put('/:id', updateAppointment);
 router.get('/by-car/:carNumber', getByCarNumber);
 router.get('/search/:term', getByIdOrCar);
 router.get('/by-number/:appointmentNumber', getAppointmentByNumber);
+router.get('/available-times/:date', getAvailableTimes);
+router.post('/appointments/:id/confirm-arrival', confirmArrival);
+router.post('/appointments/:id/reject-arrival', rejectArrival);
+
+
 
 // ✅ חדש – שליפת תורים של החודש הנוכחי
 router.get('/month', getAppointmentsThisMonth);

@@ -44,3 +44,5 @@ router.put('/:id', updateTreatment);
 router.post('/confirm-arrival', confirmArrivalAndAddTreatment);
 
 module.exports = router;
+
+

@@ -1,12 +1,26 @@
-
-body {
-  background-color: #f8f9fa;
+.form-check-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 10px;
 }
 
-.card {
-  border-radius: 16px;
+.check-option {
+  border: 1px solid #0a0a0a;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  min-width: 220px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-textarea {
-  resize: vertical;
+.check-option input[type="checkbox"] {
+  margin-left: 8px;
+  transform: scale(1.2);
+}
+
+.check-option .check-label {
+  font-size: 16px;
 }

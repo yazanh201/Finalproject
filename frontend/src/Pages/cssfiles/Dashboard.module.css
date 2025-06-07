@@ -139,7 +139,10 @@
 .mainContent {
   flex-grow: 1;
   margin-right: 260px;
+
   padding: 20px;
+  padding: 30px;
+
   background-color: #f8f9fa;
   min-height: 100vh;
   text-align: center;
@@ -215,3 +218,59 @@
 }
 
 
+
+
+.dropdownWrapper {
+  position: relative;
+  display: inline-block;
+  z-index: 1000;
+}
+
+.dropdownMenu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 8px;
+  background-color: #2d2d2d; /* כמו ה־header שלך */
+  border-radius: 10px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+  min-width: 200px;
+  z-index: 1000;
+  direction: rtl;
+  overflow: hidden;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dropdownItem {
+  background: none;
+  color: #f1f1f1;
+  padding: 10px 22px;
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
+  text-align: right;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: inherit;
+  width: 100%;
+  transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out;
+}
+
+.dropdownItem:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #fbc531;
+}

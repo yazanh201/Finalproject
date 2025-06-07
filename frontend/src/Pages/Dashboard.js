@@ -1,5 +1,7 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect, useRef } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import styles from "./cssfiles/Dashboard.module.css";
+
 import CarsTable from "../Tabels/CarsTable";
 import Customers from "../Tabels/CustomersTable";
 import Inquiries from "../Tabels/Inquiries";
@@ -9,21 +11,21 @@ import Employees from "../Tabels/EmployeesTable";
 import Repairtypes from "../Tabels/RepairtypesTable";
 import CarsUnderMaintance from "../Tabels/CarsUnderMaintance";
 import CarOrders from "../Tabels/CarOrders";
-import styles from "./cssfiles/Dashboard.module.css";
-import { FaSignOutAlt, FaTachometerAlt } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import CameraPanel from "../components/CameraPanel";
 
+import { FaSignOutAlt, FaTachometerAlt } from "react-icons/fa";
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const [role, setRole] = useState("");
   const [activeView, setActiveView] = useState("home");
-  const [selectedAppointmentNumber, setSelectedAppointmentNumber] = useState(null); // ✅ שליטה במספר תור עבור טיפולים
+  const [selectedAppointmentNumber, setSelectedAppointmentNumber] = useState(null);
   const [selectedRepairId, setSelectedRepairId] = useState(null);
   const [selectedTreatmentNumber, setSelectedTreatmentNumber] = useState(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-
+  const [showCamera, setShowCamera] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const dropdownTimeoutRef = useRef(null);
 
   useEffect(() => {
     const isLoggedIn = localStorage.getItem("isLoggedIn");
@@ -40,6 +42,17 @@ const Dashboard = () => {
     localStorage.removeItem("isLoggedIn");
     localStorage.removeItem("role");
     navigate("/login");
+  };
+
+  const handleMouseEnter = () => {
+    clearTimeout(dropdownTimeoutRef.current);
+    setShowDropdown(true);
+  };
+
+  const handleMouseLeave = () => {
+    dropdownTimeoutRef.current = setTimeout(() => {
+      setShowDropdown(false);
+    }, 200);
   };
 
   const renderContent = () => {
@@ -91,7 +104,7 @@ const Dashboard = () => {
         );
     }
   };
-  
+
   const goToRepairType = (repairId) => {
     setSelectedRepairId(repairId);
     setActiveView("Repairtypes");
@@ -103,7 +116,7 @@ const Dashboard = () => {
       const data = await res.json();
       if (data && data.appointmentNumber) {
         setSelectedAppointmentNumber(data.appointmentNumber);
-        setSelectedTreatmentNumber(data.treatmentId);  // ✅ סנן לפי טיפול מדויק
+        setSelectedTreatmentNumber(data.treatmentId);
         setActiveView("Treatments");
       } else {
         alert("לא נמצא מזהה תור בטיפול זה");
@@ -116,19 +129,14 @@ const Dashboard = () => {
 
   const goToAppointment = (appointmentNumber) => {
     setSelectedAppointmentNumber(appointmentNumber);
-    setSelectedTreatmentNumber(null); // כדי להציג את כל הטיפולים בתור
+    setSelectedTreatmentNumber(null);
     setActiveView("Appointments");
   };
 
   return (
     <div className={styles.dashboardContainer}>
       <header className={styles.header}>
-        <button
-          className={styles["navbar-toggler"]}
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-        >
-          ☰
-        </button>
+        <button className={styles["navbar-toggler"]} onClick={() => setIsMenuOpen(!isMenuOpen)}>☰</button>
 
         <div className={styles.dashboardTitle}>
           <h4>Dashboard</h4>
@@ -140,14 +148,27 @@ const Dashboard = () => {
             <Link to="/AdvancedDashboard" className={styles.headerLink}>
               <FaTachometerAlt className={styles.icon} /> לוח ניהול מתקדם
             </Link>
-          
           )}
-            <button onClick={handleLogout} className={styles.headerLinkLogout}>
-              <FaSignOutAlt className={styles.icon} /> התנתקות
-            </button>
+
+          <div
+            className={styles.dropdownWrapper}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+          >
+            <button className={styles.headerLink}>⚙️ פעולות נוספות</button>
+            {showDropdown && (
+              <div className={styles.dropdownMenu}>
+                <button className={styles.dropdownItem} onClick={() => setShowCamera(true)}>📸 הפעל מצלמה</button>
+                <button className={styles.dropdownItem} onClick={() => navigate("/create-treatment")}>➕ הוספת טיפול חדש</button>
+                <button className={styles.dropdownItem} onClick={() => navigate("/AppointmentForm")}>➕ קביעת תור</button>
+                <button onClick={handleLogout} className={styles.headerLinkLogout}>
+                  <FaSignOutAlt className={styles.icon} /> התנתקות
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </header>
-
 
       <div className={styles.mainWrapper}>
         <nav className={styles.sidebar}>
@@ -171,6 +192,10 @@ const Dashboard = () => {
         <main className={styles.mainContent}>
           {renderContent()}
         </main>
+
+        {showCamera && (
+          <CameraPanel onClose={() => setShowCamera(false)} />
+        )}
       </div>
     </div>
   );

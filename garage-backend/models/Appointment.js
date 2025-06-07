@@ -34,6 +34,15 @@ const appointmentSchema = new mongoose.Schema({
     type: String,
     required: false
   },
+
+  arrivalStatus: {
+  type: String,
+  enum: ["הגיע", "לא הגיע", "בהמתנה"], // הוספת ערך ברירת מחדל חוקי
+  default: "בהמתנה"
+},
+
+
+
   treatment: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Treatment'
