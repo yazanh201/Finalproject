@@ -9,13 +9,13 @@ import Dashboard from './Pages/Dashboard';
 import PrivateRoute from './PrivateRoute';
 import About from './Pages/About';
 import AdvancedDashboard from "./Pages/advanceddashboard/AdvancedDashboard"; 
-import RecommendedCars from './recommendations/RecommendedCars';
 import ChatBot from "./components/ChatBot";
 import TreatmentsTable from "./Tabels/TreatmentsTable";
 import TreatmentDetails from './components/TreatmentDetails';
 import CreateTreatment from './components/CreateTreatment';
 import CustomerVehicles from './components/CustomerVehicles';
 import NewAppointmentForm from './components/AppointmentsForm';
+import RecommendedCars from './hooks/useRecommendedCars';
 
 function App() {
   return (
@@ -27,7 +27,9 @@ function App() {
         <Route path="/Services" element={<Services />} />
         <Route path="/Login" element={<Login />} />
         <Route path="/About" element={<About />} />
+
         <Route path="/RecommendedCars" element={<RecommendedCars />} />
+
         <Route path="/AppointmentForm" element={<NewAppointmentForm />} />
         <Route path="/appointments/edit/:id" element={<NewAppointmentForm />} />
         <Route path="/treatment/:id" element={<TreatmentDetails />} />
