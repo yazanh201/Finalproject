@@ -1,6 +1,8 @@
 ultralytics==8.0.204
+torch==2.1.2
 opencv-python
 easyocr
 Flask
 flask-cors
-numpy
+numpy==1.24.4
+

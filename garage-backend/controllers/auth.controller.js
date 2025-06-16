@@ -31,6 +31,7 @@ const registerUser = async (req, res) => {
 // פונקציה להתחברות משתמש
 const loginUser = async (req, res) => {
   try {
+    
     const { username, password } = req.body;
 
     // חיפוש המשתמש לפי שם משתמש

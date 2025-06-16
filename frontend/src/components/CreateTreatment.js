@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './cssfiles/createtreatment.css';
 import { useLocation, useNavigate } from 'react-router-dom';
 
@@ -63,6 +63,13 @@ const CreateTreatment = () => {
 
   const [treatmentServices, setTreatmentServices] = useState([]);
 
+  // ✅ Load treatment checklist if editing
+  useEffect(() => {
+    if (state.treatmentServices && Array.isArray(state.treatmentServices)) {
+      setTreatmentServices(state.treatmentServices);
+    }
+  }, [state.treatmentServices]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
@@ -103,16 +110,18 @@ const CreateTreatment = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const API_BASE = process.env.REACT_APP_API_BASE || 'http://localhost:5000';
     const isEdit = form.treatmentId && form.treatmentId.trim() !== "";
     const url = isEdit
-      ? `/api/treatments/${form.treatmentId}`
-      : '/api/treatments';
+      ? `${API_BASE}/api/treatments/${form.treatmentId}`
+      : `${API_BASE}/api/treatments`;
     const method = isEdit ? 'PUT' : 'POST';
 
     const formData = new FormData();
+
     for (const key in form) {
-      if (key === "images") {
-        form.images.forEach((img) => formData.append("images", img));
+      if (key === "images" && Array.isArray(form[key]) && form[key].length > 0) {
+        form[key].forEach((img) => formData.append("images", img));
       } else if (key === "invoiceFile" && form.invoiceFile) {
         formData.append("invoice", form.invoiceFile);
       } else if (key !== "treatmentId") {
@@ -125,13 +134,23 @@ const CreateTreatment = () => {
     try {
       const response = await fetch(url, {
         method,
-        body: formData
+        body: formData,
       });
 
-      const data = await response.json();
+      const contentType = response.headers.get("content-type");
+      let data;
+      if (contentType && contentType.includes("application/json")) {
+        data = await response.json();
+      } else {
+        const text = await response.text();
+        console.error("🧨 תגובה מהשרת אינה JSON:\n", text);
+        throw new Error(`שגיאה לא צפויה מהשרת:\n${text}`);
+      }
+
       if (!response.ok) throw new Error(data.message || 'שגיאה בשמירה');
 
       alert(`✅ הטיפול ${isEdit ? 'עודכן בהצלחה' : 'נשמר בהצלחה'}!`);
+
       if (!isEdit) {
         setForm({
           date: new Date().toISOString().split("T")[0],
@@ -153,7 +172,7 @@ const CreateTreatment = () => {
         navigate(-1);
       }
     } catch (err) {
-      console.error(err);
+      console.error("❌ שגיאה בבקשה:", err);
       alert(`❌ שגיאה: ${err.message}`);
     }
   };
@@ -164,6 +183,7 @@ const CreateTreatment = () => {
         <h3 className="text-center mb-4">טופס טיפול לרכב</h3>
         <form onSubmit={handleSubmit}>
           <div className="row g-4">
+            {/* left column */}
             <div className="col-md-6">
               <label className="form-label">תאריך</label>
               <input type="date" name="date" className="form-control" value={form.date} onChange={handleChange} required />
@@ -175,6 +195,7 @@ const CreateTreatment = () => {
               <input type="text" name="customerName" className="form-control" value={form.customerName} onChange={handleChange} required />
             </div>
 
+            {/* right column */}
             <div className="col-md-6">
               <label className="form-label">עלות</label>
               <input type="number" name="cost" className="form-control" value={form.cost} onChange={handleChange} />
@@ -191,6 +212,7 @@ const CreateTreatment = () => {
               </select>
             </div>
 
+            {/* checklist selection */}
             <div className="col-md-6">
               <label className="form-label mt-3">בחר קטגוריה להוספה</label>
               <select className="form-control" onChange={handleCategoryChange}>

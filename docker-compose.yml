@@ -1,0 +1,35 @@
+services:
+  backend:
+    build: ./garage-backend
+    container_name: garage-backend
+    ports:
+      - "5000:5000"
+    networks:
+      - garage-net
+    depends_on:
+      - plate-detector
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        REACT_APP_API_URL: http://localhost:5000
+    container_name: garage-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - garage-net
+
+  plate-detector:
+    build: ./plates  # 👈 זו התיקייה הנכונה עכשיו
+    container_name: plate-detector
+    ports:
+      - "3300:3300"
+    networks:
+      - garage-net
+    command: ["python", "app.py"]
+
+networks:
+  garage-net:

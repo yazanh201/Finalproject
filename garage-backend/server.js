@@ -26,9 +26,11 @@ app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // חיבור למסד נתונים
-mongoose.connect(process.env.MONGO_URI, {})
-  .then(() => console.log('✅ מחובר ל-MongoDB'))
-  .catch((error) => console.error('❌ שגיאה בחיבור ל-MongoDB:', error));
+require("dotenv").config(); // בראש הקובץ
+
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => console.log("✅ MongoDB Atlas connected"))
+  .catch(err => console.error("❌ MongoDB connection error:", err));
 
 // שימוש בנתיבים
 app.use('/api/customers', customerRoutes);
@@ -49,6 +51,6 @@ app.get('/', (req, res) => {
 
 // הפעלת השרת
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 השרת רץ על פורט: ${PORT}`);
 });

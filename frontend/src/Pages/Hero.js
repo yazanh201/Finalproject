@@ -1,6 +1,6 @@
 import React from 'react';
 import './cssfiles/Hero.css'; // ייבוא קובץ ה-CSS
-import Contact from './Contact';
+import Contact from '../Pages/Contact';
 
 function Hero() {
   return (

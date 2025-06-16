@@ -127,6 +127,15 @@ const updateTreatment = async (req, res) => {
     treatment.workerId = req.body?.workerId || treatment.workerId;
     treatment.idNumber = req.body?.idNumber || treatment.idNumber;
 
+    // ✅ הוספת טיפול משירותים checklist
+    if (req.body.treatmentServices) {
+      try {
+        treatment.treatmentServices = JSON.parse(req.body.treatmentServices);
+      } catch (e) {
+        console.warn("⚠️ פורמט לא תקין בשדה treatmentServices:", e.message);
+      }
+    }
+
     if (req.files?.invoice?.[0]) {
       treatment.invoiceFile = req.files.invoice[0].filename;
     }
