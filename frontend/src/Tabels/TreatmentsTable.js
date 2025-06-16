@@ -151,6 +151,7 @@ const TreatmentsTable = ({
               <th>שם לקוח</th>
               <th>צפייה</th>
               <th>עריכה</th>
+              <th>חשבונית</th>
             </tr>
           </thead>
           <tbody>
@@ -203,13 +204,25 @@ const TreatmentsTable = ({
                           status: treatment.status || "",
                           treatmentId: treatment._id || "",
                           repairTypeId: treatment.typeId || "",
-                          workerId: treatment.workerId || ""
+                          workerId: treatment.workerId || "",
+                          // ✅ תוסיף את זה:
+                          treatmentServices: treatment.treatmentServices || []
                         }
                       })
                     }
+
                     title="עריכת טיפול"
                   >
                     ✏️
+                  </button>
+                </td>
+                <td>
+                  <button
+                    className="btn btn-outline-success btn-sm"
+                    onClick={() => navigate(`/invoice/${treatment._id}`)}
+                    title="צפייה בחשבונית"
+                  >
+                    🧾 חשבונית
                   </button>
                 </td>
               </tr>
