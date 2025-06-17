@@ -12,8 +12,9 @@ const {
   getTreatmentsByCarPlate,
   addTreatment,
   updateTreatment,
-  confirmArrivalAndAddTreatment
-} = require('../controllers/treatment.controller');
+  confirmArrivalAndAddTreatment,
+  getRevenueByCategory
+} = controller;
 
 // 📥 שליפות לפי קריטריונים
 router.get('/', getAllTreatments);
@@ -22,6 +23,7 @@ router.get('/check', controller.checkTreatmentByPlate);
 router.get('/by-appointment/:appointmentNumber', getTreatmentsByAppointmentNumber);
 router.get('/by-date/:date', getTreatmentsByDate);
 router.get('/by-car/:carPlate', getTreatmentsByCarPlate);
+router.get('/summary/revenue-by-category', getRevenueByCategory);
 
 // ➕ הוספת טיפול עם העלאת קבצים (חשבונית + תמונות)
 router.post(
@@ -46,7 +48,7 @@ router.put(
   updateTreatment
 );
 
-// 📥 שליפה לפי מזהה ObjectId (הנתיב הזה חייב להיות אחרון!)
+// ❗ שים לב: חייב להיות אחרון – אחרת הוא יתפוס את כל הנתיבים כמו /by-car/...
 router.get('/:id', getTreatmentByObjectId);
 
 module.exports = router;

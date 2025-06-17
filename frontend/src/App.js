@@ -16,6 +16,7 @@ import CreateTreatment from './components/CreateTreatment';
 import CustomerVehicles from './components/CustomerVehicles';
 import NewAppointmentForm from './components/AppointmentsForm';
 import RecommendedCars from './hooks/useRecommendedCars';
+import InvoicePage from './components/InvoicePage';
 
 function App() {
   return (
@@ -37,7 +38,7 @@ function App() {
         <Route path="/customer-vehicles/:customerId" element={<CustomerVehicles />} />
         <Route path="/AdvancedDashboard" element={<AdvancedDashboard />} />
         <Route path="/create-treatment" element={<CreateTreatment />} />
-        
+        <Route path="/invoice/:treatmentId" element={<InvoicePage />} />        
         <Route
           path="/Dashboard"
           element={

@@ -13,16 +13,21 @@ const getAllTreatments = async (req, res) => {
   }
 };
 
-// שליפה לפי מזהה טיפול
 const getTreatmentById = async (req, res) => {
+  const treatmentId = parseInt(req.params.treatmentId);
+  if (isNaN(treatmentId)) {
+    return res.status(400).json({ message: "מזהה טיפול לא תקין" });
+  }
+
   try {
-    const treatment = await Treatment.findOne({ treatmentNumber: parseInt(req.params.treatmentId) });
+    const treatment = await Treatment.findOne({ treatmentNumber: treatmentId });
     if (!treatment) return res.status(404).json({ message: 'טיפול לא נמצא' });
     res.json(treatment);
   } catch (err) {
     res.status(500).json({ message: 'שגיאה בשליפה לפי מזהה טיפול', error: err.message });
   }
 };
+
 
 // שליפה לפי מזהה תור
 const getTreatmentsByAppointmentNumber = async (req, res) => {
@@ -116,6 +121,7 @@ const updateTreatment = async (req, res) => {
     const treatment = await Treatment.findById(req.params.id);
     if (!treatment) return res.status(404).json({ message: "טיפול לא נמצא" });
 
+    // עדכון שדות רגילים
     treatment.date = req.body?.date || treatment.date;
     treatment.cost = isNaN(Number(req.body?.cost)) ? treatment.cost : Number(req.body.cost);
     treatment.carPlate = req.body?.carPlate || treatment.carPlate;
@@ -127,15 +133,21 @@ const updateTreatment = async (req, res) => {
     treatment.workerId = req.body?.workerId || treatment.workerId;
     treatment.idNumber = req.body?.idNumber || treatment.idNumber;
 
-    // ✅ הוספת טיפול משירותים checklist
-    if (req.body.treatmentServices) {
+    // ✅ עדכון treatmentServices
+    if (req.body?.treatmentServices) {
+      console.log("📥 התקבל treatmentServices בעדכון:", req.body.treatmentServices);
+
       try {
-        treatment.treatmentServices = JSON.parse(req.body.treatmentServices);
-      } catch (e) {
-        console.warn("⚠️ פורמט לא תקין בשדה treatmentServices:", e.message);
+        treatment.treatmentServices =
+          typeof req.body.treatmentServices === "string"
+            ? JSON.parse(req.body.treatmentServices)
+            : req.body.treatmentServices;
+      } catch (err) {
+        console.error("❌ שגיאה בפיענוח treatmentServices בעת עדכון:", err);
       }
     }
 
+    // עדכון קבצים
     if (req.files?.invoice?.[0]) {
       treatment.invoiceFile = req.files.invoice[0].filename;
     }
@@ -150,6 +162,7 @@ const updateTreatment = async (req, res) => {
     res.status(500).json({ message: "❌ שגיאה בעדכון טיפול", error: err.message });
   }
 };
+
 
 // אישור הגעה ויצירת טיפול מתור
 const confirmArrivalAndAddTreatment = async (req, res) => {
@@ -260,6 +273,41 @@ const checkTreatmentByPlate = async (req, res) => {
   }
 };
 
+
+const getRevenueByCategory = async (req, res) => {
+  try {
+    const treatments = await Treatment.find({});
+
+    const categoryMap = {};
+
+    treatments.forEach(t => {
+      const cost = Number(t.cost) || 0;
+      const services = t.treatmentServices || [];
+
+      services.forEach(service => {
+        const category = service?.category || "לא ידוע";
+        if (!categoryMap[category]) {
+          categoryMap[category] = 0;
+        }
+        categoryMap[category] += cost;
+      });
+    });
+
+    const result = Object.entries(categoryMap).map(([name, value]) => ({ name, value }));
+    console.log("🚀 נתוני תגובה:", result);
+
+
+    res.json(result);
+  } catch (err) {
+    console.error("שגיאה בשליפת הכנסות לפי קטגוריה:", err);
+    res.status(500).json({ message: "שגיאה בשליפת הכנסות לפי קטגוריה", error: err.message });
+  }
+};
+
+
+
+
+
 module.exports = {
   getAllTreatments,
   getTreatmentById,
@@ -270,5 +318,6 @@ module.exports = {
   updateTreatment,
   confirmArrivalAndAddTreatment,
   getTreatmentByObjectId,
-  checkTreatmentByPlate
+  checkTreatmentByPlate,
+  getRevenueByCategory
 };

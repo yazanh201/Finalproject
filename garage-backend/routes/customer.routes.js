@@ -9,7 +9,9 @@ const {
   searchCustomer,
   updateCustomer,
   getNewCustomersThisMonth,
-  addCarToCustomer
+  addCarToCustomer,
+  getIdNumberByCarPlate,
+  getEmailByCarPlate
 } = require('../controllers/customer.controller');
 
 /**
@@ -48,5 +50,10 @@ router.put("/:id/add-car", addCarToCustomer);
  */
 router.get("/new-this-month", getNewCustomersThisMonth);
 
-// ייצוא ה-router לשימוש בקובץ server.js
+// שליפת תעודת זהות לפי מספר רכב
+router.get('/id-by-plate/:plateNumber', getIdNumberByCarPlate);
+
+router.get('/email-by-plate/:plateNumber', getEmailByCarPlate);
+
+
 module.exports = router;

@@ -1,7 +1,6 @@
 import React from 'react';
 
-import './footer.css'; // ייבוא קובץ ה-CSS לעיצוב
-import './cssfiles/footer.css'; // ייבוא קובץ ה-CSS לעיצוב
+import '../components/cssfiles/footer.css';
 
 
 /**

@@ -193,10 +193,65 @@ const getNewCustomersThisMonth = async (req, res) => {
   }
 };
 
-module.exports = {
-  getNewCustomersThisMonth,
-  // ... שאר הפונקציות שלך
+/**
+ * 📌 שליפת תעודת זהות של לקוח לפי מספר רכב
+ */
+const getIdNumberByCarPlate = async (req, res) => {
+  try {
+    const { plateNumber } = req.params;
+
+    if (!plateNumber) {
+      return res.status(400).json({ message: "❌ חובה לציין מספר רכב" });
+    }
+
+    // חיפוש לקוח שמכיל את מספר הרכב ברשימת הרכבים שלו
+    const customer = await Customer.findOne({ vehicles: plateNumber });
+
+    if (!customer) {
+      return res.status(404).json({ message: "❌ לקוח לא נמצא עם מספר רכב זה" });
+    }
+
+    return res.status(200).json({
+      idNumber: customer.idNumber,
+      name: customer.name,
+    });
+  } catch (error) {
+    console.error("❌ שגיאה בשליפת תעודת זהות לפי מספר רכב:", error.message);
+    return res.status(500).json({ message: "❌ שגיאה בשרת", error: error.message });
+  }
 };
+
+/**
+ * שליפת כתובת אימייל של לקוח לפי מספר רכב
+ */
+const getEmailByCarPlate = async (req, res) => {
+  try {
+    const { plateNumber } = req.params;
+
+    if (!plateNumber) {
+      return res.status(400).json({ message: "❌ חובה לציין מספר רכב" });
+    }
+
+    // חיפוש לקוח שמכיל את מספר הרכב במערך הרכבים
+    const customer = await Customer.findOne({ vehicles: plateNumber });
+
+    if (!customer) {
+      return res.status(404).json({ message: "❌ לקוח לא נמצא עם מספר רכב זה" });
+    }
+
+    return res.status(200).json({
+      email: customer.email,
+      name: customer.name,
+    });
+  } catch (error) {
+    console.error("❌ שגיאה בשליפת אימייל לפי מספר רכב:", error.message);
+    return res.status(500).json({ message: "❌ שגיאה בשרת", error: error.message });
+  }
+};
+
+
+
+
 
 // ייצוא כל הפונקציות לשימוש בקובץ ה-routes
 module.exports = {
@@ -206,4 +261,6 @@ module.exports = {
   updateCustomer,
   addCarToCustomer,
   getNewCustomersThisMonth,
+  getIdNumberByCarPlate,
+  getEmailByCarPlate
 };

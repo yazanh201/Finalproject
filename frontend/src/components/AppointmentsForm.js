@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
-import './cssfiles/createtreatment.css'; // שימוש בעיצוב הקיים
 
 const CreateAppointment = () => {
   const navigate = useNavigate();
