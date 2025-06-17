@@ -25,20 +25,27 @@ const TreatmentTypePieChart = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    axios.get('/api/treatments/summary/revenue-by-category')
-      .then(res => {
-        const filteredData = res.data.filter(entry => entry.value > 0); // ✅ סינון ערכים של 0
-        setData(filteredData);
-      })
-      .catch(err => {
-        console.error("שגיאה בשליפת נתוני גרף:", err);
+useEffect(() => {
+  axios.get("http://localhost:5000/api/treatments/summary/revenue-by-category")
+    .then(res => {
+      if (!Array.isArray(res.data)) {
+        console.error("❌ הצורה של הנתונים אינה מערך:", res.data);
         setData([]);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, []);
+        return;
+      }
+
+      const filteredData = res.data.filter(entry => entry.value > 0); // ✅ סינון ערכים של 0
+      setData(filteredData);
+    })
+    .catch(err => {
+      console.error("שגיאה בשליפת נתוני גרף:", err);
+      setData([]);
+    })
+    .finally(() => {
+      setLoading(false);
+    });
+}, []);
+
 
   return (
     <div className={styles.chartContainer}>

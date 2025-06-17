@@ -15,8 +15,9 @@ import TreatmentDetails from './components/TreatmentDetails';
 import CreateTreatment from './components/CreateTreatment';
 import CustomerVehicles from './components/CustomerVehicles';
 import NewAppointmentForm from './components/AppointmentsForm';
-import RecommendedCars from './hooks/useRecommendedCars';
 import InvoicePage from './components/InvoicePage';
+// ⚠️ ודא שזה קומפוננטה, אחרת הסר או שנה את השימוש
+// import RecommendedCars from './hooks/useRecommendedCars'; 
 
 function App() {
   return (
@@ -29,7 +30,8 @@ function App() {
         <Route path="/Login" element={<Login />} />
         <Route path="/About" element={<About />} />
 
-        <Route path="/RecommendedCars" element={<RecommendedCars />} />
+        {/* ⚠️ הוסר RecommendedCars כי הוא ככל הנראה אינו קומפוננטה תקפה */}
+        {/* <Route path="/RecommendedCars" element={<RecommendedCars />} /> */}
 
         <Route path="/AppointmentForm" element={<NewAppointmentForm />} />
         <Route path="/appointments/edit/:id" element={<NewAppointmentForm />} />

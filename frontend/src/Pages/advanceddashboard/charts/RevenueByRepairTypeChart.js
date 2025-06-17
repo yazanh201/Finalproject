@@ -14,21 +14,28 @@ const RevenueByRepairTypeChart = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    axios.get('/api/treatments/summary/revenue-by-category')
-      .then(res => {
-        const filtered = res.data.filter(item => item.value > 0); // הסרת ערכים של 0
-        const transformed = filtered.map(item => ({
-          name: item.name,
-          revenue: item.value
-        }));
-        setData(transformed);
-      })
-      .catch(err => {
-        console.error("❌ שגיאה בשליפת הכנסות:", err);
-        setData([]);
-      })
-      .finally(() => setLoading(false));
-  }, []);
+  axios.get("http://localhost:5000/api/treatments/summary/revenue-by-category")
+    .then(res => {
+      if (!Array.isArray(res.data)) {
+        console.error("❌ הצורה של הנתונים אינה מערך:", res.data);
+        setData([]); // בטיחות
+        return;
+      }
+
+      const filtered = res.data.filter(item => item.value > 0);
+      const transformed = filtered.map(item => ({
+        name: item.name,
+        revenue: item.value
+      }));
+      setData(transformed);
+    })
+    .catch(err => {
+      console.error("❌ שגיאה בשליפת הכנסות:", err);
+      setData([]);
+    })
+    .finally(() => setLoading(false));
+}, []);
+
 
   return (
     <div className={styles.chartContainer} dir="rtl">
