@@ -12,7 +12,8 @@ const {
   getAppointmentByNumber,
   rejectArrival,
   confirmArrival,
-  getAppointmentsThisMonth // ✅
+  getAppointmentsThisMonth, // ✅
+  searchCustomersByName
 } = require('../controllers/appointment.controller');
 
 router.post('/', addAppointment);
@@ -26,7 +27,7 @@ router.get('/by-number/:appointmentNumber', getAppointmentByNumber);
 router.get('/available-times/:date', getAvailableTimes);
 router.post('/appointments/:id/confirm-arrival', confirmArrival);
 router.post('/appointments/:id/reject-arrival', rejectArrival);
-
+router.get('/search', searchCustomersByName);
 
 
 // ✅ חדש – שליפת תורים של החודש הנוכחי

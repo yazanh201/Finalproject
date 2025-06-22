@@ -8,7 +8,6 @@ import Inquiries from "../Tabels/Inquiries";
 import TreatmentsTable from "../Tabels/TreatmentsTable";
 import Appointment from "../Tabels/Appointments";
 import Employees from "../Tabels/EmployeesTable";
-import Repairtypes from "../Tabels/RepairtypesTable";
 import CarsUnderMaintance from "../Tabels/CarsUnderMaintance";
 import CarOrders from "../Tabels/CarOrders";
 import CameraPanel from "../components/CameraPanel";
@@ -158,6 +157,7 @@ const Dashboard = () => {
             <button className={styles.headerLink}>⚙️ פעולות נוספות</button>
             {showDropdown && (
               <div className={styles.dropdownMenu}>
+                <button className={styles.dropdownItem} onClick={() => navigate("/add-customer-with-vehicle")}>➕ הוספת לקוח ורכב</button>
                 <button className={styles.dropdownItem} onClick={() => setShowCamera(true)}>📸 הפעל מצלמה</button>
                 <button className={styles.dropdownItem} onClick={() => navigate("/create-treatment")}>➕ הוספת טיפול חדש</button>
                 <button className={styles.dropdownItem} onClick={() => navigate("/AppointmentForm")}>➕ קביעת תור</button>
@@ -185,7 +185,6 @@ const Dashboard = () => {
             )}
             <li className={styles.navItem}><button className={styles.sidebarBtn} onClick={() => setActiveView("Treatments")}>טיפולים</button></li>
             <li className={styles.navItem}><button className={styles.sidebarBtn} onClick={() => setActiveView("CarsUnderMaintance")}>רכבים בטיפול</button></li>
-            <li className={styles.navItem}><button className={styles.sidebarBtn} onClick={() => setActiveView("Repairtypes")}>סוגי טיפולים/תיקונים</button></li>
           </ul>
         </nav>
 

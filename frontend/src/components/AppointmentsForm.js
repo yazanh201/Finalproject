@@ -6,6 +6,8 @@ const CreateAppointment = () => {
   const location = useLocation();
   const { id } = useParams(); // קבלת id מהנתיב אם יש
   const [availableTimes, setAvailableTimes] = useState([]);
+  const [suggestions, setSuggestions] = useState([]);
+  const [typingTimeout, setTypingTimeout] = useState(null);
   const [form, setForm] = useState({
     date: '',
     time: '',
@@ -72,6 +74,7 @@ const CreateAppointment = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+
     if (name === 'date') {
       const today = new Date().toISOString().slice(0, 10);
       if (value < today) {
@@ -80,12 +83,21 @@ const CreateAppointment = () => {
       }
       fetchAvailableTimes(value);
     }
+
     if (name === 'idNumber' && !/^\d{0,9}$/.test(value)) return;
-    if (name === 'name' && !/^[א-תa-zA-Z\s]*$/.test(value)) return;
+    if (name === 'name') {
+      if (!/^[א-תa-zA-Z\s]*$/.test(value)) return;
+
+      // קריאה להצעות שם לקוח (autocomplete)
+      fetchCustomerSuggestions(value);
+    }
+
     if (name === 'phoneNumber' && !/^\d{0,7}$/.test(value)) return;
     if (name === 'carNumber' && !/^\d{0,8}$/.test(value)) return;
+
     setForm((prev) => ({ ...prev, [name]: value }));
   };
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -141,57 +153,133 @@ const CreateAppointment = () => {
     }
   };
 
-  return (
-    <div className="container mt-5" dir="rtl">
-      <div className="card shadow p-4">
-        <h3 className="text-center mb-4">{location.state || id ? "עריכת תור" : "קביעת תור חדש"}</h3>
-        <form onSubmit={handleSubmit}>
-          <div className="row g-4">
-            <div className="col-md-6">
-              <label className="form-label">תאריך</label>
-              <input type="date" name="date" className="form-control" value={form.date} onChange={handleChange} required />
-              <label className="form-label mt-3">שעה</label>
-              <select name="time" className="form-control" value={form.time} onChange={handleChange}>
-                <option value="">בחר שעה</option>
-                {availableTimes.map((time) => (
-                  <option key={time} value={time}>{time}</option>
-                ))}
-              </select>
-              <label className="form-label mt-3">תיאור</label>
-              <textarea name="description" className="form-control" rows="3" value={form.description} onChange={handleChange}></textarea>
-            </div>
-            <div className="col-md-6">
-              <label className="form-label">תעודת זהות</label>
-              <input type="text" name="idNumber" className="form-control" value={form.idNumber} onChange={handleChange} required />
-              <label className="form-label mt-3">שם לקוח</label>
-              <input type="text" name="name" className="form-control" value={form.name} onChange={handleChange} required />
-              <label className="form-label mt-3">טלפון</label>
-              <div className="d-flex">
-                <select name="phonePrefix" className="form-select w-auto" value={form.phonePrefix} onChange={handleChange}>
-                  <option value="050">050</option>
-                  <option value="052">052</option>
-                  <option value="053">053</option>
-                  <option value="054">054</option>
-                  <option value="055">055</option>
-                  <option value="056">056</option>
-                  <option value="057">057</option>
-                  <option value="058">058</option>
-                  <option value="059">059</option>
-                </select>
-                <input type="text" name="phoneNumber" className="form-control ms-2" value={form.phoneNumber} onChange={handleChange} required placeholder="7 ספרות" />
-              </div>
-              <label className="form-label mt-3">מספר רישוי</label>
-              <input type="text" name="carNumber" className="form-control" value={form.carNumber} onChange={handleChange} required />
-            </div>
-            <div className="col-12 text-center mt-4">
-              <button type="submit" className="btn btn-success mx-2 px-4">{location.state || id ? "עדכן" : "שמור "}</button>
-              <button type="button" className="btn btn-secondary mx-2 px-4" onClick={() => navigate('/Dashboard')}>ביטול</button>
-            </div>
-          </div>
-        </form>
-      </div>
-    </div>
+  const fetchCustomerSuggestions = (value) => {
+  if (value.length < 2) {
+    setSuggestions([]);
+    return;
+  }
+
+  // מנגנון דיליי כדי לא לשלוח כל תו
+  if (typingTimeout) clearTimeout(typingTimeout);
+  setTypingTimeout(
+    setTimeout(async () => {
+      try {
+        const res = await fetch(`http://localhost:5000/api/customers/search?query=${value}`);
+        const data = await res.json();
+        setSuggestions(data);
+      } catch (error) {
+        console.error('שגיאה בחיפוש לקוחות:', error);
+      }
+    }, 300)
   );
+};
+
+
+return (
+  <div className="container mt-5" dir="rtl">
+    <div className="card shadow p-4 position-relative">
+      <h3 className="text-center mb-4">
+        {location.state || id ? "עריכת תור" : "קביעת תור חדש"}
+      </h3>
+      <form onSubmit={handleSubmit}>
+        <div className="row g-4">
+          <div className="col-md-6">
+            <label className="form-label">תאריך</label>
+            <input type="date" name="date" className="form-control" value={form.date} onChange={handleChange} required />
+
+            <label className="form-label mt-3">שעה</label>
+            <select name="time" className="form-control" value={form.time} onChange={handleChange}>
+              <option value="">בחר שעה</option>
+              {availableTimes.map((time) => (
+                <option key={time} value={time}>{time}</option>
+              ))}
+            </select>
+
+            <label className="form-label mt-3">תיאור</label>
+            <textarea name="description" className="form-control" rows="3" value={form.description} onChange={handleChange}></textarea>
+          </div>
+
+          <div className="col-md-6 position-relative">
+            {/* שם לקוח ראשון */}
+            <label className="form-label">שם לקוח</label>
+            <input
+              type="text"
+              name="name"
+              className="form-control"
+              value={form.name}
+              onChange={handleChange}
+              autoComplete="off"
+              required
+            />
+
+            {/* הצעות אוטומטיות לשם הלקוח */}
+            {suggestions.length > 0 && (
+              <ul className="list-group position-absolute z-3 w-100" style={{ maxHeight: 150, overflowY: "auto" }}>
+                {suggestions.map((s) => (
+                  <li
+                    key={s._id}
+                    className="list-group-item list-group-item-action"
+                    style={{ cursor: "pointer" }}
+                    onClick={() => {
+                      setForm((prev) => ({
+                        ...prev,
+                        name: s.name,
+                        idNumber: s.idNumber,
+                        phoneNumber: s.phoneNumber?.substring(3) || "",
+                        phonePrefix: s.phoneNumber?.substring(0, 3) || "050",
+                      }));
+                      setSuggestions([]);
+                    }}
+                  >
+                    {s.name} – {s.idNumber}
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            {/* אחריו תעודת זהות */}
+            <label className="form-label mt-3">תעודת זהות</label>
+            <input
+              type="text"
+              name="idNumber"
+              className="form-control"
+              value={form.idNumber}
+              onChange={handleChange}
+              required
+            />
+
+            {/* שאר השדות כרגיל */}
+            <label className="form-label mt-3">טלפון</label>
+            <div className="d-flex">
+              <select name="phonePrefix" className="form-select w-auto" value={form.phonePrefix} onChange={handleChange}>
+                <option value="050">050</option>
+                <option value="052">052</option>
+                <option value="053">053</option>
+                <option value="054">054</option>
+                <option value="055">055</option>
+                <option value="056">056</option>
+                <option value="057">057</option>
+                <option value="058">058</option>
+                <option value="059">059</option>
+              </select>
+              <input type="text" name="phoneNumber" className="form-control ms-2" value={form.phoneNumber} onChange={handleChange} required placeholder="7 ספרות" />
+            </div>
+
+            <label className="form-label mt-3">מספר רישוי</label>
+            <input type="text" name="carNumber" className="form-control" value={form.carNumber} onChange={handleChange} required />
+          </div>
+
+
+          <div className="col-12 text-center mt-4">
+            <button type="submit" className="btn btn-success mx-2 px-4">{location.state || id ? "עדכן" : "שמור "}</button>
+            <button type="button" className="btn btn-secondary mx-2 px-4" onClick={() => navigate('/Dashboard')}>ביטול</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+);
+
 };
 
 export default CreateAppointment;

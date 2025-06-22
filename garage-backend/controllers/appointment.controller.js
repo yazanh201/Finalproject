@@ -170,6 +170,19 @@ const rejectArrival = async (req, res) => {
   }
 };
 
+const searchCustomersByName = async (req, res) => {
+  try {
+    const nameQuery = req.query.name || '';
+    const results = await Customer.find({
+      name: { $regex: nameQuery, $options: 'i' },
+    }).limit(10);
+    res.json(results);
+  } catch (error) {
+    console.error('❌ שגיאה בחיפוש לקוחות:', error);
+    res.status(500).json({ message: 'שגיאה בחיפוש לקוחות' });
+  }
+};
+
 // ייצוא כל הפונקציות
 module.exports = {
   addAppointment,
@@ -184,4 +197,5 @@ module.exports = {
   getAvailableTimes,
   confirmArrival,
   rejectArrival,
+  searchCustomersByName
 };

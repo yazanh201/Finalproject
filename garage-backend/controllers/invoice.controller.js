@@ -1,6 +1,7 @@
 // 📁 controllers/invoice.controller.js
 const Invoice = require("../models/Invoice");
 const Treatment = require("../models/Treatment");
+const mongoose = require("mongoose");
 
 // יצירת חשבונית
 const createInvoice = async (req, res) => {
