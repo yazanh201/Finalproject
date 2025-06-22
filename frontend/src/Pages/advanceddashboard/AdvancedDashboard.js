@@ -177,16 +177,16 @@ const handleNotificationClick = (type, data) => {
 
 
         <main className={styles.mainContent}>
-          <div style={{
-            display: 'flex',
-            justifyContent: 'center',
-            flexWrap: 'wrap',
-            gap: '20px',
-            padding: '20px'
-          }}>
-            <TreatmentTypePieChart />
-            <RevenueByRepairTypeChart />
-          </div>
+          <div className={styles.chartsContainer}>
+  <div className={styles.chartBox}>
+    <TreatmentTypePieChart />
+  </div>
+  <div className={styles.chartBox}>
+    <RevenueByRepairTypeChart />
+  </div>
+</div>
+
+
 
 
           <DashboardOverview

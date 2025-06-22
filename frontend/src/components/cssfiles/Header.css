@@ -53,34 +53,38 @@
   color: #000;
 }
 
-/* עיצוב למסכים קטנים */
 @media (max-width: 768px) {
   .hamburger {
     display: flex;
+    z-index: 1001; /* חשוב שהכפתור יופיע מעל */
   }
 
   .menu {
-    display: none; /* הסתר את התפריט כברירת מחדל */
-    flex-direction: column;
-    position: absolute;
+    display: none;
+    flex-direction: column-reverse;
+    position: absolute; /* ✅ שיהיה מעל הכל */
     top: 60px;
     right: 0;
     background: #000;
-    width: 100%;
+    width: 70vw;
+    height: auto;
     padding: 10px 0;
+    z-index: 1000; /* מעל הקנבס */
+    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.5);
   }
 
   .menu.open {
-    display: flex; /* הצגת התפריט כאשר ה-Hamburger לחוץ */
+    display: flex;
   }
 
   .menu li {
-    text-align: center;
+    text-align: right;
     width: 100%;
   }
 
   .menu a {
-    padding: 15px 0;
+    padding: 15px 20px;
     display: block;
+    color: white;
   }
 }

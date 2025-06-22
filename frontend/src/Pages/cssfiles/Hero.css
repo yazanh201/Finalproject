@@ -1,7 +1,67 @@
-.hero {
-      height: 80vh; /* גובה של 80% מהמסך */
-      background: url('/img/garageimg.png') no-repeat center center/cover;
-      color: white;
-        
+.hero-section {
+  display: flex;
+  flex-direction: row-reverse; /* תמונה מימין */
+  align-items: center;
+  justify-content: space-between;
+  height: 100vh;
+  background-color: #000000;
+  padding: 0 5vw;
+  direction: rtl;
+  overflow: hidden; /* ❗ לא תהיה גלילה */
+}
+
+.hero-model {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none; /* לא חוסם כפתורים */
+}
+
+.hero-content {
+  flex: 1;
+  padding: 2rem;
+  color: white;
+  text-align: right;
+  z-index: 1;
+}
+
+.hero-content h1 {
+  font-size: 3rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+.hero-content p {
+  font-size: 1.5rem;
+}
+
+/* ✅ רספונסיביות */
+@media (max-width: 992px) {
+  .hero-section {
+    flex-direction: column;
+    text-align: center;
+    height: auto;
+    padding: 2rem;
   }
-  
+
+  .hero-content {
+    order: 2;
+    padding: 1rem;
+  }
+
+  .hero-model {
+    order: 1;
+    width: 100%;
+    height: 300px;
+  }
+
+  .hero-content h1 {
+    font-size: 2rem;
+  }
+
+  .hero-content p {
+    font-size: 1.2rem;
+  }
+}
