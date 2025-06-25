@@ -7,10 +7,14 @@ const mongoose = require("mongoose");
 const createInvoice = async (req, res) => {
   try {
     const { treatmentId, items } = req.body;
+
     const treatment = await Treatment.findById(treatmentId);
     if (!treatment) return res.status(404).json({ message: "טיפול לא נמצא" });
 
     const total = items.reduce((sum, item) => sum + (item.price || 0), 0);
+    const VAT_PERCENT = 17;
+    const vatAmount = (total * VAT_PERCENT) / 100;
+    const totalWithVAT = total + vatAmount;
 
     const invoice = new Invoice({
       treatmentId,
@@ -18,16 +22,23 @@ const createInvoice = async (req, res) => {
       customerIdNumber: treatment.idNumber,
       carPlate: treatment.carPlate,
       items,
-      total
+      total,
+      vatAmount,
+      totalWithVAT
     });
 
     await invoice.save();
+
+    // ✅ עדכון עלות הטיפול אוטומטית
+    await Treatment.findByIdAndUpdate(treatmentId, { cost: Math.round(totalWithVAT) });
+
     res.status(201).json(invoice);
   } catch (err) {
     console.error("❌ שגיאה ביצירת חשבונית:", err);
     res.status(500).json({ message: "שגיאה ביצירת חשבונית", error: err.message });
   }
 };
+
 
 // שליפת חשבונית לפי מזהה טיפול
 const getInvoiceByTreatmentId = async (req, res) => {
@@ -46,7 +57,6 @@ const updateInvoiceByTreatmentId = async (req, res) => {
   const { items } = req.body;
 
   try {
-    // חישוב סה״כ וסה״כ כולל מע״מ
     const total = items.reduce((sum, item) => sum + (item.price || 0), 0);
     const VAT_PERCENT = 17;
     const vatAmount = (total * VAT_PERCENT) / 100;
@@ -67,12 +77,18 @@ const updateInvoiceByTreatmentId = async (req, res) => {
       return res.status(404).json({ message: "חשבונית לא נמצאה לעדכון" });
     }
 
+    // ✅ עדכון עלות הטיפול אוטומטית
+    await Treatment.findByIdAndUpdate(treatmentId, { cost: Math.round(totalWithVAT) });
+
+
+
     res.json(updatedInvoice);
   } catch (error) {
     console.error("❌ שגיאה בעדכון חשבונית:", error);
     res.status(500).json({ message: "שגיאה בעדכון חשבונית" });
   }
 };
+
 
 module.exports = {
   createInvoice,

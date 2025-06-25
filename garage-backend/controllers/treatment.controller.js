@@ -1,7 +1,7 @@
 const Appointment = require('../models/Appointment');
 const Treatment = require('../models/Treatment');
 const Client = require('../models/Customer');
-
+const Invoice = require('../models/Invoice');
 // שליפה כללית
 const getAllTreatments = async (req, res) => {
   try {
@@ -297,6 +297,65 @@ const getRevenueByCategory = async (req, res) => {
 
 
 
+const updateTreatmentCostFromInvoice = async (req, res) => {
+  try {
+    const { treatmentId } = req.params;
+
+    // חיפוש החשבונית לפי treatmentId
+    const invoice = await Invoice.findOne({ treatmentId });
+    if (!invoice) {
+      return res.status(404).json({ message: "⚠️ חשבונית לא נמצאה עבור טיפול זה" });
+    }
+
+    const costToUpdate = invoice.total || invoice.totalWithVAT;
+    if (typeof costToUpdate !== 'number') {
+      return res.status(400).json({ message: "⚠️ סכום לא תקין בחשבונית" });
+    }
+
+    const updatedTreatment = await Treatment.findOneAndUpdate(
+      { _id: treatmentId },
+      { cost: costToUpdate },
+      { new: true }
+    );
+
+    if (!updatedTreatment) {
+      return res.status(404).json({ message: "⚠️ טיפול לא נמצא" });
+    }
+
+    res.json({
+      message: "✅ עלות הטיפול עודכנה בהצלחה מהחשבונית",
+      cost: updatedTreatment.cost,
+      treatment: updatedTreatment
+    });
+  } catch (error) {
+    console.error("❌ שגיאה בעדכון עלות טיפול:", error.message);
+    res.status(500).json({ message: "❌ שגיאה בעדכון טיפול", error: error.message });
+  }
+};
+
+// ✅ סכום כולל של טיפולים לחודש הנוכחי
+const getMonthlyRevenue = async (req, res) => {
+  try {
+    const startOfMonth = new Date();
+    startOfMonth.setDate(1);
+    startOfMonth.setHours(0, 0, 0, 0);
+
+    const endOfMonth = new Date(startOfMonth);
+    endOfMonth.setMonth(endOfMonth.getMonth() + 1);
+
+    const treatments = await Treatment.find({
+      date: { $gte: startOfMonth, $lt: endOfMonth }
+    });
+
+    const totalRevenue = treatments.reduce((sum, t) => sum + (t.cost || 0), 0);
+
+    res.json({ totalRevenue });
+  } catch (error) {
+    console.error("❌ שגיאה בשליפת הכנסות חודשיות:", error);
+    res.status(500).json({ message: "שגיאה בשליפת הכנסות חודשיות" });
+  }
+};
+
 
 
 module.exports = {
@@ -310,5 +369,7 @@ module.exports = {
   confirmArrivalAndAddTreatment,
   getTreatmentByObjectId,
   checkTreatmentByPlate,
-  getRevenueByCategory
+  getRevenueByCategory,
+  updateTreatmentCostFromInvoice,
+  getMonthlyRevenue
 };

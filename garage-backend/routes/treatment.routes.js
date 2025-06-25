@@ -14,7 +14,9 @@ const {
   updateTreatment,
   confirmArrivalAndAddTreatment,
   getRevenueByCategory,
-  getSimpleTreatment
+  getSimpleTreatment,
+  updateTreatmentCostFromInvoice, // ✅ נוספה כאן
+  getMonthlyRevenue
 } = controller;
 
 // 📥 שליפות לפי קריטריונים
@@ -25,7 +27,11 @@ router.get('/by-appointment/:appointmentNumber', getTreatmentsByAppointmentNumbe
 router.get('/by-date/:date', getTreatmentsByDate);
 router.get('/by-car/:carPlate', getTreatmentsByCarPlate);
 router.get('/summary/revenue-by-category', getRevenueByCategory);
+router.get('/revenue/month', getMonthlyRevenue);
 
+
+// ✅ עדכון עלות הטיפול לפי החשבונית
+router.put('/update-cost-from-invoice/:treatmentId', updateTreatmentCostFromInvoice);
 
 // ➕ הוספת טיפול עם העלאת קבצים (חשבונית + תמונות)
 router.post(

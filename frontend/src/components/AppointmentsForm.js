@@ -214,28 +214,46 @@ return (
 
             {/* הצעות אוטומטיות לשם הלקוח */}
             {suggestions.length > 0 && (
-              <ul className="list-group position-absolute z-3 w-100" style={{ maxHeight: 150, overflowY: "auto" }}>
+              <ul className="list-group position-absolute z-3 w-100" style={{ maxHeight: 200, overflowY: "auto" }}>
                 {suggestions.map((s) => (
-                  <li
-                    key={s._id}
-                    className="list-group-item list-group-item-action"
-                    style={{ cursor: "pointer" }}
-                    onClick={() => {
-                      setForm((prev) => ({
-                        ...prev,
-                        name: s.name,
-                        idNumber: s.idNumber,
-                        phoneNumber: s.phoneNumber?.substring(3) || "",
-                        phonePrefix: s.phoneNumber?.substring(0, 3) || "050",
-                      }));
-                      setSuggestions([]);
-                    }}
-                  >
-                    {s.name} – {s.idNumber}
+                  <li key={s._id} className="list-group-item">
+                    <div><strong>{s.name}</strong> – ת"ז: {s.idNumber}</div>
+                    <div> {s.phone}</div>
+                    <div>
+                      רכבים:
+                      {s.vehicles && s.vehicles.length > 0 ? (
+                        <ul className="list-unstyled ms-3 mt-1">
+                          {s.vehicles.map((car, idx) => (
+                            <li key={idx}>
+                              <button
+                                type="button"
+                                className="btn btn-sm btn-outline-primary me-2 my-1"
+                                onClick={() => {
+                                  setForm((prev) => ({
+                                    ...prev,
+                                    name: s.name,
+                                    idNumber: s.idNumber,
+                                    phoneNumber: s.phone?.substring(3) || "",
+                                    phonePrefix: s.phone?.substring(0, 3) || "050",
+                                    carNumber: car, // ✅ בוחר את הרכב שנלחץ
+                                  }));
+                                  setSuggestions([]);
+                                }}
+                              >
+                                {car}
+                              </button>
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <div className="text-muted">אין רכבים</div>
+                      )}
+                    </div>
                   </li>
                 ))}
               </ul>
             )}
+
 
             {/* אחריו תעודת זהות */}
             <label className="form-label mt-3">תעודת זהות</label>

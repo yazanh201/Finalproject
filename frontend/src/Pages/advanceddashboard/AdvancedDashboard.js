@@ -15,6 +15,7 @@ import CompletedTreatments from "../tabels/CompletedTreatments";
 import useNotifications from "./useNotifications";
 import CarsUnderService from "../tabels/CarsUnderService"; // ודא נתיב נכון
 import RecommendedCars from "../tabels/RecommendedCars";
+import MonthlyRevenueTable from "../tabels/MonthlyRevenueTable";
 
 const AdvancedDashboard = () => {
   const navigate = useNavigate();
@@ -35,21 +36,20 @@ const AdvancedDashboard = () => {
   const [dynamicTableHeaders, setDynamicTableHeaders] = useState([]);
   const { activeNotifications, fetchCompletedTreatments } = useNotifications();
   const [carsInServiceCount, setCarsInServiceCount] = useState(0);
+  const [monthlyRevenue, setMonthlyRevenue] = useState(0);
+
 
 
   // קריאה לבדיקה והתראה על טיפולים שהסתיימו
-  useEffect(() => {
-    fetchCompletedTreatments();
-  }, []);
-
   useEffect(() => {
     const fetchData = async () => {
       try {
         const [customersRes, appointmentsRes, treatmentsRes] = await Promise.all([
           fetch("http://localhost:5000/api/customers/new-this-month"),
           fetch("http://localhost:5000/api/appointments/month"),
-          fetch("http://localhost:5000/api/treatments") // 🔥 הוספת קריאת טיפולים
+          fetch("http://localhost:5000/api/treatments")
         ]);
+
         const customersData = await customersRes.json();
         const appointmentsData = await appointmentsRes.json();
         const treatmentsData = await treatmentsRes.json();
@@ -57,14 +57,36 @@ const AdvancedDashboard = () => {
         setNewCustomersCount(customersData.length);
         setMonthlyAppointmentCount(appointmentsData.length);
 
+        // חישוב רכבים בטיפול
         const underServiceCount = treatmentsData.filter(t => t.status !== "הסתיים").length;
-        setCarsInServiceCount(underServiceCount); // 🔥 נוסיף משתנה סטייט carsInServiceCount
+        setCarsInServiceCount(underServiceCount);
+
+        // ✅ חישוב הכנסות חודשיות
+        const currentMonth = new Date().getMonth();
+        const currentYear = new Date().getFullYear();
+
+        const thisMonthTreatments = treatmentsData.filter(t => {
+          const treatmentDate = new Date(t.date);
+          return (
+            treatmentDate.getMonth() === currentMonth &&
+            treatmentDate.getFullYear() === currentYear
+          );
+        });
+
+        const totalRevenue = thisMonthTreatments.reduce((sum, t) => {
+          return sum + (Number(t.cost) || 0); // ודא שה-cost מספר
+        }, 0);
+
+        setMonthlyRevenue(totalRevenue);
+
       } catch (error) {
         console.error("❌ Error loading stats:", error);
       }
     };
+
     fetchData();
   }, []);
+
 
 
   useEffect(() => {
@@ -72,7 +94,7 @@ const AdvancedDashboard = () => {
   { title: "סה״כ תורים לחודש", value: monthlyAppointmentCount, key: "appointments" },
   { title: "רכבים בטיפול", value: carsInServiceCount, key: "carsUnderService" },
   { title: "לקוחות חדשים", value: newCustomersCount, key: "newCustomers" },
-  { title: "הכנסות החודש (₪)", value: 12000, key: "income" },
+  { title: "הכנסות החודש (₪)", value: monthlyRevenue, key: "income" },
   { title: "טיפולים שהתעכבו", value: 2, key: "delayedTreatments" },
 ]);
   }, [monthlyAppointmentCount, newCustomersCount,carsInServiceCount]);
@@ -99,12 +121,14 @@ const AdvancedDashboard = () => {
       case "appointments":
         setSelectedTable("monthlyAppointments");
         break;
+      case "income": // ✅ חדש – חיבור כרטיס ההכנסות
+        setSelectedTable("monthlyRevenue");
+        break;
       default:
         setTableData([]);
         setSelectedTable(null);
         break;
     }
-
     // גלילה לטבלה אחרי שינוי selectedTable
     setTimeout(() => {
       tableRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -211,6 +235,8 @@ const handleNotificationClick = (type, data) => {
               <CarsUnderService onClose={() => setSelectedTable(null)} />
             ) : selectedTable === "recommendedCars" ? (
               <RecommendedCars onClose={() => setSelectedTable(null)} />
+            ) : selectedTable === "monthlyRevenue" ? (
+              <MonthlyRevenueTable onClose={() => setSelectedTable(null)} />
             ) : (
               <DashboardTables
                 tableTitle={tableTitle}
@@ -224,6 +250,7 @@ const handleNotificationClick = (type, data) => {
               />
             )}
           </div>
+
 
 
 
