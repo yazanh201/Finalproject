@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { toast } from "react-hot-toast";
+
 
 const repairOptions = {
   "שירותים וטיפולים": [
@@ -122,64 +124,71 @@ const CreateTreatment = () => {
       )
     );
   };
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const API_BASE = process.env.REACT_APP_API_BASE || 'http://localhost:5000';
+  const isEdit = form.treatmentId && form.treatmentId.trim() !== '';
+  const url = isEdit
+    ? `${API_BASE}/api/treatments/${form.treatmentId}`
+    : `${API_BASE}/api/treatments`;
+  const method = isEdit ? 'PUT' : 'POST';
 
-    const API_BASE = process.env.REACT_APP_API_BASE || 'http://localhost:5000';
-    const isEdit = form.treatmentId && form.treatmentId.trim() !== '';
-    const url = isEdit
-      ? `${API_BASE}/api/treatments/${form.treatmentId}`
-      : `${API_BASE}/api/treatments`;
-    const method = isEdit ? 'PUT' : 'POST';
-
-    const formData = new FormData();
-    for (const key in form) {
-      if (key === "images") {
-        form.images.forEach((img) => formData.append("images", img));
-      } else if (key === "invoiceFile" && form.invoiceFile) {
-        formData.append("invoice", form.invoiceFile);
-      } else if (key !== "treatmentId") {
-        formData.append(key, form[key]);
-      }
+  const formData = new FormData();
+  for (const key in form) {
+    if (key === "images") {
+      form.images.forEach((img) => formData.append("images", img));
+    } else if (key === "invoiceFile" && form.invoiceFile) {
+      formData.append("invoice", form.invoiceFile);
+    } else if (key !== "treatmentId") {
+      formData.append(key, form[key]);
     }
-    formData.append("treatmentServices", JSON.stringify(selectedCategories));
+  }
+  formData.append("treatmentServices", JSON.stringify(selectedCategories));
 
-    try {
-      const response = await fetch(url, { method, body: formData });
-      const contentType = response.headers.get("content-type");
-      const data = contentType?.includes("application/json") ? await response.json() : await response.text();
+  try {
+    const response = await fetch(url, { method, body: formData });
+    const contentType = response.headers.get("content-type");
+    const data = contentType?.includes("application/json")
+      ? await response.json()
+      : await response.text();
 
-      if (!response.ok) throw new Error(data.message || data || 'שגיאה בשמירה');
+    if (!response.ok) throw new Error(data.message || data || 'שגיאה בשמירה');
 
-      alert(`✅ הטיפול ${isEdit ? 'עודכן בהצלחה' : 'נשמר בהצלחה'}!`);
+    toast.success(` הטיפול ${isEdit ? 'עודכן בהצלחה' : 'נשמר בהצלחה'}!`);
+    if (!isEdit) {
+  navigate("/dashboard");
+} else {
+  navigate(-1);
+}
 
-      if (!isEdit) {
-        setForm({
-          date: new Date().toISOString().split("T")[0],
-          cost: '',
-          carPlate: '',
-          description: '',
-          workerName: '',
-          customerName: '',
-          images: [],
-          invoiceFile: null,
-          repairTypeId: '',
-          status: 'בטיפול',
-          treatmentId: '',
-          workerId: '',
-          idNumber: ''
-        });
-        setSelectedCategories([]);
-        setSelectedCategory('');
-      } else {
-        navigate(-1);
-      }
-    } catch (err) {
-      console.error("❌ שגיאה בבקשה:", err);
-      alert(`❌ שגיאה: ${err.message}`);
+    if (!isEdit) {
+      setForm({
+        date: new Date().toISOString().split("T")[0],
+        cost: '',
+        carPlate: '',
+        description: '',
+        workerName: '',
+        customerName: '',
+        images: [],
+        invoiceFile: null,
+        repairTypeId: '',
+        status: 'בטיפול',
+        treatmentId: '',
+        workerId: '',
+        idNumber: ''
+      });
+      setSelectedCategories([]);
+      setSelectedCategory('');
+    } else {
+      navigate(-1);
     }
-  };
+  } catch (err) {
+    console.error(" שגיאה בבקשה:", err);
+    toast.error(` שגיאה: ${err.message}`);
+  }
+};
+
 
   return (
     <div className="container mt-5" dir="rtl">

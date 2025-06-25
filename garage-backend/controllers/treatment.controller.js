@@ -1,6 +1,5 @@
 const Appointment = require('../models/Appointment');
 const Treatment = require('../models/Treatment');
-const RepairType = require('../models/RepairType');
 const Client = require('../models/Customer');
 
 // שליפה כללית
@@ -168,12 +167,16 @@ const updateTreatment = async (req, res) => {
 const confirmArrivalAndAddTreatment = async (req, res) => {
   try {
     const { appointmentId } = req.body;
+
+    // מציאת התור לפי מזהה
     const appointment = await Appointment.findById(appointmentId);
     if (!appointment) return res.status(404).json({ message: "❌ תור לא נמצא" });
 
+    // קביעת מספר טיפול רץ
     const lastTreatment = await Treatment.findOne().sort({ treatmentNumber: -1 });
     const nextTreatmentNumber = lastTreatment ? lastTreatment.treatmentNumber + 1 : 6001;
 
+    // יצירת הטיפול החדש
     const treatment = new Treatment({
       treatmentNumber: nextTreatmentNumber,
       treatmentId: nextTreatmentNumber.toString(),
@@ -186,43 +189,31 @@ const confirmArrivalAndAddTreatment = async (req, res) => {
       workerName: "",
       images: [],
       cost: 0,
-      repairTypeId: null,
+      repairTypeId: null, // ניתן להשאיר null או להסיר לגמרי אם לא נדרש יותר
       status: 'בטיפול'
     });
 
+    // שמירת הטיפול
     await treatment.save();
 
-    const lastRepairType = await RepairType.findOne().sort({ repairId: -1 });
-    const nextRepairId = lastRepairType ? lastRepairType.repairId + 1 : 7001;
-
-    const repairType = new RepairType({
-      repairId: nextRepairId,
-      name: "",
-      description: "",
-      treatmentId: treatment.treatmentNumber
-    });
-
-    await repairType.save();
-
-    treatment.repairTypeId = nextRepairId;
-    await treatment.save();
-
+    // עדכון התור עם מזהה טיפול
     appointment.treatment = treatment._id;
     await appointment.save();
 
+    // החזרת תגובה עם אובייקט הטיפול
     res.status(201).json({
-      message: "✅ טיפול וסוג טיפול נוצרו בהצלחה",
-      treatment,
-      repairType
+      message: "✅ טיפול נוצר בהצלחה (ללא סוג טיפול)",
+      treatment
     });
   } catch (err) {
-    console.error("❌ שגיאה ביצירת טיפול וסוג טיפול:", err);
+    console.error("❌ שגיאה ביצירת טיפול:", err);
     res.status(500).json({
-      message: "❌ שגיאה ביצירת טיפול וסוג טיפול",
+      message: "❌ שגיאה ביצירת טיפול",
       error: err.message
     });
   }
 };
+
 
 // שליפה לפי אובייקט ID
 const getTreatmentByObjectId = async (req, res) => {

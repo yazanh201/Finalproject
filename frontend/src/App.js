@@ -18,6 +18,12 @@ import CustomerVehicles from './components/CustomerVehicles';
 import NewAppointmentForm from './components/AppointmentsForm';
 import InvoicePage from './components/InvoicePage';
 
+import AddCustomerWithVehicle from './components/AddCustomerWithVehicle';
+import AddVehicle from './components/AddVehicle';
+// ⚠️ ודא שזה קומפוננטה, אחרת הסר או שנה את השימוש
+// import RecommendedCars from './hooks/useRecommendedCars'; 
+
+
 function App() {
   return (
     <>
@@ -38,7 +44,9 @@ function App() {
         <Route path="/customer-vehicles/:customerId" element={<CustomerVehicles />} />
         <Route path="/AdvancedDashboard" element={<AdvancedDashboard />} />
         <Route path="/create-treatment" element={<CreateTreatment />} />
-        <Route path="/invoice/:treatmentId" element={<InvoicePage />} />        
+        <Route path="/invoice/:treatmentId" element={<InvoicePage />} />   
+        <Route path="/add-customer-with-vehicle" element={<AddCustomerWithVehicle />} />    
+        <Route path="/complete-vehicle/:plateNumber" element={<AddVehicle />} /> 
         <Route
           path="/Dashboard"
           element={

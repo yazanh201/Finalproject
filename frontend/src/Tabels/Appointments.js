@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import Modal from "./Modal";
 import { useNavigate } from "react-router-dom";
+import "../Pages/cssfiles/TablesResponsive.css"; // הוספת קובץ CSS לגלילה אופקית
+
+
 
 const Appointments = ({ onSelectTreatment, filterAppointmentNumber }) => {
   const navigate = useNavigate();
@@ -18,7 +21,6 @@ const Appointments = ({ onSelectTreatment, filterAppointmentNumber }) => {
     name: "",
     carNumber: "",
     phoneNumber: "",
-    treatmentId: "",
     arrivalStatus: ""
   });
 
@@ -64,7 +66,6 @@ const Appointments = ({ onSelectTreatment, filterAppointmentNumber }) => {
         name: "",
         carNumber: "",
         phoneNumber: "",
-        treatmentId: "",
         arrivalStatus: ""
       });
     } else if (type === "edit" && appointment) {
@@ -163,20 +164,19 @@ const Appointments = ({ onSelectTreatment, filterAppointmentNumber }) => {
         </button>
       </div>
 
-      <div className="table-responsive">
-        <table className="table table-striped">
+     <div className="table-responsive" dir="rtl">
+  <table className="table table-striped table-bordered align-middle">
           <thead>
             <tr>
               <th>מזהה תור</th>
               <th>תאריך</th>
               <th>שעה</th>
               <th>תיאור</th>
-              <th>תעודת זהות</th>
+              <th>ת"ז</th>
               <th>שם לקוח</th>
               <th>טלפון</th>
               <th>מספר רישוי</th>
-              <th>מזהה טיפול</th>
-              <th>סטטוס הגעה</th>
+              <th>סטטוס </th>
               <th>פעולה</th>
             </tr>
           </thead>
@@ -191,20 +191,7 @@ const Appointments = ({ onSelectTreatment, filterAppointmentNumber }) => {
                 <td>{appointment.name}</td>
                 <td>{appointment.phoneNumber || "—"}</td>
                 <td>{appointment.carNumber}</td>
-                <td>
-                  {appointment.treatment?.treatmentId ? (
-                    <a
-                      href="#"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        onSelectTreatment(appointment.appointmentNumber);
-                      }}
-                      style={{ textDecoration: "underline", color: "blue", cursor: "pointer" }}
-                    >
-                      {appointment.treatment.treatmentId}
-                    </a>
-                  ) : '—'}
-                </td>
+               
                 <td>{appointment.arrivalStatus || "בהמתנה"}</td>
                 <td>
                   <button
@@ -222,7 +209,8 @@ const Appointments = ({ onSelectTreatment, filterAppointmentNumber }) => {
             ))}
           </tbody>
         </table>
-      </div>
+        </div>
+      
 
       {(modalType === "add" || modalType === "edit") && (
         <Modal isOpen={true} onClose={handleCloseModal} onSave={handleSave}>

@@ -13,7 +13,8 @@ const {
   addTreatment,
   updateTreatment,
   confirmArrivalAndAddTreatment,
-  getRevenueByCategory
+  getRevenueByCategory,
+  getSimpleTreatment
 } = controller;
 
 // 📥 שליפות לפי קריטריונים
@@ -24,6 +25,7 @@ router.get('/by-appointment/:appointmentNumber', getTreatmentsByAppointmentNumbe
 router.get('/by-date/:date', getTreatmentsByDate);
 router.get('/by-car/:carPlate', getTreatmentsByCarPlate);
 router.get('/summary/revenue-by-category', getRevenueByCategory);
+
 
 // ➕ הוספת טיפול עם העלאת קבצים (חשבונית + תמונות)
 router.post(

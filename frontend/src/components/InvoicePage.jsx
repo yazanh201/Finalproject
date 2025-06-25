@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import styles from './cssfiles/InvoicePage.module.css';
 import html2pdf from 'html2pdf.js';
+import { toast } from 'react-hot-toast';
 
 
 const InvoicePage = () => {
@@ -10,95 +11,101 @@ const InvoicePage = () => {
   const { treatmentId } = useParams();
   const [treatment, setTreatment] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [prices, setPrices] = useState({}); // שמירת מחירים לפי key
+  const [prices, setPrices] = useState({});
   const [invoiceExists, setInvoiceExists] = useState(false);
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-            // שלב 1: טען את הטיפול
-            const treatmentRes = await axios.get(`/api/treatments/${treatmentId}`);
-            const treatmentData = treatmentRes.data;
+  const BASE_URL = "http://localhost:5000/uploads/";
+  const BASE_API_URL = "http://localhost:5000/";
 
-            // שלב 2: שלוף ת"ז ושם לפי מספר רכב
-            try {
-                const customerRes = await axios.get(`/api/customers/id-by-plate/${treatmentData.carPlate}`);
-                treatmentData.idNumber = customerRes.data.idNumber;
-                treatmentData.customerName = customerRes.data.name;
-            } catch (e) {
-                console.warn("⚠️ לא נמצאה תעודת זהות לפי מספר רכב:", e.message);
-            }
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // שלב 1: טען את הטיפול
+        const treatmentRes = await axios.get(`${BASE_API_URL}api/treatments/${treatmentId}`);
+        const treatmentData = treatmentRes.data;
 
-            // שלב 3: שלוף מייל לפי מספר רכב
-            try {
-                const emailRes = await axios.get(`/api/customers/email-by-plate/${treatmentData.carPlate}`);
-                treatmentData.email = emailRes.data.email;
-            } catch (e) {
-                console.warn("⚠️ לא נמצא אימייל לפי מספר רכב:", e.message);
-            }
-
-            setTreatment(treatmentData);
-
-            // שלב 4: בדוק אם קיימת חשבונית
-            const invoiceRes = await axios.get(`/api/invoices/by-treatment/${treatmentId}`);
-            if (invoiceRes.data && invoiceRes.data.items) {
-                setInvoiceExists(true);
-                const loadedPrices = {};
-                invoiceRes.data.items.forEach((item, index) => {
-                loadedPrices[index] = item.price;
-                });
-                setPrices(loadedPrices);
-            }
-            } catch (err) {
-            console.warn('ℹ️ שגיאה בטעינה:', err.message);
-            } finally {
-            setLoading(false);
-            }
-        };
-
-        fetchData();
-        }, [treatmentId]);
-
-
-
-  const handleSubmitInvoice = async () => {
-    try {
-        const items = [];
-        let itemIndex = 0;
-
-        treatment.treatmentServices.forEach((serviceGroup) => {
-        serviceGroup.selectedOptions.forEach((option) => {
-            const price = prices[itemIndex] || 0;
-            items.push({
-            name: option,
-            category: serviceGroup.category,
-            price,
-            });
-            itemIndex++;
-        });
-        });
-
-        const invoiceData = {
-        treatmentId: treatment._id,
-        items,
-        };
-
-        if (invoiceExists) {
-        // עדכון חשבונית קיימת
-        await axios.put(`/api/invoices/${treatment._id}`, invoiceData);
-        alert("🔄 החשבונית עודכנה בהצלחה");
-        } else {
-        // יצירת חשבונית חדשה
-        await axios.post("/api/invoices", invoiceData);
-        alert("✅ החשבונית נשמרה בהצלחה");
-        setInvoiceExists(true);
+        // שלב 2: שלוף ת"ז ושם לפי מספר רכב
+        try {
+          const customerRes = await axios.get(`${BASE_API_URL}api/customers/id-by-plate/${treatmentData.carPlate}`);
+          treatmentData.idNumber = customerRes.data.idNumber;
+          treatmentData.customerName = customerRes.data.name;
+        } catch (e) {
+          console.warn("⚠️ לא נמצאה תעודת זהות לפי מספר רכב:", e.message);
         }
 
-    } catch (err) {
-        console.error("❌ שגיאה בשמירת/עדכון חשבונית:", err);
-        alert("❌ שגיאה בשמירת/עדכון חשבונית");
-    }
+        // שלב 3: שלוף מייל לפי מספר רכב
+        try {
+          const emailRes = await axios.get(`${BASE_API_URL}api/customers/email-by-plate/${treatmentData.carPlate}`);
+          treatmentData.email = emailRes.data.email;
+        } catch (e) {
+          console.warn("⚠️ לא נמצא אימייל לפי מספר רכב:", e.message);
+        }
+
+        setTreatment(treatmentData);
+
+        // שלב 4: בדוק אם קיימת חשבונית
+        const invoiceRes = await axios.get(`${BASE_API_URL}api/invoices/by-treatment/${treatmentId}`);
+        if (invoiceRes.data && invoiceRes.data.items) {
+          setInvoiceExists(true);
+          const loadedPrices = {};
+          invoiceRes.data.items.forEach((item, index) => {
+            loadedPrices[index] = item.price;
+          });
+          setPrices(loadedPrices);
+        }
+      } catch (err) {
+        console.warn('שגיאה בטעינה:', err.message);
+      } finally {
+        setLoading(false);
+      }
     };
+
+    fetchData();
+  }, [treatmentId]);
+
+
+ const handleSubmitInvoice = async () => {
+  try {
+    if (!treatment?._id) {
+      console.error(" אין treatment._id – לא ניתן לשלוח חשבונית");
+      toast.error(" לא ניתן לשלוח חשבונית – אין מזהה טיפול");
+      return;
+    }
+
+    const items = [];
+    let itemIndex = 0;
+
+    treatment.treatmentServices.forEach((serviceGroup) => {
+      serviceGroup.selectedOptions.forEach((option) => {
+        const price = prices[itemIndex] || 0;
+        items.push({
+          name: option,
+          category: serviceGroup.category,
+          price,
+        });
+        itemIndex++;
+      });
+    });
+
+    const invoiceData = {
+      treatmentId: treatment._id,
+      items,
+    };
+
+    if (invoiceExists) {
+      await axios.put(`${BASE_API_URL}api/invoices/${treatment._id}`, invoiceData);
+      toast.success(" החשבונית עודכנה בהצלחה");
+    } else {
+      await axios.post(`${BASE_API_URL}api/invoices`, invoiceData);
+      toast.success(" החשבונית נשמרה בהצלחה");
+      setInvoiceExists(true);
+    }
+  } catch (err) {
+    console.error("❌ שגיאה בשמירת/עדכון חשבונית:", err);
+    toast.error(" שגיאה בשמירת או עדכון החשבונית");
+  }
+};
+
 
 
   const total = Object.values(prices).reduce((sum, price) => sum + (price || 0), 0);
@@ -142,53 +149,53 @@ const InvoicePage = () => {
 
 
     const handleSendEmail = async () => {
-        try {
-            const element = document.getElementById('invoiceContent');
+  try {
+    const element = document.getElementById('invoiceContent');
 
-            // הסתרת כפתורים זמנית
-            const hiddenElements = document.querySelectorAll('.no-print');
-            hiddenElements.forEach(el => el.style.display = 'none');
+    // הסתרת כפתורים זמנית
+    const hiddenElements = document.querySelectorAll('.no-print');
+    hiddenElements.forEach(el => el.style.display = 'none');
 
-            // הגדרות PDF
-            const opt = {
-            margin: 0.5,
-            filename: 'invoice.pdf',
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2 },
-            jsPDF: { unit: 'cm', format: 'a4', orientation: 'portrait' }
-            };
+    // הגדרות PDF
+    const opt = {
+      margin: 0.5,
+      filename: 'invoice.pdf',
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: 'cm', format: 'a4', orientation: 'portrait' }
+    };
 
-            const worker = html2pdf().set(opt).from(element);
+    const worker = html2pdf().set(opt).from(element);
 
-            // יצירת ה־PDF כ־Blob
-            const pdfBlob = await worker.outputPdf('blob');
+    // יצירת ה־PDF כ־Blob
+    const pdfBlob = await worker.outputPdf('blob');
 
-            // יצירת FormData
-            const formData = new FormData();
-            formData.append('email', treatment.email);        // כתובת המייל
-            formData.append('pdf', pdfBlob, 'invoice.pdf');   // הקובץ עצמו
+    // יצירת FormData
+    const formData = new FormData();
+    formData.append('email', treatment.email);        // כתובת המייל
+    formData.append('pdf', pdfBlob, 'invoice.pdf');   // הקובץ עצמו
 
-            // שליחת המייל לשרת
-            await axios.post(
-            'http://localhost:5000/api/email/send-invoice',
-            formData,
-            {
-                headers: {
-                'Content-Type': 'multipart/form-data'
-                }
-            }
-            );
-
-            alert('✅ החשבונית נשלחה למייל בהצלחה');
-        } catch (err) {
-            console.error('❌ שגיאה בשליחת מייל:', err);
-            alert('❌ שגיאה בשליחת מייל');
-        } finally {
-            // החזרת כפתורים לאחר השליחה
-            const hiddenElements = document.querySelectorAll('.no-print');
-            hiddenElements.forEach(el => el.style.display = 'block');
+    // שליחת המייל לשרת
+    await axios.post(
+      'http://localhost:5000/api/email/send-invoice',
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data'
         }
-        };
+      }
+    );
+
+    toast.success(' החשבונית נשלחה למייל בהצלחה!');
+  } catch (err) {
+    console.error(' שגיאה בשליחת מייל:', err);
+    toast.error(' שגיאה בשליחת המייל');
+  } finally {
+    // החזרת כפתורים לאחר השליחה
+    const hiddenElements = document.querySelectorAll('.no-print');
+    hiddenElements.forEach(el => el.style.display = 'block');
+  }
+};
 
 
 
@@ -202,9 +209,9 @@ const InvoicePage = () => {
             </div>
             <div>
                 <h3>מוסך שירות מהיר</h3>
-                <p>רחוב התיקונים 5, תל אביב</p>
-                <p>טלפון: 03-5551234</p>
-                <p>אימייל: garage@example.com</p>
+                <p>רחוב התיקונים 5, חיפה</p>
+                <p>טלפון : 03-5551234</p>
+                <p> sherotmher12@gmail.com : אימייל</p>
             </div>
             </div>
 

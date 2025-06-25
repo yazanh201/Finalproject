@@ -256,8 +256,7 @@
 .dropdownItem {
   background: none;
   color: #f1f1f1;
-  padding: 10px 22px;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: bold;
   border: none;
   text-align: right;
@@ -274,3 +273,17 @@
   background-color: rgba(255, 255, 255, 0.1);
   color: #fbc531;
 }
+.responsiveTableContainer {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-bottom: 1rem;
+  direction: rtl;
+}
+
+.responsiveTableContainer table {
+  min-width: 900px; /* אם יש הרבה עמודות - הגדל למשל ל־1000 או 1100 */
+  width: 100%;
+  border-collapse: collapse;
+}
+

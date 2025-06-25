@@ -1,0 +1,45 @@
+/* === עטיפת טבלה רספונסיבית === */
+.responsiveTableContainer {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  direction: rtl;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+  background-color: white;
+  box-shadow: 0 0 6px rgba(0,0,0,0.1);
+}
+
+/* === הטבלה עצמה — תתרחב לפי התוכן === */
+.responsiveTableContainer table {
+  width: max-content;
+  min-width: 100%;
+  border-collapse: collapse;
+  background-color: #fff;
+}
+
+/* === תאים — שומרים על שורה אחת, ריווח ופונט ברור === */
+.responsiveTableContainer th,
+.responsiveTableContainer td {
+  white-space: nowrap;
+  text-align: right;
+  padding: 10px 14px;
+  border: 1px solid #dee2e6;
+  font-size: 13px;
+}
+
+/* === פס גלילה אופקי חלק ונעים === */
+.responsiveTableContainer::-webkit-scrollbar {
+  height: 6px;
+}
+.responsiveTableContainer::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 8px;
+}
+
+/* === רספונסיביות לאייפד או מסכים קטנים יותר === */
+@media (max-width: 1024px) {
+  .responsiveTableContainer {
+    overflow-x: scroll;
+  }
+}

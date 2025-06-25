@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { FaPaperPlane, FaComments, FaTimes } from "react-icons/fa";
+import "./cssfiles/ChatBot.css";
+import { FaRobot } from "react-icons/fa";
+
 
 /**
  * 🎤 **ChatBot Component** - צ'אט חכם עם עיצוב מודרני ואינטראקטיבי.
@@ -58,7 +61,7 @@ const ChatBot = () => {
       {isOpen && (
         <div className="chat-container">
           <div className="chat-header">
-            <h3>🚗 צ'אט שירות לקוחות</h3>
+            <h3>צ'אט שירות לקוחות</h3>
             <button className="close-btn" onClick={() => setIsOpen(false)}>
               <FaTimes />
             </button>

@@ -48,5 +48,25 @@ router.delete('/:id', deleteVehicle);
 router.get('/by-customer/:customerId', getCarsByCustomer);
 
 
+/**
+ * 📌 PUT /api/cars/plate/:vehicleNumber
+ * עדכון רכב לפי מספר רכב
+ */
+router.put('/plate/:vehicleNumber', async (req, res) => {
+  try {
+    const updated = await require('../models/Vehicle').findOneAndUpdate(
+      { vehicleNumber: req.params.vehicleNumber },
+      req.body,
+      { new: true }
+    );
+    if (!updated) return res.status(404).send('רכב לא נמצא');
+    res.json(updated);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('שגיאה בעדכון הרכב');
+  }
+});
+
+
 // ייצוא הראוטר
 module.exports = router;
