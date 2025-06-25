@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Modal from "./Modal";
 import axios from "axios";
-
+import "../Pages/cssfiles/TablesResponsive.css";
 const CarOrders = () => {
   const [modalType, setModalType] = useState(null);
   const [selectedOrder, setSelectedOrder] = useState(null);
@@ -69,7 +69,7 @@ const CarOrders = () => {
         <button className="btn btn-primary me-3" onClick={() => handleShowModal("search")}>חיפוש הזמנה לפי מספר רכב</button>
       </div>
 
-      <div className="table-responsive">
+      <div className="responsiveTableContainer">
         <table className="table table-striped">
           <thead>
             <tr>

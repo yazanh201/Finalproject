@@ -317,3 +317,16 @@ td {
         padding: 70px 10px 10px;
     }
 }
+.chartsContainer {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 20px;
+  padding: 20px;
+}
+
+.chartBox {
+  flex: 1 1 45%;
+  min-width: 300px;
+  max-width: 600px;
+}

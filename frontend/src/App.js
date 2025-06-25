@@ -1,5 +1,6 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast'; // ✅ ייבוא של ה־Toaster
 import Home from './Pages/Home';
 import Contact from './Pages/Contact';
 import Services from './Pages/Services';
@@ -16,14 +17,19 @@ import CreateTreatment from './components/CreateTreatment';
 import CustomerVehicles from './components/CustomerVehicles';
 import NewAppointmentForm from './components/AppointmentsForm';
 import InvoicePage from './components/InvoicePage';
+
 import AddCustomerWithVehicle from './components/AddCustomerWithVehicle';
 import AddVehicle from './components/AddVehicle';
 // ⚠️ ודא שזה קומפוננטה, אחרת הסר או שנה את השימוש
 // import RecommendedCars from './hooks/useRecommendedCars'; 
 
+
 function App() {
   return (
     <>
+      {/* ✅ מוסיפים את ה־Toaster */}
+      <Toaster position="top-center" reverseOrder={false} />
+
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/ServicesPage" element={<ServicesPage />} />
@@ -31,10 +37,6 @@ function App() {
         <Route path="/Services" element={<Services />} />
         <Route path="/Login" element={<Login />} />
         <Route path="/About" element={<About />} />
-
-        {/* ⚠️ הוסר RecommendedCars כי הוא ככל הנראה אינו קומפוננטה תקפה */}
-        {/* <Route path="/RecommendedCars" element={<RecommendedCars />} /> */}
-
         <Route path="/AppointmentForm" element={<NewAppointmentForm />} />
         <Route path="/appointments/edit/:id" element={<NewAppointmentForm />} />
         <Route path="/treatment/:id" element={<TreatmentDetails />} />
@@ -55,7 +57,6 @@ function App() {
         />
       </Routes>
 
-      {/* הוספת הצ'אט לכל העמודים */}
       <ChatBot />
     </>
   );

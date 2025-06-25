@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
-import Modal from "./Modal"; 
-import axios from "axios";  
+import Modal from "./Modal";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import '../Pages/cssfiles/TablesResponsive.css'
 
 
 const Customers = () => {
@@ -9,8 +10,7 @@ const Customers = () => {
   const [modalType, setModalType] = useState(null);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [customers, setCustomers] = useState([]);
-  
-  // סטייטים לטופס
+
   const [name, setName] = useState('');
   const [idNumber, setIdNumber] = useState('');
   const [phone, setPhone] = useState('');
@@ -18,18 +18,14 @@ const Customers = () => {
   const [status, setStatus] = useState('פעיל');
   const [vehicleNumber, setvehicleNumber] = useState('');
 
-const [phonePrefix, setPhonePrefix] = useState('052');
-const [phoneSuffix, setPhoneSuffix] = useState('');
-
-  
-  // סטייט לשדה חיפוש
+  const [phonePrefix, setPhonePrefix] = useState('052');
+  const [phoneSuffix, setPhoneSuffix] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     fetchCustomers();
   }, []);
 
-  // שליפת כל הלקוחות
   const fetchCustomers = async () => {
     try {
       const response = await axios.get('http://localhost:5000/api/customers');
@@ -44,7 +40,6 @@ const [phoneSuffix, setPhoneSuffix] = useState('');
     setSelectedCustomer(customer);
 
     if (type === 'add') {
-      // איפוס שדות להוספה
       setName('');
       setIdNumber('');
       setPhone('');
@@ -77,77 +72,47 @@ const [phoneSuffix, setPhoneSuffix] = useState('');
     setSelectedCustomer(null);
   };
 
-  // הוספה או עדכון לקוח
   const handleSave = async () => {
-  try {
-    // אימותים
-    const idRegex = /^\d{9}$/;
-    const carRegex = /^\d{1,9}$/;
-    const nameRegex = /^[\u0590-\u05FFa-zA-Z\s]{2,}$/;
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    try {
+      const idRegex = /^\d{9}$/;
+      const carRegex = /^\d{1,9}$/;
+      const nameRegex = /^[\u0590-\u05FFa-zA-Z\s]{2,}$/;
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+      if (!nameRegex.test(name)) return alert("❌ שם לקוח חייב להכיל לפחות 2 אותיות, ללא מספרים");
+      if (!idRegex.test(idNumber)) return alert("❌ תעודת זהות חייבת להכיל בדיוק 9 ספרות");
+      if (!carRegex.test(vehicleNumber)) return alert("❌ מספר רכב חייב להכיל עד 9 ספרות בלבד");
+      if (email && !emailRegex.test(email)) return alert("❌ כתובת מייל אינה תקינה");
 
-    if (!nameRegex.test(name)) {
-      alert("❌ שם לקוח חייב להכיל לפחות 2 אותיות, ללא מספרים");
-      return;
+      const fullPhone = phonePrefix + phoneSuffix;
+      const phoneRegex = /^05[0-9]{8}$/;
+      if (!phoneRegex.test(fullPhone)) return alert("❌ מספר טלפון לא תקין. יש להזין קידומת חוקית ו-7 ספרות.");
+
+      const customerData = {
+        name,
+        idNumber,
+        phone: fullPhone,
+        email,
+        status,
+        vehicleNumber: [vehicleNumber],
+      };
+
+      if (modalType === "edit" && selectedCustomer) {
+        await axios.put(`http://localhost:5000/api/customers/${selectedCustomer._id}`, customerData);
+        alert("✅ פרטי הלקוח עודכנו בהצלחה!");
+      } else {
+        await axios.post('http://localhost:5000/api/customers', customerData);
+        alert("✅ לקוח נוסף בהצלחה!");
+      }
+
+      handleCloseModal();
+      fetchCustomers();
+    } catch (error) {
+      console.error('❌ שגיאה בשמירה:', error.message);
+      alert(error.response?.data?.message || '❌ שגיאה בשמירה');
     }
+  };
 
-    if (!idRegex.test(idNumber)) {
-      alert("❌ תעודת זהות חייבת להכיל בדיוק 9 ספרות");
-      return;
-    }
-
-    if (!carRegex.test(vehicleNumber)) {
-      alert("❌ מספר רכב חייב להכיל עד 9 ספרות בלבד");
-      return;
-    }
-
-    if (email && !emailRegex.test(email)) {
-      alert("❌ כתובת מייל אינה תקינה");
-      return;
-    }
-
-    const fullPhone = phonePrefix + phoneSuffix;
-    const phoneRegex = /^05[0-9]{8}$/;
-
-    if (!phoneRegex.test(fullPhone)) {
-      alert("❌ מספר טלפון לא תקין. יש להזין קידומת חוקית ו-7 ספרות.");
-      return;
-    }
-    const customerData = {
-      name,
-      idNumber,
-      phone: fullPhone, // ✅ עכשיו זה נשלח כמו שצריך
-      email,
-      status,
-      vehicleNumber: [vehicleNumber],
-    };
-
-    if (modalType === "edit" && selectedCustomer) {
-      await axios.put(`http://localhost:5000/api/customers/${selectedCustomer._id}`, customerData);
-      alert("✅ פרטי הלקוח עודכנו בהצלחה!");
-    } else {
-      await axios.post('http://localhost:5000/api/customers', customerData);
-      alert("✅ לקוח נוסף בהצלחה!");
-    }
-
-    handleCloseModal();
-    fetchCustomers();
-
-  } catch (error) {
-  console.error('❌ שגיאה בשמירה:', error.message);
-
-  if (error.response && error.response.status === 400) {
-    alert(error.response.data.message); // יציג את ההודעה הברורה
-  } else {
-    alert('❌ שגיאה בשמירה');
-  }
-}
-
-};
-
-
-  // פונקציה לחיפוש לקוח לפי ת"ז או שם
   const handleSearch = async () => {
     try {
       if (searchQuery.trim() === '') {
@@ -164,17 +129,14 @@ const [phoneSuffix, setPhoneSuffix] = useState('');
     }
   };
 
-
-
-    const handleAddCar = async () => {
+  const handleAddCar = async () => {
     try {
       if (!vehicleNumber || vehicleNumber.length < 5) {
         alert("❌ הזן מספר רכב חוקי");
         return;
       }
 
-      // שליחת בקשה לשרת להוספת הרכב ללקוח
-      const res = await axios.put(`http://localhost:5000/api/customers/${selectedCustomer._id}/add-car`, {
+      await axios.put(`http://localhost:5000/api/customers/${selectedCustomer._id}/add-car`, {
         vehicleNumber,
       });
 
@@ -188,15 +150,8 @@ const [phoneSuffix, setPhoneSuffix] = useState('');
   };
 
   const formatPhone = (phone) => {
-    // הסר כל תו שהוא לא ספרה
     const digits = phone.replace(/\D/g, '');
-    
-    // אם מתחיל ב־0, החלף ב־972
-    if (digits.startsWith("0")) {
-      return "972" + digits.slice(1);
-    }
-
-    return digits;
+    return digits.startsWith("0") ? "972" + digits.slice(1) : digits;
   };
 
   return (
@@ -214,26 +169,27 @@ const [phoneSuffix, setPhoneSuffix] = useState('');
         </button>
       </div>
 
-      {/* טבלת הלקוחות */}
+      {/* ✅ Responsive Wrapper */}
+   <div className="responsiveTableContainer">
       <table className="table table-striped">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>שם לקוח</th>
-            <th>ת"ז</th>
-            <th>מספר טלפון</th>
-            <th>מייל</th>
-            <th>סטטוס</th>
-            <th>רכבים</th>
-            <th>פעולה</th>
-          </tr>
-        </thead>
-        <tbody>
-          {customers.map((customer, index) => (
-            <tr key={customer._id}>
-              <td>{index + 1}</td>
-              <td>{customer.name || '-'}</td>
-              <td>{customer.idNumber || '-'}</td>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>שם לקוח</th>
+              <th>ת"ז</th>
+              <th>מספר טלפון</th>
+              <th>מייל</th>
+              <th>סטטוס</th>
+              <th>רכבים</th>
+              <th>פעולה</th>
+            </tr>
+          </thead>
+          <tbody>
+            {customers.map((customer, index) => (
+              <tr key={customer._id}>
+                <td>{index + 1}</td>
+                <td>{customer.name || '-'}</td>
+                <td>{customer.idNumber || '-'}</td>
                 <td>
                   <a
                     href={`https://wa.me/${formatPhone(customer.phone)}`}
@@ -243,31 +199,31 @@ const [phoneSuffix, setPhoneSuffix] = useState('');
                     {customer.phone}
                   </a>
                 </td>
-              <td>{customer.email || '-'}</td>
-              <td className={customer.status === "פעיל" ? "text-success" : "text-danger"}>
-                {customer.status || '-'}
-              </td>
-              <td>
-                <span
-                  style={{ color: 'blue', textDecoration: 'underline', cursor: 'pointer' }}
-                  onClick={() => navigate(`/customer-vehicles/${customer._id}`)}
-                >
-                  רכבים
-                </span>
-              </td>
-
-              <td>
-                <button className="btn btn-primary btn-sm me-2" onClick={() => handleShowModal("edit", customer)}>
-                  עריכה
-                </button>
-                <button className="btn btn-success btn-sm me-2" onClick={() => handleShowModal("addCar", customer)}>
-                  הוסף רכב
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+                <td>{customer.email || '-'}</td>
+                <td className={customer.status === "פעיל" ? "text-success" : "text-danger"}>
+                  {customer.status || '-'}
+                </td>
+                <td>
+                  <span
+                    style={{ color: 'blue', textDecoration: 'underline', cursor: 'pointer' }}
+                    onClick={() => navigate(`/customer-vehicles/${customer._id}`)}
+                  >
+                    רכבים
+                  </span>
+                </td>
+                <td>
+                  <button className="btn btn-primary btn-sm me-2" onClick={() => handleShowModal("edit", customer)}>
+                    עריכה
+                  </button>
+                  <button className="btn btn-success btn-sm me-2" onClick={() => handleShowModal("addCar", customer)}>
+                    הוסף רכב
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
       {/* מודלים */}
       {(modalType === "add" || modalType === "edit") && (
@@ -276,54 +232,17 @@ const [phoneSuffix, setPhoneSuffix] = useState('');
           <form>
             <div className="form-group mb-3">
               <label>שם לקוח מלא</label>
-              <input
-                type="text"
-                className="form-control"
-                value={name}
-                onChange={(e) => {
-                  const onlyLetters = e.target.value.replace(/[^א-תa-zA-Z\s]/g, '');
-                  setName(onlyLetters);
-                }}
-                required
-              />
-
+              <input type="text" className="form-control" value={name} onChange={(e) => setName(e.target.value.replace(/[^א-תa-zA-Z\s]/g, ''))} required />
             </div>
             <div className="form-group mb-3">
               <label>תעודת זהות</label>
-              <input
-                type="text"
-                className="form-control"
-                value={idNumber}
-                onChange={(e) => {
-                  const onlyDigits = e.target.value.replace(/\D/g, '');
-                  setIdNumber(onlyDigits);
-                }}
-                maxLength={9}
-                required
-              />
-
+              <input type="text" className="form-control" value={idNumber} onChange={(e) => setIdNumber(e.target.value.replace(/\D/g, ''))} maxLength={9} required />
             </div>
             <div className="form-group mb-3">
               <label>מספר טלפון</label>
               <div className="d-flex gap-2">
-                <input
-                  type="text"
-                  className="form-control"
-                  value={phoneSuffix}
-                  onChange={(e) => {
-                    const onlyDigits = e.target.value.replace(/\D/g, '');
-                    setPhoneSuffix(onlyDigits);
-                  }}
-                  maxLength={7}
-                  required
-                />
-                <select
-                  className="form-select"
-                  style={{ maxWidth: "100px" }}
-                  value={phonePrefix}
-                  onChange={(e) => setPhonePrefix(e.target.value)}
-                  required
-                >
+                <input type="text" className="form-control" value={phoneSuffix} onChange={(e) => setPhoneSuffix(e.target.value.replace(/\D/g, ''))} maxLength={7} required />
+                <select className="form-select" style={{ maxWidth: "100px" }} value={phonePrefix} onChange={(e) => setPhonePrefix(e.target.value)} required>
                   <option value="050">050</option>
                   <option value="052">052</option>
                   <option value="053">053</option>
@@ -335,43 +254,20 @@ const [phoneSuffix, setPhoneSuffix] = useState('');
             </div>
             <div className="form-group mb-3">
               <label>מייל</label>
-              <input
-                type="email"
-                className="form-control"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
+              <input type="email" className="form-control" value={email} onChange={(e) => setEmail(e.target.value)} required />
             </div>
             <div className="form-group mb-3">
               <label>סטטוס</label>
-              <select
-                className="form-control"
-                value={status}
-                onChange={(e) => setStatus(e.target.value)}
-                required
-              >
+              <select className="form-control" value={status} onChange={(e) => setStatus(e.target.value)} required>
                 <option value="פעיל">פעיל</option>
                 <option value="לא פעיל">לא פעיל</option>
               </select>
             </div>
             <div className="form-group mb-3">
               <label>מספר רישוי רכב</label>
-              <input
-                type="text"
-                className="form-control"
-                value={vehicleNumber}
-                onChange={(e) => {
-                  const onlyDigits = e.target.value.replace(/\D/g, '');
-                  setvehicleNumber(onlyDigits);
-                }}
-                maxLength={9}
-                required
-              />
-
+              <input type="text" className="form-control" value={vehicleNumber} onChange={(e) => setvehicleNumber(e.target.value.replace(/\D/g, ''))} maxLength={9} required />
             </div>
           </form>
-
         </Modal>
       )}
 
@@ -380,14 +276,7 @@ const [phoneSuffix, setPhoneSuffix] = useState('');
           <h3>חיפוש לקוח לפי תעודת זהות או שם</h3>
           <div className="form-group mb-3">
             <label>הזן ת"ז / שם</label>
-            <input
-              type="text"
-              className="form-control"
-              placeholder="תעודת זהות / שם"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              required
-            />
+            <input type="text" className="form-control" placeholder="תעודת זהות / שם" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} required />
           </div>
         </Modal>
       )}
@@ -397,14 +286,7 @@ const [phoneSuffix, setPhoneSuffix] = useState('');
           <h4>הוספת רכב ללקוח: {selectedCustomer.name}</h4>
           <div className="form-group mb-3">
             <label>מספר רכב חדש</label>
-            <input
-              type="text"
-              className="form-control"
-              value={vehicleNumber}
-              onChange={(e) => setvehicleNumber(e.target.value.replace(/\D/g, ""))}
-              maxLength={9}
-              required
-            />
+            <input type="text" className="form-control" value={vehicleNumber} onChange={(e) => setvehicleNumber(e.target.value.replace(/\D/g, ""))} maxLength={9} required />
           </div>
         </Modal>
       )}
@@ -413,3 +295,5 @@ const [phoneSuffix, setPhoneSuffix] = useState('');
 };
 
 export default Customers;
+
+

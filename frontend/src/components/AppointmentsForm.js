@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
+import { toast } from 'react-hot-toast';
 
 const CreateAppointment = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { id } = useParams(); // קבלת id מהנתיב אם יש
+  const { id } = useParams();
   const [availableTimes, setAvailableTimes] = useState([]);
   const [suggestions, setSuggestions] = useState([]);
   const [typingTimeout, setTypingTimeout] = useState(null);
+
   const [form, setForm] = useState({
     date: '',
     time: '',
@@ -21,7 +23,6 @@ const CreateAppointment = () => {
 
   useEffect(() => {
     if (location.state) {
-      // אם מגיעים עם state
       const data = location.state;
       setForm({
         date: data.date || '',
@@ -33,9 +34,8 @@ const CreateAppointment = () => {
         phoneNumber: data.phoneNumber ? data.phoneNumber.substring(3) : '',
         carNumber: data.carNumber || ''
       });
-      fetchAvailableTimes(data.date); // שליפת שעות לתאריך הקיים
+      fetchAvailableTimes(data.date);
     } else if (id) {
-      // אם מגיעים עם id מהכתובת
       fetch(`http://localhost:5000/api/appointments/by-number/${id}`)
         .then(res => res.json())
         .then(data => {
@@ -56,21 +56,16 @@ const CreateAppointment = () => {
   }, [location.state, id]);
 
   const fetchAvailableTimes = async (date) => {
-  if (!date) return;
-  try {
-    const res = await fetch(`http://localhost:5000/api/appointments/available-times/${date}`);
-    const data = await res.json();
-    // הוספת השעה הקיימת אם לא קיימת
-    const times = data.includes(form.time) || !form.time
-      ? data
-      : [...data, form.time];
-    setAvailableTimes(times);
-  } catch (error) {
-    console.error('❌ שגיאה בשליפת שעות פנויות:', error);
-  }
-};
-
-
+    if (!date) return;
+    try {
+      const res = await fetch(`http://localhost:5000/api/appointments/available-times/${date}`);
+      const data = await res.json();
+      const times = data.includes(form.time) || !form.time ? data : [...data, form.time];
+      setAvailableTimes(times);
+    } catch (error) {
+      console.error('❌ שגיאה בשליפת שעות פנויות:', error);
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -78,7 +73,7 @@ const CreateAppointment = () => {
     if (name === 'date') {
       const today = new Date().toISOString().slice(0, 10);
       if (value < today) {
-        alert('❌ לא ניתן לבחור תאריך שכבר עבר!');
+        toast.error('❌ לא ניתן לבחור תאריך שכבר עבר!');
         return;
       }
       fetchAvailableTimes(value);
@@ -87,8 +82,6 @@ const CreateAppointment = () => {
     if (name === 'idNumber' && !/^\d{0,9}$/.test(value)) return;
     if (name === 'name') {
       if (!/^[א-תa-zA-Z\s]*$/.test(value)) return;
-
-      // קריאה להצעות שם לקוח (autocomplete)
       fetchCustomerSuggestions(value);
     }
 
@@ -98,28 +91,29 @@ const CreateAppointment = () => {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (form.idNumber.length !== 9) {
-      alert('❌ תעודת זהות חייבת להכיל בדיוק 9 ספרות');
+      toast.error(' תעודת זהות חייבת להכיל בדיוק 9 ספרות');
       return;
     }
     if (!/^[א-תa-zA-Z\s]+$/.test(form.name)) {
-      alert('❌ שם הלקוח חייב להכיל אותיות בלבד');
+      toast.error(' שם הלקוח חייב להכיל אותיות בלבד');
       return;
     }
     if (!/^\d{7}$/.test(form.phoneNumber)) {
-      alert('❌ מספר הטלפון חייב להכיל 7 ספרות');
+      toast.error(' מספר הטלפון חייב להכיל 7 ספרות');
       return;
     }
     if (!/^\d{1,8}$/.test(form.carNumber)) {
-      alert('❌ מספר רכב חייב להכיל עד 8 ספרות');
+      toast.error(' מספר רכב חייב להכיל עד 8 ספרות');
       return;
     }
 
     const fullPhone = form.phonePrefix + form.phoneNumber;
     const payload = { ...form, phoneNumber: fullPhone };
+
     try {
       const isEdit = location.state?._id || id;
       const url = isEdit
@@ -132,10 +126,12 @@ const CreateAppointment = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
+
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || 'שגיאה בשמירה');
 
-      alert(`✅ התור ${isEdit ? 'עודכן' : 'נשמר'} בהצלחה!`);
+      toast.success(` התור ${isEdit ? 'עודכן' : 'נשמר'} בהצלחה!`);
+
       setForm({
         date: '',
         time: '',
@@ -146,36 +142,35 @@ const CreateAppointment = () => {
         phoneNumber: '',
         carNumber: '',
       });
+
       navigate('/Dashboard');
     } catch (error) {
       console.error(error);
-      alert(`❌ שגיאה: ${error.message}`);
+      toast.error(` שגיאה: ${error.message}`);
     }
   };
 
   const fetchCustomerSuggestions = (value) => {
-  if (value.length < 2) {
-    setSuggestions([]);
-    return;
-  }
+    if (value.length < 2) {
+      setSuggestions([]);
+      return;
+    }
 
-  // מנגנון דיליי כדי לא לשלוח כל תו
-  if (typingTimeout) clearTimeout(typingTimeout);
-  setTypingTimeout(
-    setTimeout(async () => {
-      try {
-        const res = await fetch(`http://localhost:5000/api/customers/search?query=${value}`);
-        const data = await res.json();
-        setSuggestions(data);
-      } catch (error) {
-        console.error('שגיאה בחיפוש לקוחות:', error);
-      }
-    }, 300)
-  );
-};
+    if (typingTimeout) clearTimeout(typingTimeout);
+    setTypingTimeout(
+      setTimeout(async () => {
+        try {
+          const res = await fetch(`http://localhost:5000/api/customers/search?query=${value}`);
+          const data = await res.json();
+          setSuggestions(data);
+        } catch (error) {
+          console.error('שגיאה בחיפוש לקוחות:', error);
+        }
+      }, 300)
+    );
+  };
 
-
-return (
+  return (
   <div className="container mt-5" dir="rtl">
     <div className="card shadow p-4 position-relative">
       <h3 className="text-center mb-4">
@@ -200,7 +195,6 @@ return (
           </div>
 
           <div className="col-md-6 position-relative">
-            {/* שם לקוח ראשון */}
             <label className="form-label">שם לקוח</label>
             <input
               type="text"
@@ -212,13 +206,12 @@ return (
               required
             />
 
-            {/* הצעות אוטומטיות לשם הלקוח */}
             {suggestions.length > 0 && (
               <ul className="list-group position-absolute z-3 w-100" style={{ maxHeight: 200, overflowY: "auto" }}>
                 {suggestions.map((s) => (
                   <li key={s._id} className="list-group-item">
                     <div><strong>{s.name}</strong> – ת"ז: {s.idNumber}</div>
-                    <div> {s.phone}</div>
+                    <div>{s.phone}</div>
                     <div>
                       רכבים:
                       {s.vehicles && s.vehicles.length > 0 ? (
@@ -235,7 +228,7 @@ return (
                                     idNumber: s.idNumber,
                                     phoneNumber: s.phone?.substring(3) || "",
                                     phonePrefix: s.phone?.substring(0, 3) || "050",
-                                    carNumber: car, // ✅ בוחר את הרכב שנלחץ
+                                    carNumber: car,
                                   }));
                                   setSuggestions([]);
                                 }}
@@ -254,8 +247,6 @@ return (
               </ul>
             )}
 
-
-            {/* אחריו תעודת זהות */}
             <label className="form-label mt-3">תעודת זהות</label>
             <input
               type="text"
@@ -266,37 +257,42 @@ return (
               required
             />
 
-            {/* שאר השדות כרגיל */}
             <label className="form-label mt-3">טלפון</label>
             <div className="d-flex">
               <select name="phonePrefix" className="form-select w-auto" value={form.phonePrefix} onChange={handleChange}>
-                <option value="050">050</option>
-                <option value="052">052</option>
-                <option value="053">053</option>
-                <option value="054">054</option>
-                <option value="055">055</option>
-                <option value="056">056</option>
-                <option value="057">057</option>
-                <option value="058">058</option>
-                <option value="059">059</option>
+                {["050", "052", "053", "054", "055", "056", "057", "058", "059"].map(p => (
+                  <option key={p} value={p}>{p}</option>
+                ))}
               </select>
-              <input type="text" name="phoneNumber" className="form-control ms-2" value={form.phoneNumber} onChange={handleChange} required placeholder="7 ספרות" />
+              <input
+                type="text"
+                name="phoneNumber"
+                className="form-control ms-2"
+                value={form.phoneNumber}
+                onChange={handleChange}
+                required
+                placeholder="7 ספרות"
+              />
             </div>
 
             <label className="form-label mt-3">מספר רישוי</label>
             <input type="text" name="carNumber" className="form-control" value={form.carNumber} onChange={handleChange} required />
           </div>
 
-
           <div className="col-12 text-center mt-4">
-            <button type="submit" className="btn btn-success mx-2 px-4">{location.state || id ? "עדכן" : "שמור "}</button>
-            <button type="button" className="btn btn-secondary mx-2 px-4" onClick={() => navigate('/Dashboard')}>ביטול</button>
+            <button type="submit" className="btn btn-success mx-2 px-4">
+              {location.state || id ? "עדכן" : "שמור "}
+            </button>
+            <button type="button" className="btn btn-secondary mx-2 px-4" onClick={() => navigate('/Dashboard')}>
+              ביטול
+            </button>
           </div>
         </div>
       </form>
     </div>
   </div>
 );
+
 
 };
 

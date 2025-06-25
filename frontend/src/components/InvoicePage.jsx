@@ -3,6 +3,8 @@ import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import styles from './cssfiles/InvoicePage.module.css';
 import html2pdf from 'html2pdf.js';
+import { toast } from 'react-hot-toast';
+
 
 const InvoicePage = () => {
   const downloadButtonRef = useRef(null);
@@ -52,7 +54,7 @@ const InvoicePage = () => {
           setPrices(loadedPrices);
         }
       } catch (err) {
-        console.warn('ℹ️ שגיאה בטעינה:', err.message);
+        console.warn('שגיאה בטעינה:', err.message);
       } finally {
         setLoading(false);
       }
@@ -62,10 +64,11 @@ const InvoicePage = () => {
   }, [treatmentId]);
 
 
-  const handleSubmitInvoice = async () => {
+ const handleSubmitInvoice = async () => {
   try {
     if (!treatment?._id) {
-      console.error("❌ אין treatment._id – לא ניתן לשלוח חשבונית");
+      console.error(" אין treatment._id – לא ניתן לשלוח חשבונית");
+      toast.error(" לא ניתן לשלוח חשבונית – אין מזהה טיפול");
       return;
     }
 
@@ -89,18 +92,17 @@ const InvoicePage = () => {
       items,
     };
 
-
     if (invoiceExists) {
       await axios.put(`${BASE_API_URL}api/invoices/${treatment._id}`, invoiceData);
-      alert("🔄 החשבונית עודכנה בהצלחה");
+      toast.success(" החשבונית עודכנה בהצלחה");
     } else {
       await axios.post(`${BASE_API_URL}api/invoices`, invoiceData);
-      alert("✅ החשבונית נשמרה בהצלחה");
+      toast.success(" החשבונית נשמרה בהצלחה");
       setInvoiceExists(true);
     }
   } catch (err) {
     console.error("❌ שגיאה בשמירת/עדכון חשבונית:", err);
-    alert("❌ שגיאה בשמירת/עדכון חשבונית");
+    toast.error(" שגיאה בשמירת או עדכון החשבונית");
   }
 };
 
@@ -147,53 +149,53 @@ const InvoicePage = () => {
 
 
     const handleSendEmail = async () => {
-        try {
-            const element = document.getElementById('invoiceContent');
+  try {
+    const element = document.getElementById('invoiceContent');
 
-            // הסתרת כפתורים זמנית
-            const hiddenElements = document.querySelectorAll('.no-print');
-            hiddenElements.forEach(el => el.style.display = 'none');
+    // הסתרת כפתורים זמנית
+    const hiddenElements = document.querySelectorAll('.no-print');
+    hiddenElements.forEach(el => el.style.display = 'none');
 
-            // הגדרות PDF
-            const opt = {
-            margin: 0.5,
-            filename: 'invoice.pdf',
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2 },
-            jsPDF: { unit: 'cm', format: 'a4', orientation: 'portrait' }
-            };
+    // הגדרות PDF
+    const opt = {
+      margin: 0.5,
+      filename: 'invoice.pdf',
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: 'cm', format: 'a4', orientation: 'portrait' }
+    };
 
-            const worker = html2pdf().set(opt).from(element);
+    const worker = html2pdf().set(opt).from(element);
 
-            // יצירת ה־PDF כ־Blob
-            const pdfBlob = await worker.outputPdf('blob');
+    // יצירת ה־PDF כ־Blob
+    const pdfBlob = await worker.outputPdf('blob');
 
-            // יצירת FormData
-            const formData = new FormData();
-            formData.append('email', treatment.email);        // כתובת המייל
-            formData.append('pdf', pdfBlob, 'invoice.pdf');   // הקובץ עצמו
+    // יצירת FormData
+    const formData = new FormData();
+    formData.append('email', treatment.email);        // כתובת המייל
+    formData.append('pdf', pdfBlob, 'invoice.pdf');   // הקובץ עצמו
 
-            // שליחת המייל לשרת
-            await axios.post(
-            'http://localhost:5000/api/email/send-invoice',
-            formData,
-            {
-                headers: {
-                'Content-Type': 'multipart/form-data'
-                }
-            }
-            );
-
-            alert('✅ החשבונית נשלחה למייל בהצלחה');
-        } catch (err) {
-            console.error('❌ שגיאה בשליחת מייל:', err);
-            alert('❌ שגיאה בשליחת מייל');
-        } finally {
-            // החזרת כפתורים לאחר השליחה
-            const hiddenElements = document.querySelectorAll('.no-print');
-            hiddenElements.forEach(el => el.style.display = 'block');
+    // שליחת המייל לשרת
+    await axios.post(
+      'http://localhost:5000/api/email/send-invoice',
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data'
         }
-        };
+      }
+    );
+
+    toast.success(' החשבונית נשלחה למייל בהצלחה!');
+  } catch (err) {
+    console.error(' שגיאה בשליחת מייל:', err);
+    toast.error(' שגיאה בשליחת המייל');
+  } finally {
+    // החזרת כפתורים לאחר השליחה
+    const hiddenElements = document.querySelectorAll('.no-print');
+    hiddenElements.forEach(el => el.style.display = 'block');
+  }
+};
 
 
 

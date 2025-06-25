@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import API_BASE from "../config";
+import toast, { Toaster } from 'react-hot-toast';
 
 const Login = () => {
   const [username, setUsername] = useState(""); // קלט שם משתמש
@@ -10,9 +11,8 @@ const Login = () => {
   const navigate = useNavigate();
 
   // פונקציה שמבצעת התחברות לשרת
- const handleLogin = async (e) => {
+const handleLogin = async (e) => {
   e.preventDefault();
-  setError(""); // איפוס שגיאה קודמת
 
   try {
     const response = await fetch(`${API_BASE}/api/auth/login`, {
@@ -26,26 +26,22 @@ const Login = () => {
     const data = await response.json();
 
     if (!response.ok) {
-      setError(data.message || "שגיאה בהתחברות");
+      toast.error(data.message || "שגיאה בהתחברות");
       return;
     }
 
-    console.log("Token:", data.token);
-    console.log("Role:", data.role);
-
-    // שמירת טוקן ו־role ב-localStorage
     localStorage.setItem("token", data.token);
     localStorage.setItem("role", data.role);
     localStorage.setItem("isLoggedIn", "true");
 
+    toast.success("התחברת בהצלחה!");
     navigate("/dashboard");
 
   } catch (err) {
     console.error("Login error:", err);
-    setError("שגיאת רשת. נסה שוב מאוחר יותר.");
+    toast.error("שגיאת רשת. נסה שוב מאוחר יותר.");
   }
 };
-
 
   return (
     <>

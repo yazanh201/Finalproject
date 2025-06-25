@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-hot-toast"; // ✅ ייבוא ה-toast
+
 
 const AddCustomerWithCar = () => {
   const navigate = useNavigate();
@@ -26,35 +28,35 @@ const AddCustomerWithCar = () => {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
+  
+    
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // אימותים...
-    if (form.name.trim().length < 2) return alert("❌ שם לקוח אינו תקין");
-    if (form.idNumber.length !== 9) return alert("❌ תעודת זהות חייבת להכיל בדיוק 9 ספרות");
-    if (form.phoneNumber.length !== 7) return alert("❌ מספר טלפון חייב להכיל 7 ספרות");
-    if (form.vehicleNumber.length < 5) return alert("❌ מספר רכב חייב להכיל לפחות 5 ספרות");
+    if (form.name.trim().length < 2) return toast.error(" שם לקוח אינו תקין");
+    if (form.idNumber.length !== 9) return toast.error(" תעודת זהות חייבת להכיל בדיוק 9 ספרות");
+    if (form.phoneNumber.length !== 7) return toast.error(" מספר טלפון חייב להכיל 7 ספרות");
+    if (form.vehicleNumber.length < 5) return toast.error(" מספר רכב חייב להכיל לפחות 5 ספרות");
 
     try {
-        const payload = {
+      const payload = {
         name: form.name,
         idNumber: form.idNumber,
         phone: form.phonePrefix + form.phoneNumber,
         email: form.email,
         status: form.status,
         vehicleNumber: form.vehicleNumber,
-        };
+      };
 
-        await axios.post("http://localhost:5000/api/customers", payload);
-        alert("✅ הלקוח נשמר בהצלחה!");
+      await axios.post("http://localhost:5000/api/customers", payload);
 
-        // ✅ ניווט להשלמת פרטי הרכב
-        navigate(`/complete-vehicle/${form.vehicleNumber}`);
+      toast.success(" הלקוח נשמר בהצלחה!");
+      navigate(`/complete-vehicle/${form.vehicleNumber}`);
     } catch (error) {
-        console.error("❌ שגיאה:", error);
-        alert("❌ ארעה שגיאה בהוספה. ודא שכל הנתונים תקינים.");
+      console.error(" שגיאה:", error);
+      toast.error(" ארעה שגיאה בהוספה. ודא שכל הנתונים תקינים.");
     }
-    };
+  };
 
 
   return (

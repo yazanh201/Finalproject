@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import Modal from "./Modal";
 import { useNavigate } from "react-router-dom";
+import "../Pages/cssfiles/TablesResponsive.css";
+import DynamicTable from "./DynamicTable";
 
 const TreatmentsTable = ({
   filterAppointment,
@@ -140,7 +142,7 @@ const TreatmentsTable = ({
         </button>
       </div>
 
-      <div className="table-responsive">
+     <div className="responsiveTableContainer">
         <table className="table table-striped">
           <thead>
             <tr>

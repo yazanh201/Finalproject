@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Modal from "./Modal";
-
+import '../Pages/cssfiles/TablesResponsive.css'
 /**
  * רכיב `CarsInService`
  * - מציג רשימת רכבים שנמצאים בטיפול.
@@ -66,7 +66,8 @@ const CarsInService = () => {
         </button>
       </div>
 
-      <div className="table-responsive">
+      <div className="responsiveTableContainer">
+
         <table className="table table-striped">
           <thead>
             <tr>

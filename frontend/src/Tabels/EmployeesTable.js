@@ -2,6 +2,9 @@ import React, { useEffect, useState } from "react";
 import Modal from "./Modal";
 import DynamicTable from "./DynamicTable";
 
+
+import "../Pages/cssfiles/TablesResponsive.css"; // הוספת קובץ CSS לגלילה אופקית
+
 const Employees = () => {
   const [employees, setEmployees] = useState([]);
   const [modalType, setModalType] = useState(null);
@@ -96,13 +99,15 @@ const Employees = () => {
         </button>
       </div>
 
-      <DynamicTable
-        title=""
-        headers={headers}
-        data={employees}
-        actionLabel="עריכה"
-        onRowAction={(emp) => handleShowModal("edit", emp)}
-      />
+      <div className="responsiveTableContainer">
+        <DynamicTable
+          title=""
+          headers={headers}
+          data={employees}
+          actionLabel="עריכה"
+          onRowAction={(emp) => handleShowModal("edit", emp)}
+        />
+      </div>
 
       {(modalType === "add" || modalType === "edit") && selectedEmployee && (
         <Modal isOpen={true} onClose={handleCloseModal} onSave={handleSave}>

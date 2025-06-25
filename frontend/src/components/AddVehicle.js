@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
+import { toast } from "react-hot-toast"; // ✅ ייבוא toast
 
 const AddVehicleDetails = () => {
   const { plateNumber } = useParams();
@@ -40,16 +41,15 @@ const AddVehicleDetails = () => {
   }, [plateNumber]);
 
   // 💾 שליחה לעדכון
-  const handleSave = async (e) => {
+   const handleSave = async (e) => {
     e.preventDefault();
     const currentYear = new Date().getFullYear();
 
-    // אימותים בסיסיים
-    if (!manufacturer || manufacturer.length < 2) return alert("❌ חובה להזין יצרן");
-    if (!model) return alert("❌ חובה להזין דגם");
-    if (!year || year < 1950 || year > currentYear) return alert("❌ שנת ייצור לא תקינה");
-    if (!color || color.length < 2) return alert("❌ חובה להזין צבע");
-    if (!mileage || mileage < 0) return alert("❌ קילומטראז' לא תקין");
+    if (!manufacturer || manufacturer.length < 2) return toast.error(" חובה להזין יצרן");
+    if (!model) return toast.error(" חובה להזין דגם");
+    if (!year || year < 1950 || year > currentYear) return toast.error(" שנת ייצור לא תקינה");
+    if (!color || color.length < 2) return toast.error(" חובה להזין צבע");
+    if (!mileage || mileage < 0) return toast.error(" קילומטראז' לא תקין");
 
     try {
       await axios.put(`http://localhost:5000/api/cars/plate/${plateNumber}`, {
@@ -60,14 +60,13 @@ const AddVehicleDetails = () => {
         mileage,
         vehicleNumber: plateNumber,
       });
-      alert("✅ הרכב עודכן בהצלחה!");
+      toast.success(" הרכב עודכן בהצלחה!");
       navigate("/dashboard");
     } catch (err) {
       console.error(err);
-      alert("❌ שגיאה בעדכון הרכב");
+      toast.error(" שגיאה בעדכון הרכב");
     }
   };
-
   if (!vehicle) return <div className="text-center mt-5">🔄 טוען...</div>;
 
   return (
