@@ -1,51 +1,46 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Header from "../components/Header";
 import API_BASE from "../config";
 import toast, { Toaster } from 'react-hot-toast';
 
 const Login = () => {
-  const [username, setUsername] = useState(""); // קלט שם משתמש
-  const [password, setPassword] = useState(""); // קלט סיסמה
-  const [error, setError] = useState(""); // הודעת שגיאה
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  // פונקציה שמבצעת התחברות לשרת
-const handleLogin = async (e) => {
-  e.preventDefault();
+  const handleLogin = async (e) => {
+    e.preventDefault();
 
-  try {
-    const response = await fetch(`${API_BASE}/api/auth/login`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ username, password }),
-    });
+    try {
+      const response = await fetch(`${API_BASE}/api/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
 
-    const data = await response.json();
+      const data = await response.json();
 
-    if (!response.ok) {
-      toast.error(data.message || "שגיאה בהתחברות");
-      return;
+      if (!response.ok) {
+        toast.error(data.message || "שגיאה בהתחברות");
+        return;
+      }
+
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("role", data.role);
+      localStorage.setItem("isLoggedIn", "true");
+
+      toast.success("התחברת בהצלחה!");
+      navigate("/dashboard");
+    } catch (err) {
+      console.error("Login error:", err);
+      toast.error("שגיאת רשת. נסה שוב מאוחר יותר.");
     }
-
-    localStorage.setItem("token", data.token);
-    localStorage.setItem("role", data.role);
-    localStorage.setItem("isLoggedIn", "true");
-
-    toast.success("התחברת בהצלחה!");
-    navigate("/dashboard");
-
-  } catch (err) {
-    console.error("Login error:", err);
-    toast.error("שגיאת רשת. נסה שוב מאוחר יותר.");
-  }
-};
+  };
 
   return (
     <>
-      <Header />
+      <Toaster position="top-center" reverseOrder={false} />
       <div className="container d-flex justify-content-center align-items-center vh-100">
         <div className="card p-4 shadow-lg" style={{ width: "100%", maxWidth: "400px" }}>
           <h2 className="text-center mb-4">התחברות</h2>
