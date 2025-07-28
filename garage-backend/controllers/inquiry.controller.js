@@ -20,6 +20,23 @@ const addInquiry = async (req, res) => {
   }
 };
 
+// controller
+const deleteInquiry = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const inquiry = await Inquiry.findByIdAndDelete(id);
+    if (!inquiry) {
+      return res.status(404).json({ message: "❌ פנייה לא נמצאה למחיקה" });
+    }
+    res.json({ message: "✅ הפנייה נמחקה בהצלחה" });
+  } catch (err) {
+    console.error("❌ שגיאה במחיקת פנייה:", err.message);
+    res.status(500).json({ message: "❌ שגיאה בשרת", error: err.message });
+  }
+};
+
+
 module.exports = {
   addInquiry,
+  deleteInquiry
 };

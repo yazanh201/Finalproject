@@ -165,6 +165,20 @@ const CarsTable = () => {
   "סקודה", "ניסאן", "רנו", "הונדה", "לקסוס"
 ];
 
+const handleDelete = async (id) => {
+  if (!window.confirm("האם אתה בטוח שברצונך למחוק את הרכב הזה?")) return;
+
+  try {
+    await axios.delete(`http://localhost:5000/api/cars/${id}`);
+    alert("✅ הרכב נמחק בהצלחה!");
+    fetchCars(); // רענון הטבלה אחרי המחיקה
+  } catch (error) {
+    console.error("❌ שגיאה במחיקת רכב:", error);
+    alert(error.response?.data?.message || "❌ שגיאה במחיקת רכב");
+  }
+};
+
+
 
 
   return (
@@ -206,7 +220,7 @@ const CarsTable = () => {
               <td>{car.mileage !== undefined ? `${car.mileage} ק"מ` : '-'}</td>
               <td>
                 <button className="btn btn-primary btn-sm me-2" onClick={() => handleShowModal("edit", car)}>עריכה</button>
-                <button className="btn btn-danger btn-sm" onClick={() => handleDelete(car._id)}>מחיקה</button>
+                <button className="btn btn-danger btn-sm me-2" onClick={() => handleDelete(car._id)}>מחיקה</button>
               </td>
             </tr>
           ))}

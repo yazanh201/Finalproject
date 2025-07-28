@@ -2,9 +2,16 @@ const Vehicle = require('../models/Vehicle');
 const Customer = require("../models/Customer");
 
 // 📌 הוספת רכב חדש
+// 📌 הוספת רכב חדש
 const addVehicle = async (req, res) => {
   try {
     const { vehicleNumber, ownerName, ownerIdNumber, manufacturer, model, year, color, mileage } = req.body;
+
+    // ✅ בדיקה אם רכב עם אותו מספר כבר קיים
+    const existingVehicle = await Vehicle.findOne({ vehicleNumber });
+    if (existingVehicle) {
+      return res.status(400).json({ message: `❌ רכב עם מספר ${vehicleNumber} כבר קיים במערכת.` });
+    }
 
     const newVehicle = new Vehicle({
       vehicleNumber: vehicleNumber || '',
@@ -17,7 +24,6 @@ const addVehicle = async (req, res) => {
       mileage: mileage || 0,
     });
 
-
     await newVehicle.save();
 
     res.status(201).json({ message: '✅ רכב נוסף בהצלחה', vehicle: newVehicle });
@@ -26,6 +32,7 @@ const addVehicle = async (req, res) => {
     res.status(500).json({ message: '❌ שגיאה בשרת', error: error.message });
   }
 };
+
 
 // 📌 שליפת כל הרכבים
 const getAllVehicles = async (req, res) => {
@@ -83,11 +90,18 @@ const deleteVehicle = async (req, res) => {
   try {
     const { id } = req.params;
 
+    // מחיקת הרכב
     const deletedVehicle = await Vehicle.findByIdAndDelete(id);
 
     if (!deletedVehicle) {
       return res.status(404).json({ message: '❌ רכב לא נמצא למחיקה' });
     }
+
+    // מחיקת מספר הרכב מרשימת הרכבים של הלקוח
+    await Customer.updateOne(
+      { vehicles: deletedVehicle.vehicleNumber },
+      { $pull: { vehicles: deletedVehicle.vehicleNumber } }
+    );
 
     res.status(200).json({ message: '✅ רכב נמחק בהצלחה' });
   } catch (error) {
@@ -95,6 +109,7 @@ const deleteVehicle = async (req, res) => {
     res.status(500).json({ message: '❌ שגיאה בשרת', error: error.message });
   }
 };
+
 
 
 const getCarsByCustomer = async (req, res) => {
@@ -110,6 +125,7 @@ const getCarsByCustomer = async (req, res) => {
     res.status(500).json({ message: "שגיאה בשרת", error: error.message });
   }
 };
+
 
 
 // 📤 ייצוא הפונקציות

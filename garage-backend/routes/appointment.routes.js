@@ -13,7 +13,8 @@ const {
   rejectArrival,
   confirmArrival,
   getAppointmentsThisMonth, // ✅
-  searchCustomersByName
+  searchCustomersByName,
+  deleteAppointment
 } = require('../controllers/appointment.controller');
 
 router.post('/', addAppointment);
@@ -32,5 +33,8 @@ router.get('/search', searchCustomersByName);
 
 // ✅ חדש – שליפת תורים של החודש הנוכחי
 router.get('/month', getAppointmentsThisMonth);
+
+router.delete('/:id', deleteAppointment);
+
 
 module.exports = router;

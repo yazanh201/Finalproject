@@ -103,6 +103,28 @@ const Inquiries = () => {
   
     return matchSearch && matchStatus && matchDate;
   });
+
+  const handleDelete = async (id) => {
+  if (!window.confirm("האם אתה בטוח שברצונך למחוק את הפנייה הזו?")) return;
+
+  try {
+    const res = await fetch(`http://localhost:5000/api/inquiries/${id}`, {
+      method: "DELETE",
+    });
+    const data = await res.json();
+
+    if (res.ok) {
+      alert("✅ הפנייה נמחקה בהצלחה!");
+      setInquiries((prev) => prev.filter((inq) => inq._id !== id)); // מסיר מהטבלה
+    } else {
+      alert(data.message || "❌ שגיאה במחיקת הפנייה");
+    }
+  } catch (err) {
+    console.error("❌ שגיאה במחיקה:", err);
+    alert("❌ שגיאה בחיבור לשרת");
+  }
+};
+
   
 
   return (
@@ -163,6 +185,12 @@ const Inquiries = () => {
                 <td>
                   <button className="btn btn-sm btn-primary" onClick={() => handleShowModal("edit", inquiry)}>
                     ערוך
+                  </button>
+                  <button
+                    className="btn btn-sm btn-danger me-2"
+                    onClick={() => handleDelete(inquiry._id)}
+                  >
+                    מחק
                   </button>
                 </td>
               </tr>

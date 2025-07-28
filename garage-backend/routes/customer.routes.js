@@ -11,7 +11,8 @@ const {
   getNewCustomersThisMonth,
   addCarToCustomer,
   getIdNumberByCarPlate,
-  getEmailByCarPlate
+  getEmailByCarPlate,
+  deleteCustomer
 } = require('../controllers/customer.controller');
 
 /**
@@ -54,6 +55,8 @@ router.get("/new-this-month", getNewCustomersThisMonth);
 router.get('/id-by-plate/:plateNumber', getIdNumberByCarPlate);
 
 router.get('/email-by-plate/:plateNumber', getEmailByCarPlate);
+
+router.delete('/:id', deleteCustomer);
 
 
 module.exports = router;

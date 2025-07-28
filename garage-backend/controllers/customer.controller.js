@@ -11,12 +11,15 @@ const addCustomer = async (req, res) => {
   try {
     let { name, idNumber, phone, email, status, vehicleNumber } = req.body;
 
-    // ✅ בדיקה אם הלקוח כבר קיים לפי תעודת זהות
-    const existingCustomer = await Customer.findOne({ idNumber });
+    // ✅ בדיקה אם לקוח כבר קיים לפי ת"ז או שם
+    const existingCustomer = await Customer.findOne({
+      $or: [{ idNumber: idNumber }, { name: name }]
+    });
     if (existingCustomer) {
-      return res.status(400).json({ message: "❌ לקוח עם תעודת זהות זו כבר קיים במערכת." });
+      return res.status(400).json({ message: "לקוח זה כבר קיים במערכת" });
     }
 
+    // ✅ הכנה למערך רכבים
     let vehicles = [];
     if (Array.isArray(vehicleNumber)) {
       vehicles = vehicleNumber;
@@ -24,6 +27,15 @@ const addCustomer = async (req, res) => {
       vehicles = [vehicleNumber];
     }
 
+    // ✅ בדיקה אם אחד מהרכבים כבר קיים במסד הנתונים
+    for (const number of vehicles) {
+      const existingVehicle = await Vehicle.findOne({ vehicleNumber: number });
+      if (existingVehicle) {
+        return res.status(400).json({ message: ` הרכב עם מספר ${number} כבר קיים במערכת.` });
+      }
+    }
+
+    // ✅ יצירת לקוח חדש
     const newCustomer = new Customer({
       name,
       idNumber,
@@ -35,11 +47,9 @@ const addCustomer = async (req, res) => {
 
     await newCustomer.save();
 
-    // יצירת רכבים שלא קיימים עדיין
+    // ✅ יצירת רכבים חדשים שלא קיימים
     for (const number of vehicles) {
-      const existingVehicle = await Vehicle.findOne({ vehicleNumber: number });
-
-      if (number && !existingVehicle) {
+      if (number) {
         const newVehicle = new Vehicle({
           vehicleNumber: number,
           ownerName: name,
@@ -59,7 +69,6 @@ const addCustomer = async (req, res) => {
   } catch (error) {
     console.error('❌ שגיאה בהוספת לקוח:', error.message);
 
-    // ✅ טיפול בשגיאת Duplicate תעודת זהות אם תקרה מ־MongoDB
     if (error.code === 11000 && error.keyPattern?.idNumber) {
       return res.status(400).json({ message: "❌ לקוח עם תעודת זהות זו כבר קיים במערכת." });
     }
@@ -67,6 +76,7 @@ const addCustomer = async (req, res) => {
     res.status(500).json({ message: '❌ שגיאה בשרת', error: error.message });
   }
 };
+
 
   
 
@@ -144,37 +154,43 @@ const addCarToCustomer = async (req, res) => {
     const { vehicleNumber } = req.body;
 
     const customer = await Customer.findById(id);
-    if (!customer) return res.status(404).json({ message: "לקוח לא נמצא" });
+    if (!customer) return res.status(404).json({ message: "❌ לקוח לא נמצא" });
 
+    // ✅ בדיקה אם הרכב כבר קיים אצל הלקוח הזה
     if (customer.vehicles.includes(vehicleNumber)) {
-      return res.status(400).json({ message: "הרכב כבר משויך ללקוח זה" });
+      return res.status(400).json({ message: "❌ הרכב כבר משויך ללקוח זה" });
     }
 
+    // ✅ בדיקה אם הרכב כבר קיים אצל לקוח אחר במערכת
+    const existingVehicle = await Vehicle.findOne({ vehicleNumber });
+    if (existingVehicle) {
+      return res.status(400).json({ message: `❌ רכב עם מספר ${vehicleNumber} כבר קיים במערכת ומשויך ללקוח אחר.` });
+    }
+
+    // ✅ הוספת מספר הרכב ללקוח
     customer.vehicles.push(vehicleNumber);
     await customer.save();
 
-    // יצירת רכב במסד אם הוא לא קיים
-    const existingVehicle = await Vehicle.findOne({ vehicleNumber });
-    if (!existingVehicle) {
-      const newVehicle = new Vehicle({
-        vehicleNumber,
-        ownerName: customer.name,
-        ownerIdNumber: customer.idNumber,
-        manufacturer: '',
-        model: '',
-        year: null,
-        color: '',
-        mileage: 0,
-      });
-      await newVehicle.save();
-    }
+    // ✅ יצירת רכב במסד עם פרטי בעלים
+    const newVehicle = new Vehicle({
+      vehicleNumber,
+      ownerName: customer.name,
+      ownerIdNumber: customer.idNumber,
+      manufacturer: '',
+      model: '',
+      year: null,
+      color: '',
+      mileage: 0,
+    });
+    await newVehicle.save();
 
-    res.json({ message: "✅ רכב נוסף ללקוח", customer });
+    res.json({ message: "✅ רכב נוסף ללקוח בהצלחה", customer });
   } catch (error) {
     console.error("❌ שגיאה בהוספת רכב ללקוח:", error);
     res.status(500).json({ message: "❌ שגיאה בשרת", error: error.message });
   }
 };
+
 
 const getNewCustomersThisMonth = async (req, res) => {
   try {
@@ -250,6 +266,31 @@ const getEmailByCarPlate = async (req, res) => {
 };
 
 
+const deleteCustomer = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // 🔍 חיפוש הלקוח לפי ID
+    const customer = await Customer.findById(id);
+    if (!customer) {
+      return res.status(404).json({ message: "❌ לקוח לא נמצא למחיקה" });
+    }
+
+    // 🗑️ מחיקת כל הרכבים שמקושרים ללקוח לפי ת"ז
+    await Vehicle.deleteMany({ ownerIdNumber: customer.idNumber });
+
+    // 🗑️ מחיקת הלקוח עצמו
+    await Customer.findByIdAndDelete(id);
+
+    res.status(200).json({ message: "✅ הלקוח וכל הרכבים שלו נמחקו בהצלחה" });
+  } catch (error) {
+    console.error("❌ שגיאה במחיקת לקוח:", error.message);
+    res.status(500).json({ message: "❌ שגיאה בשרת", error: error.message });
+  }
+};
+
+
+
 
 
 
@@ -262,5 +303,6 @@ module.exports = {
   addCarToCustomer,
   getNewCustomersThisMonth,
   getIdNumberByCarPlate,
-  getEmailByCarPlate
+  getEmailByCarPlate,
+  deleteCustomer
 };

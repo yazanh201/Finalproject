@@ -124,6 +124,22 @@ const TreatmentsTable = ({
     }
   };
 
+
+  const handleDelete = async (id) => {
+  if (!window.confirm("האם אתה בטוח שברצונך למחוק את הטיפול הזה?")) return;
+  try {
+    await fetch(`http://localhost:5000/api/treatments/${id}`, {
+      method: "DELETE",
+    });
+    setTreatments((prev) => prev.filter((t) => t._id !== id));
+    alert("✅ הטיפול נמחק בהצלחה!");
+  } catch (err) {
+    console.error("❌ שגיאה במחיקת טיפול:", err);
+    alert("❌ שגיאה במחיקה");
+  }
+};
+
+
   return (
     <div>
       <div className="text-center mb-4">
@@ -152,8 +168,8 @@ const TreatmentsTable = ({
               <th>מספר רכב</th>
               <th>שם לקוח</th>
               <th>צפייה</th>
-              <th>עריכה</th>
               <th>חשבונית</th>
+              <th>עריכה</th>
             </tr>
           </thead>
           <tbody>
@@ -192,6 +208,15 @@ const TreatmentsTable = ({
                 </td>
                 <td>
                   <button
+                    className="btn btn-outline-success btn-sm"
+                    onClick={() => navigate(`/invoice/${treatment._id}`)}
+                    title="צפייה בחשבונית"
+                  >
+                    🧾 חשבונית
+                  </button>
+                </td>
+                                <td>
+                  <button
                     className="btn btn-outline-secondary btn-sm"
                     onClick={() =>
                       navigate("/create-treatment", {
@@ -215,17 +240,15 @@ const TreatmentsTable = ({
 
                     title="עריכת טיפול"
                   >
-                    ✏️
+                    עריכה
                   </button>
-                </td>
-                <td>
-                  <button
-                    className="btn btn-outline-success btn-sm"
-                    onClick={() => navigate(`/invoice/${treatment._id}`)}
-                    title="צפייה בחשבונית"
-                  >
-                    🧾 חשבונית
-                  </button>
+                    <button
+                      className="btn btn-outline-danger btn-sm me-2"
+                      onClick={() => handleDelete(treatment._id)}
+                      title="מחיקת טיפול"
+                    >
+                      מחיקה
+                    </button>
                 </td>
               </tr>
             ))}

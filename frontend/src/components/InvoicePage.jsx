@@ -246,16 +246,19 @@ const InvoicePage = () => {
                         <td>{option}</td>
                         <td>
                             <input
-                                type="number"
-                                value={prices[key] || ''}
-                                onChange={(e) =>
-                                    setPrices((prev) => ({
-                                    ...prev,
-                                    [key]: Number(e.target.value),
-                                    }))
-                                }
-                                className={styles.priceInput}
-                                />
+                              type="number"
+                              min="0"   // ✅ מונע הקלדת מספרים שליליים
+                              value={prices[key] || ''}
+                              onChange={(e) => {
+                                  const val = Number(e.target.value);
+                                  if (val < 0) return; // ✅ הגנה נוספת בקוד
+                                  setPrices((prev) => ({
+                                      ...prev,
+                                      [key]: val,
+                                  }));
+                              }}
+                              className={styles.priceInput}
+                          />
 
                         </td>
                         </tr>

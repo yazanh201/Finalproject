@@ -58,6 +58,20 @@ const CarOrders = () => {
     order.carNumber.includes(searchTerm)
   );
 
+
+  const handleDelete = async (id) => {
+  if (!window.confirm("האם אתה בטוח שברצונך למחוק את ההזמנה הזו?")) return;
+  try {
+    await axios.delete(`http://localhost:5000/api/carorders/${id}`);
+    alert("✅ ההזמנה נמחקה בהצלחה!");
+    fetchOrders(); // רענון הטבלה אחרי מחיקה
+  } catch (error) {
+    console.error("❌ שגיאה במחיקת הזמנה:", error);
+    alert("❌ שגיאה במחיקת הזמנה");
+  }
+};
+
+
   return (
     <div>
       <div className="text-center mb-4">
@@ -92,7 +106,8 @@ const CarOrders = () => {
                 <td>{order.cost}</td>
                 <td className={order.status === "התקבלה" ? "text-success" : "text-warning"}>{order.status}</td>
                 <td>
-                  <button className="btn btn-primary btn-sm" onClick={() => handleShowModal("edit", order)}>עריכה</button>
+                  <button className="btn btn-primary btn-sm me-2" onClick={() => handleShowModal("edit", order)}>עריכה</button>
+                  <button className="btn btn-danger btn-sm me-2" onClick={() => handleDelete(order._id)}>מחיקה</button>
                 </td>
               </tr>
             ))}

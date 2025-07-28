@@ -63,7 +63,6 @@ const CreateTreatment = () => {
     workerName: state.workerName || '',
     customerName: state.customerName || '',
     images: [],
-    invoiceFile: null,
     repairTypeId: state.repairTypeId || '',
     status: initialStatus,
     treatmentId: state.treatmentId || '',
@@ -138,12 +137,11 @@ const handleSubmit = async (e) => {
   for (const key in form) {
     if (key === "images") {
       form.images.forEach((img) => formData.append("images", img));
-    } else if (key === "invoiceFile" && form.invoiceFile) {
-      formData.append("invoice", form.invoiceFile);
     } else if (key !== "treatmentId") {
       formData.append(key, form[key]);
     }
   }
+
   formData.append("treatmentServices", JSON.stringify(selectedCategories));
 
   try {
@@ -159,7 +157,7 @@ const handleSubmit = async (e) => {
     if (!isEdit) {
   navigate("/dashboard");
 } else {
-  navigate(-1);
+  navigate("/dashboard");
 }
 
     if (!isEdit) {
@@ -171,7 +169,6 @@ const handleSubmit = async (e) => {
         workerName: '',
         customerName: '',
         images: [],
-        invoiceFile: null,
         repairTypeId: '',
         status: 'בטיפול',
         treatmentId: '',
@@ -256,11 +253,6 @@ const handleSubmit = async (e) => {
             <div className="col-12">
               <label className="form-label">תיאור הטיפול</label>
               <textarea className="form-control" name="description" rows="3" value={form.description} onChange={handleChange}></textarea>
-            </div>
-
-            <div className="col-12">
-              <label className="form-label">חשבונית (PDF או תמונה)</label>
-              <input type="file" className="form-control" accept="image/*,application/pdf" onChange={handleFileChange} />
             </div>
 
             <div className="col-12">

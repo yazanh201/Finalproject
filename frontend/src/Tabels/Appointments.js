@@ -146,6 +146,21 @@ const Appointments = ({ onSelectTreatment, filterAppointmentNumber }) => {
     }
   };
 
+  const handleDelete = async (id) => {
+  if (!window.confirm("האם אתה בטוח שברצונך למחוק את התור הזה?")) return;
+  try {
+    await fetch(`http://localhost:5000/api/appointments/${id}`, {
+      method: "DELETE",
+    });
+    alert("✅ התור נמחק בהצלחה!");
+    setAppointments(prev => prev.filter(a => a._id !== id));
+  } catch (error) {
+    console.error("❌ שגיאה במחיקת תור:", error);
+    alert("❌ שגיאה במחיקת תור");
+  }
+};
+
+
   return (
     <div>
       <div className="text-center mb-4">
@@ -203,6 +218,12 @@ const Appointments = ({ onSelectTreatment, filterAppointmentNumber }) => {
                     }
                   >
                     עריכה
+                  </button>
+                  <button
+                    className="btn btn-danger btn-sm me-2"
+                    onClick={() => handleDelete(appointment._id)}
+                  >
+                    מחיקה
                   </button>
                 </td>
               </tr>

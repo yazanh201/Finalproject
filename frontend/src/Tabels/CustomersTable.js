@@ -15,7 +15,6 @@ const Customers = () => {
   const [idNumber, setIdNumber] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
-  const [status, setStatus] = useState('פעיל');
   const [vehicleNumber, setvehicleNumber] = useState('');
 
   const [phonePrefix, setPhonePrefix] = useState('052');
@@ -38,16 +37,6 @@ const Customers = () => {
   const handleShowModal = (type, customer = null) => {
     setModalType(type);
     setSelectedCustomer(customer);
-
-    if (type === 'add') {
-      setName('');
-      setIdNumber('');
-      setPhone('');
-      setEmail('');
-      setStatus('פעיל');
-      setvehicleNumber('');
-    }
-
     if (type === 'edit' && customer) {
       setName(customer.name);
       setIdNumber(customer.idNumber);
@@ -62,7 +51,6 @@ const Customers = () => {
       }
 
       setEmail(customer.email);
-      setStatus(customer.status);
       setvehicleNumber(customer.vehicles?.[0] || '');
     }
   };
@@ -93,17 +81,14 @@ const Customers = () => {
         idNumber,
         phone: fullPhone,
         email,
-        status,
         vehicleNumber: [vehicleNumber],
       };
 
       if (modalType === "edit" && selectedCustomer) {
         await axios.put(`http://localhost:5000/api/customers/${selectedCustomer._id}`, customerData);
         alert("✅ פרטי הלקוח עודכנו בהצלחה!");
-      } else {
-        await axios.post('http://localhost:5000/api/customers', customerData);
-        alert("✅ לקוח נוסף בהצלחה!");
       }
+
 
       handleCloseModal();
       fetchCustomers();
@@ -144,15 +129,32 @@ const Customers = () => {
       handleCloseModal();
       fetchCustomers();
     } catch (error) {
-      console.error("❌ שגיאה בהוספת רכב:", error.message);
-      alert("❌ שגיאה בהוספת רכב");
+      console.error("❌ שגיאה בהוספת רכב:", error);
+      const msg = error.response?.data?.message || "❌ שגיאה בהוספת רכב";
+      alert(msg);
     }
   };
+
 
   const formatPhone = (phone) => {
     const digits = phone.replace(/\D/g, '');
     return digits.startsWith("0") ? "972" + digits.slice(1) : digits;
   };
+
+
+  const handleDeleteCustomer = async (id) => {
+  if (!window.confirm("האם אתה בטוח שברצונך למחוק את הלקוח וכל הרכבים שלו?")) return;
+
+  try {
+    await axios.delete(`http://localhost:5000/api/customers/${id}`);
+    alert("✅ הלקוח וכל הרכבים שלו נמחקו בהצלחה!");
+    fetchCustomers();
+  } catch (error) {
+    console.error("❌ שגיאה במחיקת לקוח:", error.message);
+    alert(error.response?.data?.message || "❌ שגיאה במחיקה");
+  }
+};
+
 
   return (
     <div>
@@ -161,9 +163,7 @@ const Customers = () => {
       </div>
 
       <div className="d-flex mb-3">
-        <button className="btn btn-primary me-3" onClick={() => handleShowModal("add")}>
-          הוסף לקוח חדש
-        </button>
+
         <button className="btn btn-primary me-3" onClick={() => handleShowModal("searchID")}>
           חיפוש לפי ת"ז או שם
         </button>
@@ -179,7 +179,6 @@ const Customers = () => {
               <th>ת"ז</th>
               <th>מספר טלפון</th>
               <th>מייל</th>
-              <th>סטטוס</th>
               <th>רכבים</th>
               <th>פעולה</th>
             </tr>
@@ -200,9 +199,6 @@ const Customers = () => {
                   </a>
                 </td>
                 <td>{customer.email || '-'}</td>
-                <td className={customer.status === "פעיל" ? "text-success" : "text-danger"}>
-                  {customer.status || '-'}
-                </td>
                 <td>
                   <span
                     style={{ color: 'blue', textDecoration: 'underline', cursor: 'pointer' }}
@@ -218,6 +214,13 @@ const Customers = () => {
                   <button className="btn btn-success btn-sm me-2" onClick={() => handleShowModal("addCar", customer)}>
                     הוסף רכב
                   </button>
+                  <button 
+                    className="btn btn-success btn-sm me-2"
+                    onClick={() => handleDeleteCustomer(customer._id)}
+                  >
+                    מחק
+                  </button>
+
                 </td>
               </tr>
             ))}
@@ -226,7 +229,7 @@ const Customers = () => {
       </div>
 
       {/* מודלים */}
-      {(modalType === "add" || modalType === "edit") && (
+      {modalType === "edit" && (
         <Modal isOpen={true} onClose={handleCloseModal} onSave={handleSave}>
           <h3>{modalType === "edit" ? "עריכת לקוח" : "הוספת לקוח ורכב"}</h3>
           <form>
@@ -255,17 +258,6 @@ const Customers = () => {
             <div className="form-group mb-3">
               <label>מייל</label>
               <input type="email" className="form-control" value={email} onChange={(e) => setEmail(e.target.value)} required />
-            </div>
-            <div className="form-group mb-3">
-              <label>סטטוס</label>
-              <select className="form-control" value={status} onChange={(e) => setStatus(e.target.value)} required>
-                <option value="פעיל">פעיל</option>
-                <option value="לא פעיל">לא פעיל</option>
-              </select>
-            </div>
-            <div className="form-group mb-3">
-              <label>מספר רישוי רכב</label>
-              <input type="text" className="form-control" value={vehicleNumber} onChange={(e) => setvehicleNumber(e.target.value.replace(/\D/g, ''))} maxLength={9} required />
             </div>
           </form>
         </Modal>

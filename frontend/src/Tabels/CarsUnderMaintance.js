@@ -1,24 +1,12 @@
 import React, { useState, useEffect } from "react";
 import Modal from "./Modal";
 import '../Pages/cssfiles/TablesResponsive.css'
-/**
- * רכיב `CarsInService`
- * - מציג רשימת רכבים שנמצאים בטיפול.
- * - מאפשר הוספת רכב חדש לטיפול.
- * - מאפשר עריכת מידע על רכב בטיפול.
- */
+
 const CarsInService = () => {
   const [modalType, setModalType] = useState(null);
   const [treatments, setTreatments] = useState([]);
-  const [selectedTreatment, setSelectedTreatment] = useState({
-    carPlate: "",
-    status: "in_progress",
-    date: "",
-    exitDate: "",
-    workerId: ""
-  });
+  const [selectedTreatment, setSelectedTreatment] = useState(null);
 
-  // שליפת נתונים מהשרת
   useEffect(() => {
     fetch("http://localhost:5000/api/treatments")
       .then(res => res.json())
@@ -30,17 +18,9 @@ const CarsInService = () => {
   }, []);
 
   const handleShowModal = (type, treatment = null) => {
-    setModalType(type);
     if (type === "edit" && treatment) {
+      setModalType("edit");
       setSelectedTreatment(treatment);
-    } else {
-      setSelectedTreatment({
-        carPlate: "",
-        status: "in_progress",
-        date: "",
-        exitDate: "",
-        workerId: ""
-      });
     }
   };
 
@@ -54,29 +34,34 @@ const CarsInService = () => {
     handleCloseModal();
   };
 
+  const handleDelete = async (id) => {
+    if (!window.confirm("האם אתה בטוח שברצונך למחוק את הרכב הזה מהרשימה?")) return;
+    try {
+      await fetch(`http://localhost:5000/api/treatments/${id}`, {
+        method: "DELETE",
+      });
+      setTreatments((prev) => prev.filter((t) => t._id !== id));
+      alert("✅ הרכב הוסר מרשימת הטיפולים בהצלחה!");
+    } catch (err) {
+      console.error("❌ שגיאה במחיקת רכב בטיפול:", err);
+      alert("❌ שגיאה במחיקה");
+    }
+  };
+
   return (
     <div>
       <div className="text-center mb-4">
         <h2 className="me-3">רכבים בטיפול/תיקון</h2>
       </div>
 
-      <div className="d-flex mb-3">
-        <button className="btn btn-primary me-3" onClick={() => handleShowModal("add")}>
-          הוסף רכב
-        </button>
-      </div>
-
       <div className="responsiveTableContainer">
-
         <table className="table table-striped">
           <thead>
             <tr>
               <th>מספר רישוי</th>
               <th>סטטוס טיפול</th>
               <th>תאריך כניסה</th>
-              <th>תאריך יציאה</th>
               <th>מזהה עובד</th>
-              <th>פעולה</th>
             </tr>
           </thead>
           <tbody>
@@ -87,91 +72,18 @@ const CarsInService = () => {
                   <td>{treatment.carPlate}</td>
                   <td>{treatment.status || "—"}</td>
                   <td>{treatment.date || "—"}</td>
-                  <td>{treatment.exitDate || "—"}</td>
                   <td>{treatment.workerId || "—"}</td>
-                  <td>
-                    <button
-                      className="btn btn-primary btn-sm"
-                      onClick={() => handleShowModal("edit", treatment)}
-                    >
-                      עריכה
-                    </button>
-                  </td>
                 </tr>
               ))}
           </tbody>
         </table>
       </div>
 
-      {(modalType === "add" || modalType === "edit") && (
+      {modalType === "edit" && selectedTreatment && (
         <Modal isOpen={true} onClose={handleCloseModal} onSave={handleSave}>
-          <h3>{modalType === "edit" ? "עריכת רכב בטיפול" : "הוספת רכב לטיפול"}</h3>
+          <h3>עריכת רכב בטיפול</h3>
           <form>
-            <div className="form-group mb-3">
-              <label>מספר רישוי</label>
-              <input
-                type="text"
-                className="form-control"
-                value={selectedTreatment?.carPlate || ""}
-                onChange={(e) =>
-                  setSelectedTreatment({ ...selectedTreatment, carPlate: e.target.value })
-                }
-                required
-              />
-            </div>
-
-            <div className="form-group mb-3">
-              <label>סטטוס טיפול</label>
-              <select
-                className="form-control"
-                value={selectedTreatment?.status}
-                onChange={(e) =>
-                  setSelectedTreatment({ ...selectedTreatment, status: e.target.value })
-                }
-              >
-                <option value="in_progress">בטיפול</option>
-                <option value="waiting_parts">ממתין לחלקים</option>
-                <option value="completed">הטיפול הסתיים</option>
-              </select>
-            </div>
-
-            <div className="form-group mb-3">
-              <label>תאריך כניסה</label>
-              <input
-                type="date"
-                className="form-control"
-                value={selectedTreatment?.date || ""}
-                onChange={(e) =>
-                  setSelectedTreatment({ ...selectedTreatment, date: e.target.value })
-                }
-                required
-              />
-            </div>
-
-            <div className="form-group mb-3">
-              <label>תאריך יציאה</label>
-              <input
-                type="date"
-                className="form-control"
-                value={selectedTreatment?.exitDate || ""}
-                onChange={(e) =>
-                  setSelectedTreatment({ ...selectedTreatment, exitDate: e.target.value })
-                }
-              />
-            </div>
-
-            <div className="form-group mb-3">
-              <label>מזהה עובד</label>
-              <input
-                type="text"
-                className="form-control"
-                value={selectedTreatment?.workerId || ""}
-                onChange={(e) =>
-                  setSelectedTreatment({ ...selectedTreatment, workerId: e.target.value })
-                }
-                required
-              />
-            </div>
+            {/* כל השדות לעריכה */}
           </form>
         </Modal>
       )}

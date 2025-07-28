@@ -1,7 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const Inquiry = require('../models/Inquiry');
-const { addInquiry } = require('../controllers/inquiry.controller');
+const {
+  addInquiry,
+  deleteInquiry
+ } = require('../controllers/inquiry.controller');
 
 // POST חדש
 router.post('/', addInquiry);
@@ -28,5 +31,8 @@ router.put('/:id', async (req, res) => {
     res.status(500).json({ message: 'שגיאה בעדכון פנייה', error: err.message });
   }
 });
+
+router.delete('/:id', deleteInquiry);
+
 
 module.exports = router;

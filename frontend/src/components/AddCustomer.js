@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-hot-toast"; // ✅ ייבוא ה-toast
-
+import { toast } from "react-hot-toast";
 
 const AddCustomerWithCar = () => {
   const navigate = useNavigate();
@@ -12,14 +11,13 @@ const AddCustomerWithCar = () => {
     phonePrefix: "050",
     phoneNumber: "",
     email: "",
-    status: "פעיל",
     vehicleNumber: "", // ✅ מספר רכב
   });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    // אימותים
+    // ✅ אימותים
     if (name === "idNumber" && !/^\d{0,9}$/.test(value)) return;
     if (name === "name" && !/^[א-תa-zA-Z\s]*$/.test(value)) return;
     if (name === "phoneNumber" && !/^\d{0,7}$/.test(value)) return;
@@ -28,15 +26,13 @@ const AddCustomerWithCar = () => {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  
-    
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (form.name.trim().length < 2) return toast.error(" שם לקוח אינו תקין");
-    if (form.idNumber.length !== 9) return toast.error(" תעודת זהות חייבת להכיל בדיוק 9 ספרות");
-    if (form.phoneNumber.length !== 7) return toast.error(" מספר טלפון חייב להכיל 7 ספרות");
-    if (form.vehicleNumber.length < 5) return toast.error(" מספר רכב חייב להכיל לפחות 5 ספרות");
+    if (form.name.trim().length < 2) return toast.error("שם לקוח אינו תקין");
+    if (form.idNumber.length !== 9) return toast.error("תעודת זהות חייבת להכיל בדיוק 9 ספרות");
+    if (form.phoneNumber.length !== 7) return toast.error("מספר טלפון חייב להכיל 7 ספרות");
+    if (form.vehicleNumber.length < 5) return toast.error("מספר רכב חייב להכיל לפחות 5 ספרות");
 
     try {
       const payload = {
@@ -44,20 +40,20 @@ const AddCustomerWithCar = () => {
         idNumber: form.idNumber,
         phone: form.phonePrefix + form.phoneNumber,
         email: form.email,
-        status: form.status,
         vehicleNumber: form.vehicleNumber,
       };
 
       await axios.post("http://localhost:5000/api/customers", payload);
 
-      toast.success(" הלקוח נשמר בהצלחה!");
-      navigate(`/complete-vehicle/${form.vehicleNumber}`);
-    } catch (error) {
-      console.error(" שגיאה:", error);
-      toast.error(" ארעה שגיאה בהוספה. ודא שכל הנתונים תקינים.");
-    }
-  };
+      toast.success("הלקוח נשמר בהצלחה!");
+        navigate(`/complete-vehicle/${form.vehicleNumber}`);
+        } catch (error) {
+          console.error("שגיאה:", error);
+          const msg = error.response?.data?.message || "ארעה שגיאה בהוספה. ודא שכל הנתונים תקינים.";
+          toast.error(msg);
+        }
 
+  };
 
   return (
     <div className="container mt-4" dir="rtl">
@@ -124,19 +120,6 @@ const AddCustomerWithCar = () => {
                 value={form.email}
                 onChange={handleChange}
               />
-            </div>
-
-            <div className="col-md-6">
-              <label className="form-label">סטטוס</label>
-              <select
-                name="status"
-                className="form-select"
-                value={form.status}
-                onChange={handleChange}
-              >
-                <option value="פעיל">פעיל</option>
-                <option value="לא פעיל">לא פעיל</option>
-              </select>
             </div>
 
             <div className="col-md-6">

@@ -171,127 +171,132 @@ const CreateAppointment = () => {
   };
 
   return (
-  <div className="container mt-5" dir="rtl">
-    <div className="card shadow p-4 position-relative">
-      <h3 className="text-center mb-4">
-        {location.state || id ? "עריכת תור" : "קביעת תור חדש"}
-      </h3>
-      <form onSubmit={handleSubmit}>
-        <div className="row g-4">
-          <div className="col-md-6">
-            <label className="form-label">תאריך</label>
-            <input type="date" name="date" className="form-control" value={form.date} onChange={handleChange} required />
+    <div className="container mt-5" dir="rtl">
+      <div className="card shadow p-4 position-relative">
+        <h3 className="text-center mb-4">
+          {location.state || id ? "עריכת תור" : "קביעת תור חדש"}
+        </h3>
+        <form onSubmit={handleSubmit}>
+          <div className="row g-4">
 
-            <label className="form-label mt-3">שעה</label>
-            <select name="time" className="form-control" value={form.time} onChange={handleChange}>
-              <option value="">בחר שעה</option>
-              {availableTimes.map((time) => (
-                <option key={time} value={time}>{time}</option>
-              ))}
-            </select>
-
-            <label className="form-label mt-3">תיאור</label>
-            <textarea name="description" className="form-control" rows="3" value={form.description} onChange={handleChange}></textarea>
-          </div>
-
-          <div className="col-md-6 position-relative">
-            <label className="form-label">שם לקוח</label>
-            <input
-              type="text"
-              name="name"
-              className="form-control"
-              value={form.name}
-              onChange={handleChange}
-              autoComplete="off"
-              required
-            />
-
-            {suggestions.length > 0 && (
-              <ul className="list-group position-absolute z-3 w-100" style={{ maxHeight: 200, overflowY: "auto" }}>
-                {suggestions.map((s) => (
-                  <li key={s._id} className="list-group-item">
-                    <div><strong>{s.name}</strong> – ת"ז: {s.idNumber}</div>
-                    <div>{s.phone}</div>
-                    <div>
-                      רכבים:
-                      {s.vehicles && s.vehicles.length > 0 ? (
-                        <ul className="list-unstyled ms-3 mt-1">
-                          {s.vehicles.map((car, idx) => (
-                            <li key={idx}>
-                              <button
-                                type="button"
-                                className="btn btn-sm btn-outline-primary me-2 my-1"
-                                onClick={() => {
-                                  setForm((prev) => ({
-                                    ...prev,
-                                    name: s.name,
-                                    idNumber: s.idNumber,
-                                    phoneNumber: s.phone?.substring(3) || "",
-                                    phonePrefix: s.phone?.substring(0, 3) || "050",
-                                    carNumber: car,
-                                  }));
-                                  setSuggestions([]);
-                                }}
-                              >
-                                {car}
-                              </button>
-                            </li>
-                          ))}
-                        </ul>
-                      ) : (
-                        <div className="text-muted">אין רכבים</div>
-                      )}
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            )}
-
-            <label className="form-label mt-3">תעודת זהות</label>
-            <input
-              type="text"
-              name="idNumber"
-              className="form-control"
-              value={form.idNumber}
-              onChange={handleChange}
-              required
-            />
-
-            <label className="form-label mt-3">טלפון</label>
-            <div className="d-flex">
-              <select name="phonePrefix" className="form-select w-auto" value={form.phonePrefix} onChange={handleChange}>
-                {["050", "052", "053", "054", "055", "056", "057", "058", "059"].map(p => (
-                  <option key={p} value={p}>{p}</option>
-                ))}
-              </select>
+            {/* 🟢 צד ימין: שם ותעודת זהות בראש */}
+            <div className="col-md-6 position-relative">
+              <label className="form-label">שם לקוח</label>
               <input
                 type="text"
-                name="phoneNumber"
-                className="form-control ms-2"
-                value={form.phoneNumber}
+                name="name"
+                className="form-control"
+                value={form.name}
+                onChange={handleChange}
+                autoComplete="off"
+                required
+              />
+
+              {suggestions.length > 0 && (
+                <ul className="list-group position-absolute z-3 w-100" style={{ maxHeight: 200, overflowY: "auto" }}>
+                  {suggestions.map((s) => (
+                    <li key={s._id} className="list-group-item">
+                      <div><strong>{s.name}</strong> – ת"ז: {s.idNumber}</div>
+                      <div>{s.phone}</div>
+                      <div>
+                        רכבים:
+                        {s.vehicles && s.vehicles.length > 0 ? (
+                          <ul className="list-unstyled ms-3 mt-1">
+                            {s.vehicles.map((car, idx) => (
+                              <li key={idx}>
+                                <button
+                                  type="button"
+                                  className="btn btn-sm btn-outline-primary me-2 my-1"
+                                  onClick={() => {
+                                    setForm((prev) => ({
+                                      ...prev,
+                                      name: s.name,
+                                      idNumber: s.idNumber,
+                                      phoneNumber: s.phone?.substring(3) || "",
+                                      phonePrefix: s.phone?.substring(0, 3) || "050",
+                                      carNumber: car,
+                                    }));
+                                    setSuggestions([]);
+                                  }}
+                                >
+                                  {car}
+                                </button>
+                              </li>
+                            ))}
+                          </ul>
+                        ) : (
+                          <div className="text-muted">אין רכבים</div>
+                        )}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+
+              {/* תעודת זהות מתחת לשם */}
+              <label className="form-label mt-3">תעודת זהות</label>
+              <input
+                type="text"
+                name="idNumber"
+                className="form-control"
+                value={form.idNumber}
                 onChange={handleChange}
                 required
-                placeholder="7 ספרות"
               />
+
+              <label className="form-label mt-3">טלפון</label>
+              <div className="d-flex">
+                <select name="phonePrefix" className="form-select w-auto" value={form.phonePrefix} onChange={handleChange}>
+                  {["050", "052", "053", "054", "055", "056", "057", "058", "059"].map(p => (
+                    <option key={p} value={p}>{p}</option>
+                  ))}
+                </select>
+                <input
+                  type="text"
+                  name="phoneNumber"
+                  className="form-control ms-2"
+                  value={form.phoneNumber}
+                  onChange={handleChange}
+                  required
+                  placeholder="7 ספרות"
+                />
+              </div>
+
+              <label className="form-label mt-3">מספר רישוי</label>
+              <input type="text" name="carNumber" className="form-control" value={form.carNumber} onChange={handleChange} required />
             </div>
 
-            <label className="form-label mt-3">מספר רישוי</label>
-            <input type="text" name="carNumber" className="form-control" value={form.carNumber} onChange={handleChange} required />
-          </div>
+            {/* 🟢 צד שמאל: תאריך, שעה ותיאור */}
+            <div className="col-md-6">
+              <label className="form-label">תאריך</label>
+              <input type="date" name="date" className="form-control" value={form.date} onChange={handleChange} required />
 
-          <div className="col-12 text-center mt-4">
-            <button type="submit" className="btn btn-success mx-2 px-4">
-              {location.state || id ? "עדכן" : "שמור "}
-            </button>
-            <button type="button" className="btn btn-secondary mx-2 px-4" onClick={() => navigate('/Dashboard')}>
-              ביטול
-            </button>
+              <label className="form-label mt-3">שעה</label>
+              <select name="time" className="form-control" value={form.time} onChange={handleChange}>
+                <option value="">בחר שעה</option>
+                {availableTimes.map((time) => (
+                  <option key={time} value={time}>{time}</option>
+                ))}
+              </select>
+
+              <label className="form-label mt-3">תיאור</label>
+              <textarea name="description" className="form-control" rows="3" value={form.description} onChange={handleChange}></textarea>
+            </div>
+
+            <div className="col-12 text-center mt-4">
+              <button type="submit" className="btn btn-success mx-2 px-4">
+                {location.state || id ? "עדכן" : "שמור "}
+              </button>
+              <button type="button" className="btn btn-secondary mx-2 px-4" onClick={() => navigate('/Dashboard')}>
+                ביטול
+              </button>
+            </div>
           </div>
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
-  </div>
-);
+  );
+
 
 
 };

@@ -39,15 +39,6 @@ const updateEmployee = async (req, res) => {
   }
 };
 
-// מחיקת עובד
-const deleteEmployee = async (req, res) => {
-  try {
-    await Employee.findByIdAndDelete(req.params.id);
-    res.json({ message: "✅ עובד נמחק בהצלחה" });
-  } catch (err) {
-    res.status(500).json({ message: "❌ שגיאה במחיקה", error: err.message });
-  }
-};
 
 // חיפוש לפי ת״ז או שם
 const searchEmployee = async (req, res) => {
@@ -65,10 +56,25 @@ const searchEmployee = async (req, res) => {
   }
 };
 
+// 📌 מחיקת עובד לפי ID
+const deleteEmployee = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deleted = await Employee.findByIdAndDelete(id);
+    if (!deleted) {
+      return res.status(404).json({ message: "❌ עובד לא נמצא למחיקה" });
+    }
+    res.status(200).json({ message: "✅ העובד נמחק בהצלחה" });
+  } catch (error) {
+    console.error("❌ שגיאה במחיקת עובד:", error.message);
+    res.status(500).json({ message: "❌ שגיאה בשרת", error: error.message });
+  }
+};
+
 module.exports = {
   getAllEmployees,
   addEmployee,
   updateEmployee,
   deleteEmployee,
-  searchEmployee
+  searchEmployee,
 };
