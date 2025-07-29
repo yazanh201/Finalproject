@@ -1,0 +1,108 @@
+.report-wrapper {
+  max-width: 850px;
+  margin: auto;
+  padding: 20px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 0 10px #ccc;
+  direction: rtl;
+  font-family: 'Heebo', sans-serif;
+  color: #333;
+}
+
+.businessHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f5f7fa;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  margin-bottom: 20px;
+  direction: ltr;
+}
+
+.logo {
+  height: 100px;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.businessHeader h3 {
+  font-size: 1.6rem;
+  color: #333;
+}
+
+.businessHeader p {
+  margin: 2px 0;
+  color: #555;
+  font-size: 0.95rem;
+}
+
+.reportTitle {
+  text-align: center;
+  font-size: 26px;
+  margin-bottom: 5px;
+  color: #2c3e50;
+}
+
+.reportDate {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 1rem;
+  color: #666;
+}
+
+.report-stats {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 20px;
+}
+
+.stat-card {
+  background: #f0f8ff;
+  padding: 12px 18px;
+  border-radius: 6px;
+  font-weight: bold;
+  border: 1px solid #ddd;
+}
+
+.report-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.report-table th,
+.report-table td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: center;
+}
+
+.report-table th {
+  background-color: #2980b9;
+  color: white;
+  font-size: 1rem;
+}
+
+.report-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.download-btn {
+  display: block;
+  margin: 20px auto;
+  padding: 10px 20px;
+  background-color: #2ecc71;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.download-btn:hover {
+  background-color: #27ae60;
+}

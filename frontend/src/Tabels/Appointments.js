@@ -57,18 +57,8 @@ const Appointments = ({ onSelectTreatment, filterAppointmentNumber }) => {
 
   const handleShowModal = (type, appointment = null) => {
     setModalType(type);
-    if (type === "add") {
-      setSelectedAppointment({
-        date: "",
-        time: "",
-        description: "",
-        idNumber: "",
-        name: "",
-        carNumber: "",
-        phoneNumber: "",
-        arrivalStatus: ""
-      });
-    } else if (type === "edit" && appointment) {
+
+    if (type === "edit" && appointment) {
       setSelectedAppointment(appointment);
       setSelectedDate(appointment.date);
       fetchAvailableTimes(appointment.date);
@@ -76,6 +66,7 @@ const Appointments = ({ onSelectTreatment, filterAppointmentNumber }) => {
       setSearchTerm("");
     }
   };
+
 
   const handleCloseModal = () => {
     setModalType(null);
@@ -96,15 +87,6 @@ const Appointments = ({ onSelectTreatment, filterAppointmentNumber }) => {
           prev.map((a) => (a._id === updated._id ? updated : a))
         );
         alert("✅ התור עודכן בהצלחה!");
-      } else {
-        const res = await fetch("http://localhost:5000/api/appointments", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(selectedAppointment),
-        });
-        const newOne = await res.json();
-        setAppointments((prev) => [newOne.appointment, ...prev]);
-        alert("✅ תור נוסף בהצלחה!");
       }
     } catch (err) {
       console.error("❌ שגיאה בשמירה:", err);
@@ -112,6 +94,7 @@ const Appointments = ({ onSelectTreatment, filterAppointmentNumber }) => {
     }
     handleCloseModal();
   };
+
 
   const handleSearchById = async () => {
     try {
@@ -168,9 +151,6 @@ const Appointments = ({ onSelectTreatment, filterAppointmentNumber }) => {
       </div>
 
       <div className="d-flex mb-3">
-        <button className="btn btn-primary me-3" onClick={() => handleShowModal("add")}>
-          הוסף תור חדש
-        </button>
         <button className="btn btn-primary me-3" onClick={() => handleShowModal("searchID")}>
           חיפוש לפי ת"ז או מספר רישוי
         </button>
@@ -231,11 +211,10 @@ const Appointments = ({ onSelectTreatment, filterAppointmentNumber }) => {
           </tbody>
         </table>
         </div>
-      
 
-      {(modalType === "add" || modalType === "edit") && (
+      {modalType === "edit" && (
         <Modal isOpen={true} onClose={handleCloseModal} onSave={handleSave}>
-          <h3>{modalType === "edit" ? "עריכת תור" : "הוספת תור חדש"}</h3>
+          <h3>עריכת תור</h3>
           <form>
             {["date", "time", "description", "idNumber", "name", "carNumber", "phoneNumber"].map((field) => (
               <div className="form-group mb-3" key={field}>
@@ -269,10 +248,16 @@ const Appointments = ({ onSelectTreatment, filterAppointmentNumber }) => {
             className="form-control"
             placeholder="חיפוש לפי ת'ז או מספר רכב"
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => {
+              const value = e.target.value.replace(/\D/g, ""); // ✅ מסנן כל מה שהוא לא מספר
+              setSearchTerm(value);
+            }}
+            inputMode="numeric"
+            pattern="[0-9]*"
           />
         </Modal>
       )}
+
 
       {modalType === "searchDate" && (
         <Modal isOpen={true} onClose={handleCloseModal} onSave={handleSearchByDate}>

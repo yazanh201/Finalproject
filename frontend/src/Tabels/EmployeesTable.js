@@ -160,27 +160,89 @@ const Employees = () => {
       <Modal isOpen={true} onClose={handleCloseModal} onSave={handleSave}>
         <h3>{modalType === "edit" ? "עריכת עובד" : "הוספת עובד חדש"}</h3>
         <form>
-          {[
-            { label: "תעודת זהות", key: "idNumber" },
-            { label: "שם מלא", key: "fullName" },
-            { label: "תפקיד", key: "role" },
-            { label: "אימייל", key: "email", type: "email" },
-            { label: "טלפון", key: "phone" },
-          ].map(({ label, key, type = "text" }) => (
-            <div className="form-group mb-3" key={key}>
-              <label>{label}</label>
-              <input
-                type={type}
-                className="form-control"
-                value={selectedEmployee[key] || ""}
-                onChange={(e) =>
-                  setSelectedEmployee({ ...selectedEmployee, [key]: e.target.value })
-                }
-                required
-              />
-            </div>
-          ))}
+          {/* תעודת זהות */}
+          <div className="form-group mb-3">
+            <label>תעודת זהות</label>
+            <input
+              type="text"
+              className="form-control"
+              value={selectedEmployee.idNumber || ""}
+              onChange={(e) => {
+                const value = e.target.value.replace(/\D/g, ""); // ✅ רק מספרים
+                setSelectedEmployee({ ...selectedEmployee, idNumber: value });
+              }}
+              maxLength={9}
+              minLength={9}
+              inputMode="numeric"
+              pattern="[0-9]*"
+              required
+            />
+          </div>
 
+          {/* שם מלא */}
+          <div className="form-group mb-3">
+            <label>שם מלא</label>
+            <input
+              type="text"
+              className="form-control"
+              value={selectedEmployee.fullName || ""}
+              onChange={(e) => {
+                const value = e.target.value.replace(/[^א-תa-zA-Z\s]/g, ""); // ✅ רק אותיות ורווחים
+                setSelectedEmployee({ ...selectedEmployee, fullName: value });
+              }}
+              required
+            />
+          </div>
+
+          {/* תפקיד */}
+          <div className="form-group mb-3">
+            <label>תפקיד</label>
+            <input
+              type="text"
+              className="form-control"
+              value={selectedEmployee.role || ""}
+              onChange={(e) => {
+                const value = e.target.value.replace(/[^א-תa-zA-Z\s]/g, ""); // ✅ רק טקסט
+                setSelectedEmployee({ ...selectedEmployee, role: value });
+              }}
+              required
+            />
+          </div>
+
+          {/* אימייל */}
+          <div className="form-group mb-3">
+            <label>אימייל</label>
+            <input
+              type="email"
+              className="form-control"
+              value={selectedEmployee.email || ""}
+              onChange={(e) =>
+                setSelectedEmployee({ ...selectedEmployee, email: e.target.value })
+              }
+              required
+            />
+          </div>
+
+          {/* טלפון */}
+          <div className="form-group mb-3">
+            <label>טלפון</label>
+            <input
+              type="text"
+              className="form-control"
+              value={selectedEmployee.phone || ""}
+              onChange={(e) => {
+                const value = e.target.value.replace(/\D/g, ""); // ✅ רק מספרים
+                setSelectedEmployee({ ...selectedEmployee, phone: value });
+              }}
+              maxLength={10}
+              minLength={9}
+              inputMode="numeric"
+              pattern="[0-9]*"
+              required
+            />
+          </div>
+
+          {/* סטטוס */}
           <div className="form-group mb-3">
             <label>סטטוס</label>
             <select
@@ -197,6 +259,7 @@ const Employees = () => {
         </form>
       </Modal>
     )}
+
   </div>
 );
 };

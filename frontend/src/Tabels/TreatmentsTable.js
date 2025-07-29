@@ -3,6 +3,8 @@ import Modal from "./Modal";
 import { useNavigate } from "react-router-dom";
 import "../Pages/cssfiles/TablesResponsive.css";
 import DynamicTable from "./DynamicTable";
+import { FaEye, FaFileInvoice } from "react-icons/fa";
+
 
 const TreatmentsTable = ({
   filterAppointment,
@@ -45,20 +47,11 @@ const TreatmentsTable = ({
   const handleShowModal = (type, treatment = null) => {
     setModalType(type);
     setSearchTerm("");
-    if (type === "add") {
-      setSelectedTreatment({
-        date: "",
-        cost: "",
-        workerId: "",
-        typeId: "",
-        carPlate: "",
-        appointmentNumber: "",
-        invoiceId: ""
-      });
-    } else if (type === "edit" && treatment) {
+    if (type === "edit" && treatment) {
       setSelectedTreatment(treatment);
     }
   };
+
 
   const handleCloseModal = () => {
     setModalType(null);
@@ -153,9 +146,6 @@ const TreatmentsTable = ({
         <button className="btn btn-primary" onClick={() => handleShowModal("searchCar")}>
           חיפוש לפי מספר רכב
         </button>
-        <button className="btn btn-primary" onClick={() => handleShowModal("add")}>
-          הוספת טיפול
-        </button>
       </div>
 
      <div className="responsiveTableContainer">
@@ -197,13 +187,14 @@ const TreatmentsTable = ({
                 </td>
                 <td>{treatment.carPlate}</td>
                 <td>{treatment.customerName || "—"}</td>
+                
                 <td>
                   <button
                     className="btn btn-outline-secondary btn-sm"
                     onClick={() => navigate(`/treatment/${treatment._id}`)}
                     title="צפייה בפרטי הטיפול"
                   >
-                    👁️
+                    <FaEye size={18} /> {/* אייקון עין איכותי */}
                   </button>
                 </td>
                 <td>
@@ -212,10 +203,10 @@ const TreatmentsTable = ({
                     onClick={() => navigate(`/invoice/${treatment._id}`)}
                     title="צפייה בחשבונית"
                   >
-                    🧾 חשבונית
+                    <FaFileInvoice size={18} /> חשבונית {/* אייקון חשבונית מקצועי */}
                   </button>
                 </td>
-                                <td>
+                <td>
                   <button
                     className="btn btn-outline-secondary btn-sm"
                     onClick={() =>
@@ -256,7 +247,7 @@ const TreatmentsTable = ({
         </table>
       </div>
 
-      {(modalType === "add" || modalType === "edit") && (
+      {modalType === "edit" && (
         <Modal isOpen={true} onClose={handleCloseModal} onSave={handleSave}>
           <h3>{modalType === "edit" ? "עריכת טיפול" : "הוספת טיפול חדש"}</h3>
           <form>
@@ -306,10 +297,16 @@ const TreatmentsTable = ({
             className="form-control"
             placeholder="הזן מספר רכב"
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            inputMode="numeric"
+            onChange={(e) => {
+              // ✅ מסנן כך שיישארו רק ספרות
+              const onlyNumbers = e.target.value.replace(/[^0-9]/g, "");
+              setSearchTerm(onlyNumbers);
+            }}
           />
         </Modal>
       )}
+
     </div>
   );
 };

@@ -52,6 +52,8 @@ const CreateTreatment = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const state = location.state || {};
+  const [employees, setEmployees] = useState([]); // ✅ שמירת רשימת עובדים
+
 
   const initialStatus = allowedStatuses.includes(state.status) ? state.status : 'בטיפול';
 
@@ -74,6 +76,7 @@ const CreateTreatment = () => {
   const [selectedCategories, setSelectedCategories] = useState([]);
 
   useEffect(() => {
+    // ✅ טעינת קטגוריות קיימות
     if (state.treatmentServices) {
       try {
         const parsed = typeof state.treatmentServices === 'string'
@@ -84,7 +87,15 @@ const CreateTreatment = () => {
         console.error("שגיאה בטעינת קטגוריות קיימות", err);
       }
     }
+
+    // ✅ טעינת רשימת עובדים מהשרת
+    fetch("http://localhost:5000/api/employees")
+      .then(res => res.json())
+      .then(data => setEmployees(data))
+      .catch(err => console.error("❌ שגיאה בשליפת עובדים:", err));
+
   }, [state.treatmentServices]);
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -204,16 +215,44 @@ const handleSubmit = async (e) => {
 
             <div className="col-md-6">
               <label className="form-label">עלות</label>
-              <input type="number" name="cost" className="form-control" value={form.cost} onChange={handleChange} />
+              <input
+                type="number"
+                name="cost"
+                className="form-control"
+                value={form.cost}
+                onChange={handleChange}
+              />
+
               <label className="form-label mt-3">שם עובד</label>
-              <input type="text" name="workerName" className="form-control" value={form.workerName} onChange={handleChange} required />
+              <select
+                name="workerName"
+                className="form-select"
+                value={form.workerName}
+                onChange={handleChange}
+                required
+              >
+                <option value="">בחר עובד</option>
+                {employees.map(emp => (
+                  <option key={emp._id} value={emp.fullName}>
+                    {emp.fullName}
+                  </option>
+                ))}
+              </select>
+
               <label className="form-label mt-3">סטטוס</label>
-              <select name="status" className="form-control" value={form.status} onChange={handleChange} required>
+              <select
+                name="status"
+                className="form-control"
+                value={form.status}
+                onChange={handleChange}
+                required
+              >
                 {allowedStatuses.map(status => (
                   <option key={status} value={status}>{status}</option>
                 ))}
               </select>
             </div>
+
 
             <div className="col-md-6">
               <label className="form-label mt-3">בחר קטגוריה</label>

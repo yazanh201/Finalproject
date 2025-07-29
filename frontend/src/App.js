@@ -14,6 +14,8 @@ import NewAppointmentForm from './components/AppointmentsForm';
 import InvoicePage from './components/InvoicePage';
 import AddCustomerWithVehicle from './components/AddCustomerWithVehicle';
 import AddVehicle from './components/AddVehicle';
+import MonthlyReport from './components/MonthlyReportComponent';
+
 
 function App() {
   return (
@@ -26,6 +28,7 @@ function App() {
         <Route path="/login" element={<Login />} />
 
         {/* 🛠️ שאר הדפים נשארים כפי שהם */}
+        <Route path="/monthlyreport" element={<MonthlyReport />} />
         <Route path="/AppointmentForm" element={<NewAppointmentForm />} />
         <Route path="/appointments/edit/:id" element={<NewAppointmentForm />} />
         <Route path="/treatment/:id" element={<TreatmentDetails />} />

@@ -32,15 +32,6 @@ const Inquiries = () => {
   const handleShowModal = (type, inquiry = null) => {
     setModalType(type);
     setSelectedInquiry(inquiry);
-    if (type === "add") {
-      setNewInquiry({
-        name: "",
-        email: "",
-        phone: "",
-        message: "",
-        status: "פתוחה",
-      });
-    }
   };
 
   const handleCloseModal = () => {
@@ -49,47 +40,29 @@ const Inquiries = () => {
   };
 
   const handleSave = async () => {
-    if (modalType === "add") {
-      try {
-        const response = await fetch("http://localhost:5000/api/inquiries", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(newInquiry),
-        });
-        const saved = await response.json();
-        if (response.ok) {
-          setInquiries((prev) => [saved.inquiry, ...prev]);
-          alert("✅ פנייה נשמרה בהצלחה!");
-        } else {
-          alert("❌ שגיאה בהוספת הפנייה");
-        }
-      } catch (err) {
-        console.error("❌ שגיאה:", err);
-        alert("❌ שגיאה בחיבור לשרת");
+  if (modalType === "edit") {
+    try {
+      const response = await fetch(`http://localhost:5000/api/inquiries/${selectedInquiry._id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(selectedInquiry),
+      });
+      const updated = await response.json();
+      if (response.ok) {
+        setInquiries((prev) =>
+          prev.map((inq) => (inq._id === updated._id ? updated : inq))
+        );
+        alert("✅ הפנייה עודכנה בהצלחה!");
+      } else {
+        alert("❌ שגיאה בעדכון הפנייה");
       }
-    } else if (modalType === "edit") {
-      try {
-        const response = await fetch(`http://localhost:5000/api/inquiries/${selectedInquiry._id}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(selectedInquiry),
-        });
-        const updated = await response.json();
-        if (response.ok) {
-          setInquiries((prev) =>
-            prev.map((inq) => (inq._id === updated._id ? updated : inq))
-          );
-          alert("✅ הפנייה עודכנה בהצלחה!");
-        } else {
-          alert("❌ שגיאה בעדכון הפנייה");
-        }
-      } catch (err) {
-        console.error("❌ שגיאה:", err);
-        alert("❌ שגיאה בעדכון");
-      }
+    } catch (err) {
+      console.error("❌ שגיאה:", err);
+      alert("❌ שגיאה בעדכון");
     }
-    handleCloseModal();
-  };
+  }
+  handleCloseModal();
+};
 
   const filteredInquiries = inquiries.filter((inquiry) => {
     const matchSearch =
@@ -134,9 +107,6 @@ const Inquiries = () => {
       </div>
 
       <div className="d-flex mb-3">
-        <button className="btn btn-primary me-3" onClick={() => handleShowModal("add")}>
-          הוספת פנייה
-        </button>
         <button className="btn btn-primary me-3" onClick={() => handleShowModal("search")}>
           חיפוש לפי מספר טלפון או שם
         </button>
@@ -200,22 +170,6 @@ const Inquiries = () => {
       </div>
 
       {/* === מודלים === */}
-      {modalType === "add" && (
-        <Modal isOpen={true} onClose={handleCloseModal} onSave={handleSave}>
-          <h3>הוספת פנייה</h3>
-          <form>
-            <input type="text" className="form-control mb-2" placeholder="שם" value={newInquiry.name} onChange={(e) => setNewInquiry({ ...newInquiry, name: e.target.value })} required />
-            <input type="email" className="form-control mb-2" placeholder="אימייל" value={newInquiry.email} onChange={(e) => setNewInquiry({ ...newInquiry, email: e.target.value })} required />
-            <input type="text" className="form-control mb-2" placeholder="טלפון" value={newInquiry.phone} onChange={(e) => setNewInquiry({ ...newInquiry, phone: e.target.value })} required />
-            <textarea className="form-control mb-2" placeholder="הודעה" value={newInquiry.message} onChange={(e) => setNewInquiry({ ...newInquiry, message: e.target.value })} required />
-            <select className="form-control mb-2" value={newInquiry.status} onChange={(e) => setNewInquiry({ ...newInquiry, status: e.target.value })}>
-              <option value="פתוחה">פתוחה</option>
-              <option value="סגורה">סגורה</option>
-            </select>
-          </form>
-        </Modal>
-      )}
-
       {modalType === "edit" && selectedInquiry && (
         <Modal isOpen={true} onClose={handleCloseModal} onSave={handleSave}>
           <h3>עריכת פנייה</h3>

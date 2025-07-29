@@ -57,49 +57,55 @@ const Dashboard = () => {
   const renderContent = () => {
     switch (activeView) {
       case "cars":
-        return <CarsTable />;
+        return <div className={styles.card}><CarsTable /></div>;
       case "Customers":
-        return <Customers />;
+        return <div className={styles.card}><Customers /></div>;
       case "Inquiries":
-        return <Inquiries />;
+        return <div className={styles.card}><Inquiries /></div>;
       case "Treatments":
         return (
-          <TreatmentsTable
-            filterAppointment={selectedAppointmentNumber}
-            filterTreatmentNumber={selectedTreatmentNumber}
-            onNavigateToRepair={goToRepairType}
-            onNavigateToAppointment={goToAppointment}
-          />
+          <div className={styles.card}>
+            <TreatmentsTable
+              filterAppointment={selectedAppointmentNumber}
+              filterTreatmentNumber={selectedTreatmentNumber}
+              onNavigateToRepair={goToRepairType}
+              onNavigateToAppointment={goToAppointment}
+            />
+          </div>
         );
       case "Repairtypes":
         return (
-          <Repairtypes
-            filterRepairId={selectedRepairId}
-            onNavigateToTreatment={goToTreatment}
-          />
+          <div className={styles.card}>
+            <Repairtypes
+              filterRepairId={selectedRepairId}
+              onNavigateToTreatment={goToTreatment}
+            />
+          </div>
         );
       case "Appointments":
         return (
-          <Appointment
-            onSelectTreatment={(number) => {
-              setSelectedAppointmentNumber(number);
-              setActiveView("Treatments");
-            }}
-            filterAppointmentNumber={selectedAppointmentNumber}
-          />
+          <div className={styles.card}>
+            <Appointment
+              onSelectTreatment={(number) => {
+                setSelectedAppointmentNumber(number);
+                setActiveView("Treatments");
+              }}
+              filterAppointmentNumber={selectedAppointmentNumber}
+            />
+          </div>
         );
       case "Employees":
-        return <Employees />;
+        return <div className={styles.card}><Employees /></div>;
       case "CarsUnderMaintance":
-        return <CarsUnderMaintance />;
+        return <div className={styles.card}><CarsUnderMaintance /></div>;
       case "CarOrders":
-        return <CarOrders />;
+        return <div className={styles.card}><CarOrders /></div>;
       default:
         return (
-          <>
+          <div className={styles.card}>
             <h3>ברוך הבא ללוח הבקרה</h3>
             <p>כאן תוכל לנהל את נתוני המוסך בהתאם להרשאות שלך.</p>
-          </>
+          </div>
         );
     }
   };
@@ -132,10 +138,21 @@ const Dashboard = () => {
     setActiveView("Appointments");
   };
 
+  // Sidebar mobile overlay
+  const handleSidebarOverlayClick = () => {
+    setIsMenuOpen(false);
+  };
+
   return (
     <div className={styles.dashboardContainer}>
       <header className={styles.header}>
-        <button className={styles["navbar-toggler"]} onClick={() => setIsMenuOpen(!isMenuOpen)}>☰</button>
+        <button
+          className={styles["navbar-toggler"]}
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+          aria-label="פתח תפריט"
+        >
+          <span className={styles.hamburgerIcon}></span>
+        </button>
 
         <div className={styles.dashboardTitle}>
           <h4>Dashboard</h4>
@@ -171,20 +188,24 @@ const Dashboard = () => {
       </header>
 
       <div className={styles.mainWrapper}>
-        <nav className={styles.sidebar}>
+        {/* Sidebar overlay for mobile */}
+        {isMenuOpen && (
+          <div className={styles.sidebarOverlay} onClick={handleSidebarOverlayClick}></div>
+        )}
+        <nav className={`${styles.sidebar} ${isMenuOpen ? styles.sidebarOpen : ""}`}>
           <ul className={styles.navList}>
             {role === "admin" && (
               <>
-                <li className={styles.navItem}><button className={styles.sidebarBtn} onClick={() => setActiveView("Customers")}>לקוחות</button></li>
-                <li className={styles.navItem}><button className={styles.sidebarBtn} onClick={() => setActiveView("cars")}>רכבים</button></li>
-                <li className={styles.navItem}><button className={styles.sidebarBtn} onClick={() => setActiveView("Inquiries")}>פניות</button></li>
-                <li className={styles.navItem}><button className={styles.sidebarBtn} onClick={() => setActiveView("CarOrders")}>הזמנות לרכבים</button></li>
-                <li className={styles.navItem}><button className={styles.sidebarBtn} onClick={() => setActiveView("Appointments")}>תורים</button></li>
-                <li className={styles.navItem}><button className={styles.sidebarBtn} onClick={() => setActiveView("Employees")}>עובדים</button></li>
+                <li className={styles.navItem}><button className={styles.sidebarBtn} onClick={() => { setActiveView("Customers"); setIsMenuOpen(false); }}>לקוחות</button></li>
+                <li className={styles.navItem}><button className={styles.sidebarBtn} onClick={() => { setActiveView("cars"); setIsMenuOpen(false); }}>רכבים</button></li>
+                <li className={styles.navItem}><button className={styles.sidebarBtn} onClick={() => { setActiveView("Inquiries"); setIsMenuOpen(false); }}>פניות</button></li>
+                <li className={styles.navItem}><button className={styles.sidebarBtn} onClick={() => { setActiveView("CarOrders"); setIsMenuOpen(false); }}>הזמנות לרכבים</button></li>
+                <li className={styles.navItem}><button className={styles.sidebarBtn} onClick={() => { setActiveView("Appointments"); setIsMenuOpen(false); }}>תורים</button></li>
+                <li className={styles.navItem}><button className={styles.sidebarBtn} onClick={() => { setActiveView("Employees"); setIsMenuOpen(false); }}>עובדים</button></li>
               </>
             )}
-            <li className={styles.navItem}><button className={styles.sidebarBtn} onClick={() => setActiveView("Treatments")}>טיפולים</button></li>
-            <li className={styles.navItem}><button className={styles.sidebarBtn} onClick={() => setActiveView("CarsUnderMaintance")}>רכבים בטיפול</button></li>
+            <li className={styles.navItem}><button className={styles.sidebarBtn} onClick={() => { setActiveView("Treatments"); setIsMenuOpen(false); }}>טיפולים</button></li>
+            <li className={styles.navItem}><button className={styles.sidebarBtn} onClick={() => { setActiveView("CarsUnderMaintance"); setIsMenuOpen(false); }}>רכבים בטיפול</button></li>
           </ul>
         </nav>
 

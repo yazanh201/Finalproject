@@ -16,7 +16,7 @@ import useNotifications from "./useNotifications";
 import CarsUnderService from "../tabels/CarsUnderService"; // ודא נתיב נכון
 import RecommendedCars from "../tabels/RecommendedCars";
 import MonthlyRevenueTable from "../tabels/MonthlyRevenueTable";
-
+import MonthlyReportComponent from "../../components/MonthlyReportComponent";
 const AdvancedDashboard = () => {
   const navigate = useNavigate();
   const tableRef = useRef(null);
@@ -167,51 +167,52 @@ const handleNotificationClick = (type, data) => {
     return (
       <div className={styles.dashboardContainer}>
         <header className={styles.dashboardHeader}>
-          <h2 className={styles.headerTitle}>לוח ניהול מתקדם</h2>
-          <button className={styles.backBtn} onClick={() => navigate("/dashboard")}>
+          <h2 className={styles.headerTitle}>
+            <span role="img" aria-label="dashboard"></span> לוח ניהול מתקדם
+          </h2>
+          <button className={styles.backBtn} onClick={() => navigate("/dashboard")}> 
             <FaArrowLeft className={styles.icon} /> חזור לדשבורד
           </button>
         </header>
 
         <aside className={styles.sidebar}>
-  <ul className={styles.navList}>
-    <li className={styles.navItem}>
-      <button className={styles.sidebarBtn} onClick={() => setIsModalOpen(true)}>
-         שליחת הודעות
-      </button>
-    </li>
-    <li className={styles.navItem}>
-      <button className={styles.sidebarBtn} onClick={() => showTable("recommendedCars")}>
-         רכבים מומלצים
-      </button>
-    </li>
-    <li className={styles.navItem}>
-      <button className={styles.sidebarBtn}>
-        הורדת דוח חודשי
-      </button>
-    </li>
-    <li className={styles.navItem}>
-      <button className={styles.sidebarBtn} onClick={() => showTable("todayAppointments")}>
-         תורים להיום
-      </button>
-    </li>
-  </ul>
-</aside>
+          <ul className={styles.navList}>
+            <li className={styles.navItem}>
+              <button className={styles.sidebarBtn} onClick={() => setIsModalOpen(true)}>
+                <span role="img" aria-label="send"></span> שליחת הודעות
+              </button>
+            </li>
+            <li className={styles.navItem}>
+              <button className={styles.sidebarBtn} onClick={() => showTable("recommendedCars")}> 
+                <span role="img" aria-label="car"></span> רכבים מומלצים
+              </button>
+            </li>
+            <li className={styles.navItem}>
+              <button
+                className={styles.sidebarBtn}
+                onClick={() => navigate("/monthlyreport")}
+              >
+                דוח חודשי
+              </button>
+            </li>
 
-
+            <li className={styles.navItem}>
+              <button className={styles.sidebarBtn} onClick={() => showTable("todayAppointments")}> 
+                <span role="img" aria-label="calendar"></span> תורים להיום
+              </button>
+            </li>
+          </ul>
+        </aside>
 
         <main className={styles.mainContent}>
           <div className={styles.chartsContainer}>
-  <div className={styles.chartBox}>
-    <TreatmentTypePieChart />
-  </div>
-  <div className={styles.chartBox}>
-    <RevenueByRepairTypeChart />
-  </div>
-</div>
-
-
-
+            <div className={styles.chartBox}>
+              <TreatmentTypePieChart />
+            </div>
+            <div className={styles.chartBox}>
+              <RevenueByRepairTypeChart />
+            </div>
+          </div>
 
           <DashboardOverview
             stats={stats}
@@ -250,10 +251,6 @@ const handleNotificationClick = (type, data) => {
               />
             )}
           </div>
-
-
-
-
         </main>
         <MessageModal
           isOpen={isModalOpen}

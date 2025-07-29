@@ -301,10 +301,17 @@ const handleDelete = async (id) => {
           <h3>חיפוש רכב</h3>
           <div className="form-group mb-3">
             <label>מספר רכב או תעודת זהות</label>
-            <input type="text" className="form-control" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} required />
+            <input
+              type="text"
+              className="form-control"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value.replace(/\D/g, ""))} // ✅ מאפשר רק מספרים
+              required
+            />
           </div>
         </Modal>
       )}
+
     </div>
   );
 };

@@ -119,31 +119,105 @@ const CarOrders = () => {
         <Modal isOpen={true} onClose={handleCloseModal} onSave={handleSave}>
           <h3>{modalType === "edit" ? "עריכת הזמנה" : "הוספת הזמנה חדשה"}</h3>
           <form>
+            {/* מספר רכב - רק ספרות, עד 9 */}
             <div className="form-group mb-3">
               <label>מספר רכב</label>
-              <input type="text" className="form-control" value={selectedOrder?.carNumber || ""} onChange={(e) => setSelectedOrder({ ...selectedOrder, carNumber: e.target.value })} required />
+              <input
+                type="text"
+                className="form-control"
+                value={selectedOrder?.carNumber || ""}
+                onChange={(e) =>
+                  setSelectedOrder({
+                    ...selectedOrder,
+                    carNumber: e.target.value.replace(/\D/g, "") // ✅ רק ספרות
+                  })
+                }
+                maxLength={9}
+                required
+              />
             </div>
+
+            {/* תאריך הזמנה */}
             <div className="form-group mb-3">
               <label>תאריך הזמנה</label>
-              <input type="date" className="form-control" value={selectedOrder?.orderDate || ""} onChange={(e) => setSelectedOrder({ ...selectedOrder, orderDate: e.target.value })} required />
+              <input
+                type="date"
+                className="form-control"
+                value={selectedOrder?.orderDate || ""}
+                onChange={(e) =>
+                  setSelectedOrder({ ...selectedOrder, orderDate: e.target.value })
+                }
+                required
+              />
             </div>
+
+            {/* תאריך אספקה */}
             <div className="form-group mb-3">
               <label>תאריך אספקה</label>
-              <input type="date" className="form-control" value={selectedOrder?.deliveryDate || ""} onChange={(e) => setSelectedOrder({ ...selectedOrder, deliveryDate: e.target.value })} required />
+              <input
+                type="date"
+                className="form-control"
+                value={selectedOrder?.deliveryDate || ""}
+                onChange={(e) =>
+                  setSelectedOrder({ ...selectedOrder, deliveryDate: e.target.value })
+                }
+                required
+              />
             </div>
+
+            {/* פרטי הזמנה - טקסט עד 200 תווים */}
             <div className="form-group mb-3">
               <label>פרטי הזמנה</label>
-              <textarea className="form-control" value={selectedOrder?.details || ""} onChange={(e) => setSelectedOrder({ ...selectedOrder, details: e.target.value })} required />
+              <textarea
+                className="form-control"
+                value={selectedOrder?.details || ""}
+                onChange={(e) =>
+                  setSelectedOrder({
+                    ...selectedOrder,
+                    details: e.target.value.slice(0, 200) // ✅ מגבלת אורך
+                  })
+                }
+                required
+              />
+              <small className="text-muted">
+                {selectedOrder?.details?.length || 0}/200 תווים
+              </small>
             </div>
+
+            {/* עלות - רק מספרים חיוביים */}
             <div className="form-group mb-3">
               <label>עלות (ש"ח)</label>
-              <input type="number" className="form-control" value={selectedOrder?.cost || ""} onChange={(e) => setSelectedOrder({ ...selectedOrder, cost: e.target.value })} required />
+              <input
+                type="number"
+                className="form-control"
+                min="0"
+                step="0.01"
+                value={selectedOrder?.cost || ""}
+                onChange={(e) =>
+                  setSelectedOrder({
+                    ...selectedOrder,
+                    cost: e.target.value.replace(/[^0-9.]/g, "") // ✅ רק מספרים ונקודה
+                  })
+                }
+                required
+              />
             </div>
+
+            {/* סטטוס הזמנה */}
             <div className="form-group mb-3">
               <label>סטטוס הזמנה</label>
-              <select className="form-control" value={selectedOrder?.status || ""} onChange={(e) => setSelectedOrder({ ...selectedOrder, status: e.target.value })} required>
+              <select
+                className="form-control"
+                value={selectedOrder?.status || ""}
+                onChange={(e) =>
+                  setSelectedOrder({ ...selectedOrder, status: e.target.value })
+                }
+                required
+              >
                 {["התקבלה", "בטיפול", "הושלמה", "בוטלה"].map((status, index) => (
-                  <option key={index} value={status}>{status}</option>
+                  <option key={index} value={status}>
+                    {status}
+                  </option>
                 ))}
               </select>
             </div>
@@ -151,15 +225,24 @@ const CarOrders = () => {
         </Modal>
       )}
 
+
       {modalType === "search" && (
         <Modal isOpen={true} onClose={handleCloseModal}>
           <h3>חיפוש לפי מספר רכב</h3>
           <div className="form-group mb-3">
             <label>מספר רכב</label>
-            <input type="text" className="form-control" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} placeholder="הכנס מספר רכב לחיפוש" />
+            <input
+              type="text"
+              className="form-control"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value.replace(/\D/g, ""))} // ✅ מאפשר רק מספרים
+              placeholder="הכנס מספר רכב לחיפוש"
+              maxLength={9} // ✅ אופציונלי - מגביל לאורך מקסימלי של 9 ספרות
+            />
           </div>
         </Modal>
       )}
+
     </div>
   );
 };

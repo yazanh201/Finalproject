@@ -374,6 +374,42 @@ const deleteTreatment = async (req, res) => {
 
 
 
+const getMonthlyReportData = async (req, res) => {
+  try {
+    const treatments = await Treatment.find().sort({ createdAt: -1 });
+
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+
+    // ✅ סינון טיפולי החודש לפי תאריך
+    const monthlyTreatments = treatments.filter(t => {
+      const tDate = new Date(t.date);
+      return tDate >= startOfMonth && tDate <= endOfMonth;
+    });
+
+    const totalRevenue = monthlyTreatments.reduce((sum, t) => sum + (Number(t.cost) || 0), 0);
+    const totalTreatments = monthlyTreatments.length;
+
+    const newCustomers = await Client.find({
+      createdAt: { $gte: startOfMonth, $lte: endOfMonth }
+    }).countDocuments();
+
+    res.json({
+      treatments: monthlyTreatments,
+      totalRevenue,
+      totalTreatments,
+      newCustomers
+    });
+  } catch (error) {
+    console.error("❌ שגיאה בדוח החודשי:", error);
+    res.status(500).json({ message: "שגיאה בשליפת הדוח החודשי" });
+  }
+};
+
+
+
+
 
 module.exports = {
   getAllTreatments,
@@ -389,5 +425,6 @@ module.exports = {
   getRevenueByCategory,
   updateTreatmentCostFromInvoice,
   getMonthlyRevenue,
-  deleteTreatment
+  deleteTreatment,
+  getMonthlyReportData
 };

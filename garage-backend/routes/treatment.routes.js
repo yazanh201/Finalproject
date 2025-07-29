@@ -17,7 +17,8 @@ const {
   getSimpleTreatment,
   updateTreatmentCostFromInvoice, // ✅ נוספה כאן
   getMonthlyRevenue,
-  deleteTreatment
+  deleteTreatment,
+  getMonthlyReportData
 } = controller;
 
 // 📥 שליפות לפי קריטריונים
@@ -30,6 +31,8 @@ router.get('/by-car/:carPlate', getTreatmentsByCarPlate);
 router.get('/summary/revenue-by-category', getRevenueByCategory);
 router.get('/revenue/month', getMonthlyRevenue);
 router.delete("/:id", deleteTreatment);
+router.get("/reports/monthly", getMonthlyReportData);
+
 
 
 
