@@ -47,16 +47,20 @@ const useNotifications = () => {
     try {
       const res = await fetch("http://localhost:5000/api/treatments");
       const data = await res.json();
+
       const today = new Date().toISOString().slice(0, 10);
-      const completedToday = data.filter(t =>
+      const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+
+      const completedRecent = data.filter(t =>
         t.status === "הסתיים" &&
-        new Date(t.updatedAt).toISOString().slice(0, 10) === today
+        (new Date(t.updatedAt).toISOString().slice(0, 10) === today ||
+        new Date(t.updatedAt).toISOString().slice(0, 10) === yesterday)
       );
 
       const saved = JSON.parse(localStorage.getItem("activeNotifications")) || [];
 
-      if (completedToday.length > 0) {
-        const treatmentDetails = completedToday.map(t => ({
+      if (completedRecent.length > 0) {
+        const treatmentDetails = completedRecent.map(t => ({
           מזהה: t.treatmentNumber,
           רכב: t.carPlate,
           לקוח: t.customerName
@@ -65,7 +69,7 @@ const useNotifications = () => {
         const exists = saved.some(n => n.type === "completedTreatments");
         if (!exists) {
           const newNotification = {
-            message: `✅ ${completedToday.length} טיפולים הסתיימו היום`,
+            message: `✅ ${completedRecent.length} טיפולים הסתיימו ב־24 שעות האחרונות`,
             type: "completedTreatments",
             data: { details: treatmentDetails },
             timestamp: Date.now()
@@ -84,6 +88,8 @@ const useNotifications = () => {
       console.error("❌ שגיאה בבדיקת טיפולים שהסתיימו:", error);
     }
   };
+  
+
 
   return { activeNotifications, addNotification, removeNotification, fetchCompletedTreatments };
 };

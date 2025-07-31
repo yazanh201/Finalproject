@@ -7,7 +7,7 @@ const CarsInService = () => {
   const [treatments, setTreatments] = useState([]);
   const [selectedTreatment, setSelectedTreatment] = useState(null);
 
-  // שליפת טיפולים
+  // ✅ שליפת טיפולים
   useEffect(() => {
     fetch("http://localhost:5000/api/treatments")
       .then(res => res.json())
@@ -18,11 +18,13 @@ const CarsInService = () => {
       .catch(err => console.error("❌ שגיאה בשליפת טיפולים:", err));
   }, []);
 
-  const handleShowModal = (type, treatment = null) => {
-    if (type === "edit" && treatment) {
-      setModalType("edit");
-      setSelectedTreatment(treatment);
-    }
+  const handleShowModal = (treatment) => {
+    setModalType("edit");
+    setSelectedTreatment({
+      ...treatment,
+      delayReason: treatment.delayReason || "",
+      estimatedReleaseDate: treatment.estimatedReleaseDate || ""
+    });
   };
 
   const handleCloseModal = () => {
@@ -30,22 +32,27 @@ const CarsInService = () => {
     setSelectedTreatment(null);
   };
 
-  const handleSave = () => {
-    alert("הרכב עודכן בהצלחה!");
-    handleCloseModal();
-  };
-
-  const handleDelete = async (id) => {
-    if (!window.confirm("האם אתה בטוח שברצונך למחוק את הרכב הזה מהרשימה?")) return;
+  const handleSave = async () => {
     try {
-      await fetch(`http://localhost:5000/api/treatments/${id}`, {
-        method: "DELETE",
+      const res = await fetch(`http://localhost:5000/api/treatments/${selectedTreatment._id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          delayReason: selectedTreatment.delayReason,
+          estimatedReleaseDate: selectedTreatment.estimatedReleaseDate
+        })
       });
-      setTreatments(prev => prev.filter(t => t._id !== id));
-      alert("✅ הרכב הוסר מרשימת הטיפולים בהצלחה!");
+
+      if (!res.ok) throw new Error("❌ שגיאה בשמירה");
+
+      setTreatments(prev =>
+        prev.map(t => (t._id === selectedTreatment._id ? selectedTreatment : t))
+      );
+      alert("✅ הנתונים נשמרו בהצלחה!");
+      handleCloseModal();
     } catch (err) {
-      console.error("❌ שגיאה במחיקת רכב בטיפול:", err);
-      alert("❌ שגיאה במחיקה");
+      console.error(err);
+      alert("❌ שגיאה בשמירה");
     }
   };
 
@@ -62,6 +69,9 @@ const CarsInService = () => {
               <th>מספר רישוי</th>
               <th>סטטוס טיפול</th>
               <th>תאריך כניסה</th>
+              <th>סיבת עיכוב</th>
+              <th>תאריך משוער לשחרור</th>
+              <th>עריכה</th>
             </tr>
           </thead>
           <tbody>
@@ -72,11 +82,59 @@ const CarsInService = () => {
                   <td>{treatment.carPlate}</td>
                   <td>{treatment.status || "—"}</td>
                   <td>{treatment.date || "—"}</td>
+                  <td>{treatment.delayReason || "—"}</td>
+                  <td>
+                    {treatment.estimatedReleaseDate
+                      ? new Date(treatment.estimatedReleaseDate).toLocaleDateString("he-IL")
+                      : "—"}
+                  </td>
+                  <td>
+                    <button
+                      className="btn btn-primary btn-sm"
+                      onClick={() => handleShowModal(treatment)}
+                    >
+                      ערוך
+                    </button>
+                  </td>
                 </tr>
               ))}
           </tbody>
         </table>
       </div>
+
+      {modalType === "edit" && selectedTreatment && (
+        <Modal isOpen={true} onClose={handleCloseModal} onSave={handleSave}>
+          <h3>עריכת פרטי רכב בטיפול</h3>
+          <div className="form-group mb-3">
+            <label>סיבת עיכוב</label>
+            <textarea
+              className="form-control"
+              value={selectedTreatment.delayReason}
+              onChange={(e) =>
+                setSelectedTreatment({ ...selectedTreatment, delayReason: e.target.value })
+              }
+            />
+          </div>
+          <div className="form-group mb-3">
+            <label>תאריך משוער לשחרור</label>
+            <input
+              type="date"
+              className="form-control"
+              value={
+                selectedTreatment.estimatedReleaseDate
+                  ? new Date(selectedTreatment.estimatedReleaseDate).toISOString().split("T")[0]
+                  : ""
+              }
+              onChange={(e) =>
+                setSelectedTreatment({
+                  ...selectedTreatment,
+                  estimatedReleaseDate: e.target.value
+                })
+              }
+            />
+          </div>
+        </Modal>
+      )}
     </div>
   );
 };

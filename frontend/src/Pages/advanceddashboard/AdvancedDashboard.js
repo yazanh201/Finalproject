@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
 import DashboardOverview from "./DashboardOverview";
 import DashboardTables from "./DashboardTables";
-import MessageModal from "./MessageModal";
 import MonthlyAppointments from "../tabels/MonthlyAppointments";
 import NewCustomers from "../tabels/NewCustomers";
 import TodayAppointments from "../tabels/TodayAppointments";
@@ -13,34 +12,25 @@ import TreatmentTypePieChart from "./charts/TreatmentTypePieChart";
 import ArrivedCars from "../tabels/ArrivedCars";
 import CompletedTreatments from "../tabels/CompletedTreatments";
 import useNotifications from "./useNotifications";
-import CarsUnderService from "../tabels/CarsUnderService"; // ודא נתיב נכון
+import CarsUnderService from "../tabels/CarsUnderService";
 import RecommendedCars from "../tabels/RecommendedCars";
 import MonthlyRevenueTable from "../tabels/MonthlyRevenueTable";
-import MonthlyReportComponent from "../../components/MonthlyReportComponent";
+
 const AdvancedDashboard = () => {
   const navigate = useNavigate();
   const tableRef = useRef(null);
 
-
   const [stats, setStats] = useState([]);
-  const [delayedTreatments, setDelayedTreatments] = useState([]);
   const [selectedTable, setSelectedTable] = useState(null);
   const [tableData, setTableData] = useState([]);
   const [tableTitle, setTableTitle] = useState("");
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [message, setMessage] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [sendToAll, setSendToAll] = useState(false);
   const [monthlyAppointmentCount, setMonthlyAppointmentCount] = useState(0);
   const [newCustomersCount, setNewCustomersCount] = useState(0);
   const [dynamicTableHeaders, setDynamicTableHeaders] = useState([]);
-  const { activeNotifications, fetchCompletedTreatments } = useNotifications();
+  const { activeNotifications, addNotification } = useNotifications();
   const [carsInServiceCount, setCarsInServiceCount] = useState(0);
   const [monthlyRevenue, setMonthlyRevenue] = useState(0);
 
-
-
-  // קריאה לבדיקה והתראה על טיפולים שהסתיימו
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -57,11 +47,9 @@ const AdvancedDashboard = () => {
         setNewCustomersCount(customersData.length);
         setMonthlyAppointmentCount(appointmentsData.length);
 
-        // חישוב רכבים בטיפול
         const underServiceCount = treatmentsData.filter(t => t.status !== "הסתיים").length;
         setCarsInServiceCount(underServiceCount);
 
-        // ✅ חישוב הכנסות חודשיות
         const currentMonth = new Date().getMonth();
         const currentYear = new Date().getFullYear();
 
@@ -74,10 +62,28 @@ const AdvancedDashboard = () => {
         });
 
         const totalRevenue = thisMonthTreatments.reduce((sum, t) => {
-          return sum + (Number(t.cost) || 0); // ודא שה-cost מספר
+          return sum + (Number(t.cost) || 0);
         }, 0);
-
         setMonthlyRevenue(totalRevenue);
+
+        // ✅ התראות על טיפולים שהסתיימו
+        const today = new Date().toISOString().slice(0, 10);
+        const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+
+        const completedRecent = treatmentsData.filter(t =>
+          t.status === "הסתיים" &&
+          (new Date(t.updatedAt).toISOString().slice(0, 10) === today ||
+           new Date(t.updatedAt).toISOString().slice(0, 10) === yesterday)
+        );
+
+        if (completedRecent.length > 0) {
+          const details = completedRecent.map(t => ({
+            מזהה: t.treatmentNumber,
+            רכב: t.carPlate,
+            לקוח: t.customerName
+          }));
+          addNotification("completedTreatments", { details });
+        }
 
       } catch (error) {
         console.error("❌ Error loading stats:", error);
@@ -87,17 +93,14 @@ const AdvancedDashboard = () => {
     fetchData();
   }, []);
 
-
-
   useEffect(() => {
     setStats([
-  { title: "סה״כ תורים לחודש", value: monthlyAppointmentCount, key: "appointments" },
-  { title: "רכבים בטיפול", value: carsInServiceCount, key: "carsUnderService" },
-  { title: "לקוחות חדשים", value: newCustomersCount, key: "newCustomers" },
-  { title: "הכנסות החודש (₪)", value: monthlyRevenue, key: "income" },
-  { title: "טיפולים שהתעכבו", value: 2, key: "delayedTreatments" },
-]);
-  }, [monthlyAppointmentCount, newCustomersCount,carsInServiceCount]);
+      { title: "סה״כ תורים לחודש", value: monthlyAppointmentCount, key: "appointments" },
+      { title: "רכבים בטיפול", value: carsInServiceCount, key: "carsUnderService" },
+      { title: "לקוחות חדשים", value: newCustomersCount, key: "newCustomers" },
+      { title: "הכנסות החודש (₪)", value: monthlyRevenue, key: "income" }
+    ]);
+  }, [monthlyAppointmentCount, newCustomersCount, carsInServiceCount]);
 
   const showTable = (key) => {
     switch (key) {
@@ -113,15 +116,10 @@ const AdvancedDashboard = () => {
       case "carsUnderService":
         setSelectedTable("carsUnderService");
         break;
-      case "delayedTreatments":
-        setTableData(delayedTreatments);
-        setTableTitle("טיפולים שהתעכבו");
-        setSelectedTable("delayedTreatments");
-        break;
       case "appointments":
         setSelectedTable("monthlyAppointments");
         break;
-      case "income": // ✅ חדש – חיבור כרטיס ההכנסות
+      case "income":
         setSelectedTable("monthlyRevenue");
         break;
       default:
@@ -129,143 +127,116 @@ const AdvancedDashboard = () => {
         setSelectedTable(null);
         break;
     }
-    // גלילה לטבלה אחרי שינוי selectedTable
     setTimeout(() => {
       tableRef.current?.scrollIntoView({ behavior: "smooth" });
     }, 300);
   };
 
-
-
-
-
   const tableHeaders = {
     recommendedCars: ["מספר רכב", "בעלים", "קילומטרים משוערים", "חודשים מהטיפול האחרון"],
     newCustomers: ["שם", "טלפון", "תאריך הצטרפות"],
-    carsUnderMaintenance: ["רכב", "סיבה", "איחור", "לוחית"],
-    delayedTreatments: ["רכב", "סיבה", "איחור", "לוחית"]
+    carsUnderMaintenance: ["רכב", "סיבה", "איחור", "לוחית"]
   };
 
-const handleNotificationClick = (type, data) => {
-  if (type === "newTreatment") {
-    setSelectedTable("arrivedCars");
-  } else if (type === "completedTreatments") {
-    setSelectedTable("completedTreatments"); // הוספה חדשה להצגת טיפולים שהסתיימו
-  } else if (data) {
-    setTableTitle("🔧 פרטי רכב שנכנס לטיפול");
-    setDynamicTableHeaders(Object.keys(data));
-    setTableData([data]);
-    setSelectedTable("dynamic");
-  } else {
-    showTable(type);
-  }
+  const handleNotificationClick = (type, data) => {
+    if (type === "newTreatment") {
+      setSelectedTable("arrivedCars");
+    } else if (type === "completedTreatments") {
+      setSelectedTable("completedTreatments");
+    } else if (data) {
+      setTableTitle("🔧 פרטי רכב שנכנס לטיפול");
+      setDynamicTableHeaders(Object.keys(data));
+      setTableData([data]);
+      setSelectedTable("dynamic");
+    } else {
+      showTable(type);
+    }
+  };
+
+  return (
+    <div className={styles.dashboardContainer}>
+      <header className={styles.dashboardHeader}>
+        <h2 className={styles.headerTitle}>
+          <span role="img" aria-label="dashboard"></span> לוח ניהול מתקדם
+        </h2>
+        <button className={styles.backBtn} onClick={() => navigate("/dashboard")}>
+          <FaArrowLeft className={styles.icon} /> חזור לדשבורד
+        </button>
+      </header>
+
+      <aside className={styles.sidebar}>
+        <ul className={styles.navList}>
+          <li className={styles.navItem}>
+            <button className={styles.sidebarBtn} onClick={() => showTable("recommendedCars")}>
+              <span role="img" aria-label="car"></span> רכבים מומלצים
+            </button>
+          </li>
+          <li className={styles.navItem}>
+            <button className={styles.sidebarBtn} onClick={() => showTable("todayAppointments")}>
+              <span role="img" aria-label="calendar"></span> תורים להיום
+            </button>
+          </li>
+          <li className={styles.navItem}>
+            <button
+              className={styles.sidebarBtn}
+              onClick={() => navigate("/monthlyreport")}
+            >
+              <span role="img" aria-label="calendar"></span> דוח חודשי
+            </button>
+          </li>
+        </ul>
+      </aside>
+
+      <main className={styles.mainContent}>
+        <div className={styles.chartsContainer}>
+          <div className={styles.chartBox}>
+            <TreatmentTypePieChart />
+          </div>
+          <div className={styles.chartBox}>
+            <RevenueByRepairTypeChart />
+          </div>
+        </div>
+
+        <DashboardOverview
+          stats={stats}
+          notifications={activeNotifications}
+          onStatClick={showTable}
+          onNotificationClick={(type, data) => handleNotificationClick(type, data)}
+        />
+
+        <div ref={tableRef}>
+          {selectedTable === "monthlyAppointments" ? (
+            <MonthlyAppointments onClose={() => setSelectedTable(null)} />
+          ) : selectedTable === "newCustomers" ? (
+            <NewCustomers onClose={() => setSelectedTable(null)} />
+          ) : selectedTable === "todayAppointments" ? (
+            <TodayAppointments onClose={() => setSelectedTable(null)} />
+          ) : selectedTable === "arrivedCars" ? (
+            <ArrivedCars onClose={() => setSelectedTable(null)} />
+          ) : selectedTable === "completedTreatments" ? (
+            <CompletedTreatments onClose={() => setSelectedTable(null)} />
+          ) : selectedTable === "carsUnderService" ? (
+            <CarsUnderService onClose={() => setSelectedTable(null)} />
+          ) : selectedTable === "recommendedCars" ? (
+            <RecommendedCars onClose={() => setSelectedTable(null)} />
+          ) : selectedTable === "monthlyRevenue" ? (
+            <MonthlyRevenueTable onClose={() => setSelectedTable(null)} />
+          ) : (
+            <DashboardTables
+              tableTitle={tableTitle}
+              tableData={tableData}
+              tableHeaders={
+                selectedTable === "dynamic"
+                  ? dynamicTableHeaders
+                  : tableHeaders[selectedTable]
+              }
+              onClose={() => setSelectedTable(null)}
+            />
+          )}
+        </div>
+      </main>
+    </div>
+  );
 };
 
-
-
-
-    return (
-      <div className={styles.dashboardContainer}>
-        <header className={styles.dashboardHeader}>
-          <h2 className={styles.headerTitle}>
-            <span role="img" aria-label="dashboard"></span> לוח ניהול מתקדם
-          </h2>
-          <button className={styles.backBtn} onClick={() => navigate("/dashboard")}> 
-            <FaArrowLeft className={styles.icon} /> חזור לדשבורד
-          </button>
-        </header>
-
-        <aside className={styles.sidebar}>
-          <ul className={styles.navList}>
-            <li className={styles.navItem}>
-              <button className={styles.sidebarBtn} onClick={() => setIsModalOpen(true)}>
-                <span role="img" aria-label="send"></span> שליחת הודעות
-              </button>
-            </li>
-            <li className={styles.navItem}>
-              <button className={styles.sidebarBtn} onClick={() => showTable("recommendedCars")}> 
-                <span role="img" aria-label="car"></span> רכבים מומלצים
-              </button>
-            </li>
-            <li className={styles.navItem}>
-              <button
-                className={styles.sidebarBtn}
-                onClick={() => navigate("/monthlyreport")}
-              >
-                דוח חודשי
-              </button>
-            </li>
-
-            <li className={styles.navItem}>
-              <button className={styles.sidebarBtn} onClick={() => showTable("todayAppointments")}> 
-                <span role="img" aria-label="calendar"></span> תורים להיום
-              </button>
-            </li>
-          </ul>
-        </aside>
-
-        <main className={styles.mainContent}>
-          <div className={styles.chartsContainer}>
-            <div className={styles.chartBox}>
-              <TreatmentTypePieChart />
-            </div>
-            <div className={styles.chartBox}>
-              <RevenueByRepairTypeChart />
-            </div>
-          </div>
-
-          <DashboardOverview
-            stats={stats}
-            notifications={activeNotifications}
-            onStatClick={showTable}
-            onNotificationClick={(type, data) => handleNotificationClick(type, data)}
-          />
-
-          <div ref={tableRef}>
-            {selectedTable === "monthlyAppointments" ? (
-              <MonthlyAppointments onClose={() => setSelectedTable(null)} />
-            ) : selectedTable === "newCustomers" ? (
-              <NewCustomers onClose={() => setSelectedTable(null)} />
-            ) : selectedTable === "todayAppointments" ? (
-              <TodayAppointments onClose={() => setSelectedTable(null)} />
-            ) : selectedTable === "arrivedCars" ? (
-              <ArrivedCars onClose={() => setSelectedTable(null)} />
-            ) : selectedTable === "completedTreatments" ? (
-              <CompletedTreatments onClose={() => setSelectedTable(null)} />
-            ) : selectedTable === "carsUnderService" ? (
-              <CarsUnderService onClose={() => setSelectedTable(null)} />
-            ) : selectedTable === "recommendedCars" ? (
-              <RecommendedCars onClose={() => setSelectedTable(null)} />
-            ) : selectedTable === "monthlyRevenue" ? (
-              <MonthlyRevenueTable onClose={() => setSelectedTable(null)} />
-            ) : (
-              <DashboardTables
-                tableTitle={tableTitle}
-                tableData={tableData}
-                tableHeaders={
-                  selectedTable === "dynamic"
-                    ? dynamicTableHeaders
-                    : tableHeaders[selectedTable]
-                }
-                onClose={() => setSelectedTable(null)}
-              />
-            )}
-          </div>
-        </main>
-        <MessageModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          onSend={() => alert("📤 הודעה נשלחה!")}
-          sendToAll={sendToAll}
-          setSendToAll={setSendToAll}
-          phoneNumber={phoneNumber}
-          setPhoneNumber={setPhoneNumber}
-          message={message}
-          setMessage={setMessage}
-        />
-      </div>
-    );
-  };
-
-
-  export default AdvancedDashboard;
+export default AdvancedDashboard;

@@ -120,7 +120,7 @@ const updateTreatment = async (req, res) => {
     const treatment = await Treatment.findById(req.params.id);
     if (!treatment) return res.status(404).json({ message: "טיפול לא נמצא" });
 
-    // עדכון שדות רגילים
+    // ✅ עדכון שדות רגילים
     treatment.date = req.body?.date || treatment.date;
     treatment.cost = isNaN(Number(req.body?.cost)) ? treatment.cost : Number(req.body.cost);
     treatment.carPlate = req.body?.carPlate || treatment.carPlate;
@@ -131,6 +131,16 @@ const updateTreatment = async (req, res) => {
     treatment.repairTypeId = req.body?.repairTypeId || treatment.repairTypeId;
     treatment.workerId = req.body?.workerId || treatment.workerId;
     treatment.idNumber = req.body?.idNumber || treatment.idNumber;
+
+    // ✅ עדכון סיבת עיכוב ותאריך משוער
+    if (req.body?.delayReason !== undefined) {
+      treatment.delayReason = req.body.delayReason;
+    }
+    if (req.body?.estimatedReleaseDate !== undefined) {
+      treatment.estimatedReleaseDate = req.body.estimatedReleaseDate
+        ? new Date(req.body.estimatedReleaseDate)
+        : null;
+    }
 
     // ✅ עדכון treatmentServices
     if (req.body?.treatmentServices) {
@@ -146,7 +156,7 @@ const updateTreatment = async (req, res) => {
       }
     }
 
-    // עדכון קבצים
+    // ✅ עדכון קבצים
     if (req.files?.invoice?.[0]) {
       treatment.invoiceFile = req.files.invoice[0].filename;
     }
@@ -161,6 +171,7 @@ const updateTreatment = async (req, res) => {
     res.status(500).json({ message: "❌ שגיאה בעדכון טיפול", error: err.message });
   }
 };
+
 
 
 // אישור הגעה ויצירת טיפול מתור

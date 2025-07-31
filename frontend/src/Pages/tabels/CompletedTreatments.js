@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import DashboardTables from "../advanceddashboard/DashboardTables";
 import { useNavigate } from "react-router-dom";
+import { FaEye, FaFileInvoice } from "react-icons/fa";
 
 const CompletedTreatments = ({ onClose }) => {
   const [completedTreatments, setCompletedTreatments] = useState([]);
@@ -34,6 +35,7 @@ const CompletedTreatments = ({ onClose }) => {
     "לקוח",
     "תיאור",
     "תאריך עדכון",
+    "חשבונית",
     "צפייה",
     "עריכה"
   ];
@@ -43,19 +45,28 @@ const CompletedTreatments = ({ onClose }) => {
     "רכב": treatment.carPlate,
     "לקוח": treatment.customerName,
     "תיאור": treatment.description,
-    "תאריך עדכון": new Date(treatment.updatedAt).toLocaleDateString(),
+    "תאריך עדכון": new Date(treatment.updatedAt).toLocaleDateString("he-IL"),
+    "חשבונית": (
+      <button
+        className="btn btn-outline-success btn-sm"
+        onClick={() => navigate(`/invoice/${treatment._id}`)}
+        title="צפייה בחשבונית"
+      >
+        <FaFileInvoice size={18} /> חשבונית
+      </button>
+    ),
     "צפייה": (
       <button
         className="btn btn-outline-secondary btn-sm"
         onClick={() => navigate(`/treatment/${treatment._id}`)}
         title="צפייה בפרטי הטיפול"
       >
-        👁️
+        <FaEye size={18} />
       </button>
     ),
     "עריכה": (
       <button
-        className="btn btn-outline-secondary btn-sm me-1"
+        className="btn btn-outline-secondary btn-sm"
         onClick={() =>
           navigate("/create-treatment", {
             state: {
@@ -69,7 +80,8 @@ const CompletedTreatments = ({ onClose }) => {
               status: treatment.status || "",
               treatmentId: treatment._id || "",
               repairTypeId: treatment.typeId || "",
-              workerId: treatment.workerId || ""
+              workerId: treatment.workerId || "",
+              treatmentServices: treatment.treatmentServices || []
             }
           })
         }

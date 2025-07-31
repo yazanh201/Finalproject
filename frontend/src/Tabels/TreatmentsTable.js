@@ -154,7 +154,6 @@ const TreatmentsTable = ({
             <tr>
               <th>מזהה טיפול</th>
               <th>תאריך</th>
-              <th>מזהה תור</th>
               <th>מספר רכב</th>
               <th>שם לקוח</th>
               <th>צפייה</th>
@@ -167,24 +166,7 @@ const TreatmentsTable = ({
               <tr key={treatment._id}>
                 <td>{treatment.treatmentId}</td>
                 <td>{treatment.date}</td>
-                <td>
-                  {treatment.appointmentNumber ? (
-                    <a
-                      href="#"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        if (typeof onNavigateToAppointment === "function") {
-                          onNavigateToAppointment(treatment.appointmentNumber);
-                        }
-                      }}
-                      style={{ textDecoration: "underline", color: "blue" }}
-                    >
-                      {treatment.appointmentNumber}
-                    </a>
-                  ) : (
-                    <span style={{ color: "gray" }}>—</span>
-                  )}
-                </td>
+
                 <td>{treatment.carPlate}</td>
                 <td>{treatment.customerName || "—"}</td>
                 
@@ -208,7 +190,7 @@ const TreatmentsTable = ({
                 </td>
                 <td>
                   <button
-                    className="btn btn-outline-secondary btn-sm"
+                    className="btn btn-primary btn-sm"
                     onClick={() =>
                       navigate("/create-treatment", {
                         state: {
@@ -234,7 +216,7 @@ const TreatmentsTable = ({
                     עריכה
                   </button>
                     <button
-                      className="btn btn-outline-danger btn-sm me-2"
+                      className="btn btn-primary btn-sm me-2"
                       onClick={() => handleDelete(treatment._id)}
                       title="מחיקת טיפול"
                     >
@@ -257,7 +239,6 @@ const TreatmentsTable = ({
               { key: "workerId", label: "מזהה עובד" },
               { key: "typeId", label: "סוג טיפול" },
               { key: "carPlate", label: "מספר רכב" },
-              { key: "appointmentNumber", label: "מזהה תור" },
               { key: "invoiceId", label: "מזהה חשבונית" }
             ].map(({ key, label, type = "text" }) => (
               <div className="form-group mb-3" key={key}>
