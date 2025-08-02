@@ -13,55 +13,81 @@ const InvoicePage = () => {
   const [loading, setLoading] = useState(true);
   const [prices, setPrices] = useState({});
   const [invoiceExists, setInvoiceExists] = useState(false);
+  const [orders, setOrders] = useState([]);
+
 
   const BASE_URL = "http://localhost:5000/uploads/";
   const BASE_API_URL = "http://localhost:5000/";
 
   useEffect(() => {
-    const fetchData = async () => {
+  const fetchData = async () => {
+    try {
+      // ✅ שלב 1: טען את הטיפול
+      const treatmentRes = await axios.get(`${BASE_API_URL}api/treatments/${treatmentId}`);
+      const treatmentData = treatmentRes.data;
+
+      // ✅ שלב 2: שלוף ת"ז ושם לפי מספר רכב
       try {
-        // שלב 1: טען את הטיפול
-        const treatmentRes = await axios.get(`${BASE_API_URL}api/treatments/${treatmentId}`);
-        const treatmentData = treatmentRes.data;
-
-        // שלב 2: שלוף ת"ז ושם לפי מספר רכב
-        try {
-          const customerRes = await axios.get(`${BASE_API_URL}api/customers/id-by-plate/${treatmentData.carPlate}`);
-          treatmentData.idNumber = customerRes.data.idNumber;
-          treatmentData.customerName = customerRes.data.name;
-        } catch (e) {
-          console.warn("⚠️ לא נמצאה תעודת זהות לפי מספר רכב:", e.message);
-        }
-
-        // שלב 3: שלוף מייל לפי מספר רכב
-        try {
-          const emailRes = await axios.get(`${BASE_API_URL}api/customers/email-by-plate/${treatmentData.carPlate}`);
-          treatmentData.email = emailRes.data.email;
-        } catch (e) {
-          console.warn("⚠️ לא נמצא אימייל לפי מספר רכב:", e.message);
-        }
-
-        setTreatment(treatmentData);
-
-        // שלב 4: בדוק אם קיימת חשבונית
-        const invoiceRes = await axios.get(`${BASE_API_URL}api/invoices/by-treatment/${treatmentId}`);
-        if (invoiceRes.data && invoiceRes.data.items) {
-          setInvoiceExists(true);
-          const loadedPrices = {};
-          invoiceRes.data.items.forEach((item, index) => {
-            loadedPrices[index] = item.price;
-          });
-          setPrices(loadedPrices);
-        }
-      } catch (err) {
-        console.warn('שגיאה בטעינה:', err.message);
-      } finally {
-        setLoading(false);
+        const customerRes = await axios.get(`${BASE_API_URL}api/customers/id-by-plate/${treatmentData.carPlate}`);
+        treatmentData.idNumber = customerRes.data.idNumber;
+        treatmentData.customerName = customerRes.data.name;
+      } catch (e) {
+        console.warn("⚠️ לא נמצאה תעודת זהות לפי מספר רכב:", e.message);
       }
-    };
 
-    fetchData();
-  }, [treatmentId]);
+      // ✅ שלב 3: שלוף מייל לפי מספר רכב
+      try {
+        const emailRes = await axios.get(`${BASE_API_URL}api/customers/email-by-plate/${treatmentData.carPlate}`);
+        treatmentData.email = emailRes.data.email;
+      } catch (e) {
+        console.warn("⚠️ לא נמצא אימייל לפי מספר רכב:", e.message);
+      }
+
+      setTreatment(treatmentData);
+
+      // ✅ שלב 4: שלוף הזמנות פעילות לפי מספר רכב
+      try {
+        const ordersRes = await axios.get(`${BASE_API_URL}api/carorders/active/${treatmentData.carPlate}`);
+        const activeOrders = ordersRes.data;
+
+        // 🔄 הוספת מחירים להזמנות
+        const orderPrices = {};
+        activeOrders.forEach(order => {
+          const key = `הזמנה-${order._id}`;
+          orderPrices[key] = order.cost;
+        });
+
+        // שמירת ההזמנות בסטייט להצגה בטבלה
+        setOrders(activeOrders);
+
+        // ✅ הוספת מחירי ההזמנות ל־prices הקיים
+        setPrices(prev => ({ ...prev, ...orderPrices }));
+      } catch (e) {
+        console.warn("⚠️ לא נמצאו הזמנות פעילות לרכב זה:", e.message);
+      }
+
+      // ✅ שלב 5: בדוק אם קיימת חשבונית
+      const invoiceRes = await axios.get(`${BASE_API_URL}api/invoices/by-treatment/${treatmentId}`);
+      if (invoiceRes.data && invoiceRes.data.items) {
+        setInvoiceExists(true);
+        const loadedPrices = {};
+        invoiceRes.data.items.forEach((item) => {
+          const key = `${item.category}-${item.name}`;
+          loadedPrices[key] = item.price;
+        });
+        setPrices(prev => ({ ...prev, ...loadedPrices }));
+      }
+
+    } catch (err) {
+      console.warn('❌ שגיאה בטעינת נתונים לחשבונית:', err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchData();
+}, [treatmentId]);
+
 
 
  const handleSubmitInvoice = async () => {
@@ -73,19 +99,32 @@ const InvoicePage = () => {
     }
 
     const items = [];
-    let itemIndex = 0;
 
-    treatment.treatmentServices.forEach((serviceGroup) => {
-      serviceGroup.selectedOptions.forEach((option) => {
-        const price = prices[itemIndex] || 0;
+      // ✅ הוספת השירותים שבוצעו
+      treatment.treatmentServices.forEach((serviceGroup) => {
+        serviceGroup.selectedOptions.forEach((option) => {
+          const key = `${serviceGroup.category}-${option}`;
+          const price = prices[key] || 0;
+          items.push({
+            name: option,
+            category: serviceGroup.category,
+            price,
+          });
+        });
+      });
+
+      // ✅ הוספת ההזמנות הפעילות
+      orders.forEach((order) => {
+        const key = `הזמנה-${order._id}`;
+        const price = prices[key] || 0;
         items.push({
-          name: option,
-          category: serviceGroup.category,
+          name: `הזמנה: ${order.details}`,
+          category: 'הזמנות',
           price,
         });
-        itemIndex++;
       });
-    });
+
+
 
     const invoiceData = {
       treatmentId: treatment._id,
@@ -238,34 +277,61 @@ const InvoicePage = () => {
                 </tr>
                 </thead>
                 <tbody>
-                {treatment.treatmentServices.map((group, groupIndex) =>
-                    group.selectedOptions.map((option, optionIndex) => {
-                    const key = groupIndex * 100 + optionIndex;
-                    return (
+                  {/* ✅ הצגת השירותים שבוצעו */}
+                  {treatment.treatmentServices.map((group) =>
+                    group.selectedOptions.map((option) => {
+                      const key = `${group.category}-${option}`;
+                      return (
                         <tr key={key}>
-                        <td>{option}</td>
-                        <td>
+                          <td>{option}</td>
+                          <td>
                             <input
                               type="number"
-                              min="0"   // ✅ מונע הקלדת מספרים שליליים
+                              min="0"
                               value={prices[key] || ''}
                               onChange={(e) => {
-                                  const val = Number(e.target.value);
-                                  if (val < 0) return; // ✅ הגנה נוספת בקוד
-                                  setPrices((prev) => ({
-                                      ...prev,
-                                      [key]: val,
-                                  }));
+                                const val = Number(e.target.value);
+                                if (val < 0) return;
+                                setPrices((prev) => ({
+                                  ...prev,
+                                  [key]: val,
+                                }));
                               }}
                               className={styles.priceInput}
-                          />
-
-                        </td>
+                            />
+                          </td>
                         </tr>
-                    );
+                      );
                     })
-                )}
+                  )}
+
+                  {/* ✅ הצגת ההזמנות הפעילות של הרכב */}
+                  {orders.map((order) => {
+                    const key = `הזמנה-${order._id}`;
+                    return (
+                      <tr key={key}>
+                        <td>הזמנה: {order.details}</td>
+                        <td>
+                          <input
+                            type="number"
+                            min="0"
+                            value={prices[key] || ''}
+                            onChange={(e) => {
+                              const val = Number(e.target.value);
+                              if (val < 0) return;
+                              setPrices((prev) => ({
+                                ...prev,
+                                [key]: val,
+                              }));
+                            }}
+                            className={styles.priceInput}
+                          />
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
+
             </table>
             ) : (
             <p>לא הוזנו שירותים</p>

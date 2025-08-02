@@ -6,7 +6,6 @@ const useRecommendedCars = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // שליפת רכבים ולקוחות
         const [vehiclesRes, customersRes] = await Promise.all([
           fetch("http://localhost:5000/api/cars"),
           fetch("http://localhost:5000/api/customers"),
@@ -18,14 +17,12 @@ const useRecommendedCars = () => {
 
         const recommendations = await Promise.all(
           vehicles.map(async (vehicle) => {
-            // שליפת טיפולים לפי מספר רכב
             const treatmentsRes = await fetch(
               `http://localhost:5000/api/treatments/by-car/${vehicle.vehicleNumber}`
             );
             const treatments = await treatmentsRes.json();
             if (treatments.length === 0) return null;
 
-            // טיפול אחרון
             const lastTreatment = treatments.sort(
               (a, b) => new Date(b.date) - new Date(a.date)
             )[0];
@@ -35,16 +32,34 @@ const useRecommendedCars = () => {
               (today.getFullYear() - lastServiceDate.getFullYear()) * 12 +
               (today.getMonth() - lastServiceDate.getMonth());
 
-            // חישוב קילומטראז' מוערך
             const vehicleAgeInYears = Math.max(today.getFullYear() - vehicle.year, 1);
             const avgKmPerYear = vehicle.mileage / vehicleAgeInYears;
             const estimatedKmAtTreatment = avgKmPerYear * (monthsSinceService / 12);
             const kmSinceService = estimatedKmAtTreatment;
             const currentcalculated = vehicle.mileage + kmSinceService;
 
-            // חיפוש טלפון בעל הרכב לפי ownerId
-            const matchedCustomer = customers.find(c => c.ownerId === vehicle.ownerId);
-            const phoneNumber = matchedCustomer ? matchedCustomer.phone : "לא נמצא";
+            // ✅ חיפוש לפי vehicles במודל לקוח
+            let matchedCustomer = customers.find(c =>
+              c.vehicles && c.vehicles.some(vNum =>
+                String(vNum).trim() === String(vehicle.vehicleNumber).trim()
+              )
+            );
+
+            // ✅ fallback לפי ownerId אם לא נמצא לפי vehicles
+            if (!matchedCustomer && vehicle.ownerId) {
+              matchedCustomer = customers.find(c => String(c._id) === String(vehicle.ownerId));
+            }
+
+            console.log("🔍 רכב:", vehicle.vehicleNumber, "לקוח שנמצא:", matchedCustomer);
+
+            // ✅ שם הבעלים - קודם מהלקוח, אחרת מהרכב
+            const ownerName = matchedCustomer && matchedCustomer.fullName
+              ? matchedCustomer.fullName
+              : vehicle.ownerName || "לא נמצא";
+
+            const phoneNumber = matchedCustomer && matchedCustomer.phone
+              ? matchedCustomer.phone
+              : "לא נמצא";
 
             const needsService =
               monthsSinceService >= 6 || kmSinceService >= 15000;
@@ -52,8 +67,19 @@ const useRecommendedCars = () => {
             return needsService
               ? {
                   "מספר רכב": vehicle.vehicleNumber,
-                  "שם בעלים": vehicle.ownerName,
-                  "טלפון בעלים": phoneNumber,
+                  "שם בעלים": ownerName,
+                  "טלפון בעלים": phoneNumber !== "לא נמצא"
+                    ? (
+                        <a
+                          href={`https://wa.me/972${phoneNumber.replace(/^0/, "")}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{ color: "green", fontWeight: "bold" }}
+                        >
+                          {phoneNumber}
+                        </a>
+                      )
+                    : "לא נמצא",
                   "שנת ייצור": vehicle.year,
                   "קילומטראז' אחרון": vehicle.mileage,
                   "קילומטראז' מחושב": Math.round(currentcalculated),

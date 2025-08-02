@@ -5,7 +5,9 @@ const {
   getAllCarOrders,
   updateCarOrder,
   searchCarOrdersByCarNumber,
-  deleteCarOrder
+  deleteCarOrder,
+  getActiveOrdersByCarNumber,
+  getMonthlyCarOrders
 } = require('../controllers/carOrder.controller');
 
 // יצירת הזמנה חדשה
@@ -21,6 +23,10 @@ router.put('/:id', updateCarOrder);
 router.get('/search/:carNumber', searchCarOrdersByCarNumber);
 
 router.delete('/:id', deleteCarOrder);
+
+router.get('/active/:carNumber', getActiveOrdersByCarNumber);
+
+router.get('/reports/monthly', getMonthlyCarOrders);
 
 
 module.exports = router;

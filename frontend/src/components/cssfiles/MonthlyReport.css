@@ -106,3 +106,18 @@
 .download-btn:hover {
   background-color: #27ae60;
 }
+
+.table-title {
+  font-size: 18px;
+  font-weight: bold;
+  margin-top: 25px;    /* ✅ מרחק מלמעלה */
+  margin-bottom: 10px; /* ✅ מרחק מהטבלה */
+  text-align: right;   /* כיוון ימין */
+  color: #003366;      /* צבע אחיד */
+}
+
+.report-table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-bottom: 20px; /* ✅ מרווח תחתון בין הטבלאות */
+}

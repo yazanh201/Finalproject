@@ -3,7 +3,7 @@ const Employee = require("../models/Employee");
 // שליפת כל העובדים
 const getAllEmployees = async (req, res) => {
   try {
-    const employees = await Employee.find().sort({ fullName: 1 }); // מיון לפי שם לדוגמה
+    const employees = await Employee.find().sort({ fullName: 1 });
     res.json(employees);
   } catch (err) {
     res.status(500).json({ message: "❌ שגיאה בשליפת עובדים", error: err.message });
@@ -13,19 +13,41 @@ const getAllEmployees = async (req, res) => {
 // הוספת עובד
 const addEmployee = async (req, res) => {
   try {
+    console.log("📥 POST /api/employees BODY:", req.body); // Debug
+
+    const { idNumber, fullName, role, email, phone } = req.body;
+
+    // ✅ ולידציה: בדיקה שכל השדות קיימים
+    if (!idNumber || !fullName || !role || !email || !phone) {
+      return res.status(400).json({ message: "❌ יש למלא את כל השדות" });
+    }
+
     const newEmployee = new Employee({
-      idNumber: req.body.idNumber,
-      fullName: req.body.fullName,
-      role: req.body.role,
-      email: req.body.email,
-      phone: req.body.phone,
-      status: req.body.status || "פעיל",
+      idNumber: String(idNumber).trim(),
+      fullName: String(fullName).trim(),
+      role: String(role).trim(),
+      email: String(email).trim(),
+      phone: String(phone).trim(),
     });
 
     await newEmployee.save();
+
+    console.log("✅ עובד נשמר בהצלחה:", newEmployee);
     res.status(201).json(newEmployee);
+
   } catch (err) {
-    res.status(500).json({ message: "❌ שגיאה בהוספה", error: err.message });
+    console.error("❌ שגיאה בהוספת עובד:", err);
+
+    if (err.code === 11000) {
+      return res.status(400).json({ message: "❌ עובד עם תעודת זהות זו כבר קיים" });
+    }
+
+    if (err.name === "ValidationError") {
+      const messages = Object.values(err.errors).map(e => e.message);
+      return res.status(400).json({ message: "❌ שגיאת ולידציה", errors: messages });
+    }
+
+    res.status(500).json({ message: "❌ שגיאה בשרת", error: err.message });
   }
 };
 
@@ -38,7 +60,6 @@ const updateEmployee = async (req, res) => {
     res.status(500).json({ message: "❌ שגיאה בעדכון", error: err.message });
   }
 };
-
 
 // חיפוש לפי ת״ז או שם
 const searchEmployee = async (req, res) => {
@@ -56,7 +77,7 @@ const searchEmployee = async (req, res) => {
   }
 };
 
-// 📌 מחיקת עובד לפי ID
+// מחיקה
 const deleteEmployee = async (req, res) => {
   try {
     const { id } = req.params;

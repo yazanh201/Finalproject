@@ -177,9 +177,9 @@ const Dashboard = () => {
                 {role === "admin" ? (
                   <>
                     <button className={styles.dropdownItem} onClick={() => navigate("/add-customer-with-vehicle")}>➕ הוספת לקוח ורכב</button>
-                    <button className={styles.dropdownItem} onClick={() => setShowCamera(true)}>📸 הפעל מצלמה</button>
                     <button className={styles.dropdownItem} onClick={() => navigate("/create-treatment")}>➕ הוספת טיפול חדש</button>
                     <button className={styles.dropdownItem} onClick={() => navigate("/AppointmentForm")}>➕ קביעת תור</button>
+                    <button className={styles.dropdownItem} onClick={() => setShowCamera(true)}>📸 הפעל מצלמה</button>
                     <button onClick={handleLogout} className={styles.headerLinkLogout}>
                       <FaSignOutAlt className={styles.icon} /> התנתקות
                     </button>

@@ -60,10 +60,42 @@ const deleteCarOrder = async (req, res) => {
   }
 };
 
+const getActiveOrdersByCarNumber = async (req, res) => {
+  try {
+    const { carNumber } = req.params;
+    const activeOrders = await CarOrder.find({
+      carNumber,
+      status: { $nin: ['בוטלה', 'הושלמה'] } // ✅ לא בוטלה ולא הושלמה
+    });
+    res.json(activeOrders);
+  } catch (error) {
+    res.status(500).json({ message: 'שגיאה בשליפת הזמנות פעילות', error: error.message });
+  }
+};
+
+// שליפת הזמנות לפי חודש נוכחי
+const getMonthlyCarOrders = async (req, res) => {
+  try {
+    const startOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+    const endOfMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0);
+
+    const orders = await CarOrder.find({
+      orderDate: { $gte: startOfMonth, $lte: endOfMonth }
+    }).sort({ orderDate: -1 });
+
+    res.json(orders);
+  } catch (error) {
+    res.status(500).json({ message: "שגיאה בשליפת הזמנות חודשיות", error: error.message });
+  }
+};
+
+
 module.exports = {
   createCarOrder,
   getAllCarOrders,
   updateCarOrder,
   searchCarOrdersByCarNumber,
-  deleteCarOrder
+  deleteCarOrder,
+  getActiveOrdersByCarNumber ,
+  getMonthlyCarOrders
 };

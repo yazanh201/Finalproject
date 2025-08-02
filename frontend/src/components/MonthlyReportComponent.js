@@ -5,13 +5,27 @@ import "./cssfiles/MonthlyReport.css";
 const MonthlyReportComponent = () => {
   const reportRef = useRef(null);
   const [data, setData] = useState(null);
+  const [orders, setOrders] = useState([]); // ✅ הזמנות
+  const [newCustomersList, setNewCustomersList] = useState([]); // ✅ לקוחות חדשים
 
   useEffect(() => {
     const fetchReport = async () => {
       try {
+        // ✅ שליפת טיפולים חודשיים
         const res = await fetch("http://localhost:5000/api/treatments/reports/monthly");
         const result = await res.json();
         setData(result);
+
+        // ✅ שליפת הזמנות חודשיות
+        const ordersRes = await fetch("http://localhost:5000/api/carorders/reports/monthly");
+        const ordersData = await ordersRes.json();
+        setOrders(ordersData);
+
+        // ✅ שליפת לקוחות חדשים החודש
+        const customersRes = await fetch("http://localhost:5000/api/customers/new-this-month");
+        const customersData = await customersRes.json();
+        setNewCustomersList(customersData);
+
       } catch (err) {
         console.error("❌ שגיאה בטעינת דוח:", err);
       }
@@ -37,7 +51,7 @@ const MonthlyReportComponent = () => {
     <div className="report-wrapper">
       <div className="report-box" ref={reportRef}>
         
-        {/* ✅ כותרת כמו חשבונית */}
+        {/* ✅ כותרת דוח */}
         <div className="businessHeader">
           <div>
             <img src="/img/invlogo.png" alt="לוגו מוסך" className="logo" />
@@ -46,11 +60,11 @@ const MonthlyReportComponent = () => {
             <h3>מוסך שירות מהיר</h3>
             <p>רחוב התיקונים 5, חיפה</p>
             <p>טלפון : 03-5551234</p>
-            <p>אימייל : sherotmher12@gmail.com</p>
+            <p>sherotmher12@gmail.com : אימייל </p>
           </div>
         </div>
 
-        <h2 className="reportTitle"> דוח חודשי</h2>
+        <h2 className="reportTitle">דוח חודשי</h2>
         <p className="reportDate">
           {new Date().toLocaleString("he-IL", { month: "long", year: "numeric" })}
         </p>
@@ -59,10 +73,12 @@ const MonthlyReportComponent = () => {
         <div className="report-stats">
           <div className="stat-card">סה"כ טיפולים: {data.totalTreatments}</div>
           <div className="stat-card">סה"כ הכנסות: ₪{data.totalRevenue}</div>
-          <div className="stat-card">לקוחות חדשים: {data.newCustomers}</div>
+          <div className="stat-card">לקוחות חדשים: {newCustomersList.length}</div>
+          <div className="stat-card">סה"כ הזמנות: {orders.length}</div>
         </div>
 
-        {/* ✅ טבלה */}
+        {/* ✅ טבלת טיפולים */}
+        <h3 className="table-title">טיפולים שבוצעו :</h3>
         <table className="report-table">
           <thead>
             <tr>
@@ -81,6 +97,63 @@ const MonthlyReportComponent = () => {
             ))}
           </tbody>
         </table>
+
+        {/* ✅ טבלת הזמנות רכבים */}
+        {orders.length > 0 && (
+          <>
+            <h3 className="table-title">הזמנות רכבים :</h3>
+            <table className="report-table">
+              <thead>
+                <tr>
+                  <th>מספר רכב</th>
+                  <th>פרטי הזמנה</th>
+                  <th>עלות</th>
+                  <th>תאריך הזמנה</th>
+                </tr>
+              </thead>
+              <tbody>
+                {orders.map((o, i) => (
+                  <tr key={i}>
+                    <td>{o.carNumber}</td>
+                    <td>{o.details}</td>
+                    <td>{o.cost} ₪</td>
+                    <td>{new Date(o.orderDate).toLocaleDateString("he-IL")}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </>
+        )}
+
+        {/* ✅ טבלת לקוחות חדשים */}
+        {newCustomersList.length > 0 && (
+          <>
+            <h3 className="table-title">לקוחות חדשים החודש :</h3>
+            <table className="report-table">
+              <thead>
+                <tr>
+                  <th>שם מלא</th>
+                  <th>תעודת זהות</th>
+                  <th>טלפון</th>
+                  <th>אימייל</th>
+                  <th>תאריך הצטרפות</th>
+                </tr>
+              </thead>
+              <tbody>
+                {newCustomersList.map((c, i) => (
+                  <tr key={i}>
+                    <td>{c.name}</td>
+                    <td>{c.idNumber}</td>
+                    <td>{c.phone}</td>
+                    <td>{c.email}</td>
+                    <td>{new Date(c.createdAt).toLocaleDateString("he-IL")}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </>
+        )}
+
       </div>
 
       <button className="download-btn" onClick={handleDownloadPdf}>
