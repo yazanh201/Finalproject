@@ -1,5 +1,4 @@
-
-import { Phone, MapPin, Clock, Mail } from 'lucide-react';
+import { Phone, MapPin, Clock } from 'lucide-react';
 import { useState } from 'react';
 
 const Contact = () => {
@@ -13,7 +12,7 @@ const Contact = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log('Form submitted:', formData);
-    // Here you would typically send the form data to your backend
+    // כאן ניתן לשלוח את הנתונים לשרת
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -40,7 +39,7 @@ const Contact = () => {
           <div className="space-y-8">
             <div className="bg-black/40 backdrop-blur-sm border border-gray-800 rounded-2xl p-6">
               <h3 className="text-2xl font-bold text-white mb-6">פרטי התקשרות</h3>
-              
+
               <div className="space-y-6">
                 <div className="flex items-center gap-4">
                   <div className="bg-red-600 p-3 rounded-full flex-shrink-0">
@@ -78,19 +77,29 @@ const Contact = () => {
               </div>
             </div>
 
-            {/* Map placeholder */}
-            <div className="bg-black/40 backdrop-blur-sm border border-gray-800 rounded-2xl p-6">
-              <h3 className="text-xl font-bold text-white mb-4">מפת המסלול</h3>
-              <div className="w-full h-64 bg-gray-800 rounded-lg flex items-center justify-center">
-                <MapPin className="w-12 h-12 text-red-500" />
-              </div>
-            </div>
+            {/* Embedded Google Map */}
+  <div className="bg-black/40 backdrop-blur-sm border border-gray-800 rounded-2xl p-6">
+  <h3 className="text-xl font-bold text-white mb-4">מפת המסלול</h3>
+  <div className="w-full h-64 rounded-lg overflow-hidden">
+    <iframe
+      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3353.236239315319!2d35.067626!3d32.812505!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x151db0cc8b17a251%3A0xdd3ca761dc2908ca!2z15DXlteV16gg16rXotep15nXmdeU!5e0!3m2!1siw!2sil!4v1754044938841!5m2!1siw!2sil"
+      width="100%"
+      height="100%"
+      style={{ border: 0 }}
+      allowFullScreen
+      loading="lazy"
+      referrerPolicy="no-referrer-when-downgrade"
+    ></iframe>
+  </div>
+</div>
+
+
           </div>
 
           {/* Contact Form */}
           <div className="bg-black/40 backdrop-blur-sm border border-gray-800 rounded-2xl p-8">
             <h3 className="text-2xl font-bold text-white mb-6">שלח הודעה</h3>
-            
+
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>

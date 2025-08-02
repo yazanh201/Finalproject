@@ -1,13 +1,16 @@
-
 import { ArrowLeft, Wrench, Gauge, CircleDot, Battery, Shield, Droplets, CheckCircle, Clock, Award } from 'lucide-react';
 import { useState } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+
 
 const ServicesPage = () => {
   const [selectedService, setSelectedService] = useState(null);
+  
+  const navigate = useNavigate();
+
 
   const services = [
     {
@@ -15,7 +18,7 @@ const ServicesPage = () => {
       title: "שירות כללי",
       shortDescription: "תחזוקה מקצועית לשמירה על ביצועי הרכב",
       description: "החלפת שמן, פילטר שמן ואוויר לשמירה על הביצועים של הרכב",
-      image: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=600&h=400&fit=crop",
+      image: '/img/p4.jpg',
       price: "מ-250 ₪",
       duration: "45-60 דקות",
       detailedInfo: {
@@ -42,7 +45,7 @@ const ServicesPage = () => {
       title: "בדיקה כללית",
       shortDescription: "אבחון ממוחשב מקיף לכל מערכות הרכב",
       description: "בדיקה ממוחשבת לאיתור תקלות והבטחת הבטיחות",
-      image: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&h=400&fit=crop",
+      image: '/img/p9.jpg',
       price: "מ-150 ₪",
       duration: "30-45 דקות",
       detailedInfo: {
@@ -69,7 +72,7 @@ const ServicesPage = () => {
       title: "צמיגים",
       shortDescription: "החלפה, תיקון ואיזון מקצועי",
       description: "החלפה ותיקון צמיגים לכל הרכבים",
-      image: "https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7?w=600&h=400&fit=crop",
+      image: '/img/p11.jpg',
       price: "מ-80 ₪",
       duration: "20-40 דקות",
       detailedInfo: {
@@ -96,7 +99,7 @@ const ServicesPage = () => {
       title: "מערכת חשמל",
       shortDescription: "תיקון ותחזוקת מערכות חשמל ומצבר",
       description: "תיקון ותחזוקה של מערכות החשמל והמצבר",
-      image: "https://images.unsplash.com/photo-1531297484001-80022131f5a1?w=600&h=400&fit=crop",
+      image: '/img/p2.jpg',
       price: "מ-120 ₪",
       duration: "30-90 דקות",
       detailedInfo: {
@@ -123,7 +126,7 @@ const ServicesPage = () => {
       title: "מערכת בלמים",
       shortDescription: "בדיקה ותיקון לבטיחות מרבית",
       description: "בדיקה ותיקון מערכת הבלמים לבטיחות מרבית",
-      image: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=600&h=400&fit=crop",
+      image: '/img/p10.jpg',
       price: "מ-200 ₪",
       duration: "60-120 דקות",
       detailedInfo: {
@@ -150,7 +153,7 @@ const ServicesPage = () => {
       title: "מערכת קירור",
       shortDescription: "תחזוקת רדיאטור ומערכת קירור",
       description: "תחזוקה ותיקון מערכת הקירור והרדיאטור",
-      image: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=600&h=400&fit=crop",
+      image: '/img/p3.jpg',
       price: "מ-180 ₪",
       duration: "45-90 דקות",
       detailedInfo: {
@@ -202,14 +205,14 @@ const ServicesPage = () => {
               חזרה לעמוד הבית
             </Link>
           </div>
-          
+
           <h1 className="text-5xl md:text-7xl font-black text-white mb-6 leading-tight">
             השירותים שלנו
           </h1>
           <p className="text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
             מגוון רחב של שירותי תחזוקה ותיקון מקצועיים לרכב שלכם
           </p>
-          
+
           <div className="mt-12 grid grid-cols-3 gap-8 max-w-2xl mx-auto">
             <div className="text-center">
               <div className="text-3xl font-bold text-red-500 mb-2">6+</div>
@@ -243,13 +246,9 @@ const ServicesPage = () => {
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent"></div>
-                  
-                  {/* Icon Badge */}
                   <div className="absolute top-4 right-4 bg-red-600/90 backdrop-blur-sm p-3 rounded-full border border-red-500/30">
                     <service.icon className="w-6 h-6 text-white" />
                   </div>
-                  
-                  {/* Price Badge */}
                   <div className="absolute bottom-4 left-4 bg-black/80 backdrop-blur-sm px-3 py-1 rounded-full border border-gray-600/30">
                     <span className="text-red-400 font-semibold text-sm">{service.price}</span>
                   </div>
@@ -262,8 +261,7 @@ const ServicesPage = () => {
                   <p className="text-gray-300 text-sm mb-3 leading-relaxed">
                     {service.shortDescription}
                   </p>
-                  
-                  {/* Service Info */}
+
                   <div className="flex items-center gap-4 mb-4 text-xs text-gray-400">
                     <div className="flex items-center gap-1">
                       <Clock className="w-3 h-3" />
@@ -310,7 +308,6 @@ const ServicesPage = () => {
               </DialogHeader>
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-6">
-                {/* Service Image */}
                 <div className="relative h-80 rounded-2xl overflow-hidden shadow-2xl">
                   <img
                     src={selectedService.image}
@@ -330,9 +327,7 @@ const ServicesPage = () => {
                   </div>
                 </div>
 
-                {/* Service Details */}
                 <div className="space-y-6">
-                  {/* Treatments */}
                   <Card className="bg-gradient-to-br from-gray-800/80 to-gray-900/60 border-gray-600/50 shadow-xl">
                     <CardContent className="p-6">
                       <h4 className="text-xl font-bold text-red-400 mb-4 flex items-center gap-2">
@@ -352,7 +347,6 @@ const ServicesPage = () => {
                     </CardContent>
                   </Card>
 
-                  {/* Benefits */}
                   <Card className="bg-gradient-to-br from-blue-900/30 to-blue-800/20 border-blue-600/30 shadow-xl">
                     <CardContent className="p-6">
                       <h4 className="text-xl font-bold text-blue-400 mb-4 flex items-center gap-2">
@@ -374,7 +368,6 @@ const ServicesPage = () => {
                 </div>
               </div>
 
-              {/* Warranty Info */}
               <Card className="mt-8 bg-gradient-to-r from-purple-900/30 to-purple-800/20 border-purple-600/30">
                 <CardContent className="p-6 text-center">
                   <h5 className="font-bold text-purple-400 mb-2 text-lg">אחריות</h5>
@@ -382,16 +375,15 @@ const ServicesPage = () => {
                 </CardContent>
               </Card>
 
-              {/* Call to Action */}
               <div className="mt-8 text-center p-8 bg-gradient-to-r from-red-600/20 to-red-700/10 rounded-2xl border border-red-600/30">
                 <h5 className="text-2xl font-bold text-white mb-3">מעוניינים בשירות זה?</h5>
                 <p className="text-gray-300 mb-6 text-lg">צרו איתנו קשר לקביעת תור או לקבלת הצעת מחיר מותאמת אישית</p>
                 <div className="flex gap-4 justify-center">
-                  <Button className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-bold px-8 py-3 text-lg">
+                  <Button
+                    onClick={() => navigate('/contact')}
+                    className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-bold px-8 py-3 text-lg"
+                  >
                     קבע תור עכשיו
-                  </Button>
-                  <Button variant="outline" className="border-red-500/50 text-red-400 hover:bg-red-600/10 font-bold px-8 py-3 text-lg">
-                    קבל הצעת מחיר
                   </Button>
                 </div>
               </div>
