@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: garage-backend
+    env: docker
+    plan: free
+    dockerCommand: docker-compose up garage-backend
+
+  - type: web
+    name: garage-frontweb
+    env: docker
+    plan: free
+    dockerCommand: docker-compose up garage-frontweb
+
+  - type: web
+    name: garage-frontend
+    env: docker
+    plan: free
+    dockerCommand: docker-compose up garage-frontend
+
+  - type: web
+    name: plate-detector
+    env: docker
+    plan: free
+    dockerCommand: docker-compose up plate-detector
