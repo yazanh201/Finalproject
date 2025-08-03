@@ -5,6 +5,7 @@ services:
     plan: free
     rootDir: garage-backend
     dockerfilePath: Dockerfile
+    dockerCommand: docker-compose up garage-backend
 
   - type: web
     name: garage-frontweb
@@ -12,6 +13,7 @@ services:
     plan: free
     rootDir: frontweb
     dockerfilePath: Dockerfile
+    dockerCommand: docker-compose up garage-frontweb
 
   - type: web
     name: garage-frontend
@@ -19,6 +21,7 @@ services:
     plan: free
     rootDir: frontend
     dockerfilePath: Dockerfile
+    dockerCommand: docker-compose up garage-frontend
 
   - type: web
     name: plate-detector
@@ -26,3 +29,4 @@ services:
     plan: free
     rootDir: plates
     dockerfilePath: Dockerfile
+    dockerCommand: docker-compose up plate-detector
