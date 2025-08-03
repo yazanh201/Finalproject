@@ -4,29 +4,21 @@ services:
     env: docker
     plan: free
     rootDir: garage-backend
-    dockerfilePath: Dockerfile
-    dockerCommand: docker-compose up garage-backend
-
-  - type: web
-    name: garage-frontweb
-    env: docker
-    plan: free
-    rootDir: frontweb
-    dockerfilePath: Dockerfile
-    dockerCommand: docker-compose up garage-frontweb
 
   - type: web
     name: garage-frontend
     env: docker
     plan: free
     rootDir: frontend
-    dockerfilePath: Dockerfile
-    dockerCommand: docker-compose up garage-frontend
+
+  - type: web
+    name: garage-frontweb
+    env: docker
+    plan: free
+    rootDir: frontweb
 
   - type: web
     name: plate-detector
     env: docker
     plan: free
     rootDir: plates
-    dockerfilePath: Dockerfile
-    dockerCommand: docker-compose up plate-detector
