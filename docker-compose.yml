@@ -13,7 +13,7 @@ services:
     build:
       context: ./frontweb
       args:
-        REACT_APP_API_URL: http://localhost:5000
+        REACT_APP_API_URL: https://garage-backend-rozt.onrender.com
     container_name: garage-frontweb
     ports:
       - "3000:80"
@@ -26,7 +26,7 @@ services:
     build:
       context: ./frontend
       args:
-        REACT_APP_API_URL: http://localhost:5000
+        REACT_APP_API_URL: https://garage-backend-rozt.onrender.com
     container_name: garage-frontend
     ports:
       - "3001:80"
