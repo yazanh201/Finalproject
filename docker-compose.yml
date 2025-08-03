@@ -9,12 +9,12 @@ services:
     depends_on:
       - plate-detector
 
-  frontend:
+  frontweb:
     build:
-      context: ./frontend
+      context: ./frontweb
       args:
         REACT_APP_API_URL: http://localhost:5000
-    container_name: garage-frontend
+    container_name: garage-frontweb
     ports:
       - "3000:80"
     depends_on:
@@ -22,8 +22,21 @@ services:
     networks:
       - garage-net
 
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        REACT_APP_API_URL: http://localhost:5000
+    container_name: garage-frontend
+    ports:
+      - "3001:80"
+    depends_on:
+      - backend
+    networks:
+      - garage-net
+
   plate-detector:
-    build: ./plates  # 👈 זו התיקייה הנכונה עכשיו
+    build: ./plates
     container_name: plate-detector
     ports:
       - "3300:3300"

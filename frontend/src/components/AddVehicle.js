@@ -101,27 +101,38 @@ const AddVehicleDetails = () => {
             />
           </div>
 
-          <div className="col-md-6">
-            <label className="form-label">שנת ייצור</label>
-            <input
-              type="number"
-              className="form-control"
-              value={year}
-              onChange={(e) => setYear(e.target.value)}
-              required
-            />
-          </div>
+        <div className="col-md-6">
+  <label className="form-label">שנת ייצור</label>
+  <select
+    className="form-select"
+    value={year}
+    onChange={(e) => setYear(e.target.value)}
+    required
+  >
+    <option value="">בחר שנה</option>
+    {[...Array(new Date().getFullYear() - 1994).keys()].map(i => {
+      const y = 1995 + i;
+      return <option key={y} value={y}>{y}</option>;
+    })}
+  </select>
+</div>
 
-          <div className="col-md-6">
-            <label className="form-label">צבע</label>
-            <input
-              type="text"
-              className="form-control"
-              value={color}
-              onChange={(e) => setColor(e.target.value)}
-              required
-            />
-          </div>
+
+         <div className="col-md-6">
+  <label className="form-label">צבע</label>
+  <select
+    className="form-select"
+    value={color}
+    onChange={(e) => setColor(e.target.value)}
+    required
+  >
+    <option value="">בחר צבע</option>
+    {["לבן", "שחור", "אפור", "כסוף", "כחול", "אדום", "ירוק", "צהוב", "חום", "זהב", "בורדו"].map((c, idx) => (
+      <option key={idx} value={c}>{c}</option>
+    ))}
+  </select>
+</div>
+
 
           <div className="col-md-6">
             <label className="form-label">קילומטראז'</label>
