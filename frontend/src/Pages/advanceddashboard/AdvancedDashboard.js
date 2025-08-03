@@ -15,6 +15,8 @@ import useNotifications from "./useNotifications";
 import CarsUnderService from "../tabels/CarsUnderService";
 import RecommendedCars from "../tabels/RecommendedCars";
 import MonthlyRevenueTable from "../tabels/MonthlyRevenueTable";
+import InvoicesTable from "../tabels/InvoicesTable";
+
 
 const AdvancedDashboard = () => {
   const navigate = useNavigate();
@@ -184,6 +186,11 @@ const AdvancedDashboard = () => {
               <span role="img" aria-label="calendar"></span> דוח חודשי
             </button>
           </li>
+          <li className={styles.navItem}>
+            <button className={styles.sidebarBtn} onClick={() => setSelectedTable("invoices")}>
+              <span role="img" aria-label="invoice">📄</span> חשבוניות
+            </button>
+          </li>
         </ul>
       </aside>
 
@@ -221,6 +228,8 @@ const AdvancedDashboard = () => {
             <RecommendedCars onClose={() => setSelectedTable(null)} />
           ) : selectedTable === "monthlyRevenue" ? (
             <MonthlyRevenueTable onClose={() => setSelectedTable(null)} />
+          ) : selectedTable === "invoices" ? (   // ✅ הוספנו את האפשרות לחשבוניות
+            <InvoicesTable onClose={() => setSelectedTable(null)} />
           ) : (
             <DashboardTables
               tableTitle={tableTitle}

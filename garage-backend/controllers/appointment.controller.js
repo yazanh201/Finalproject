@@ -2,6 +2,7 @@
 
 const Appointment = require('../models/Appointment');
 const Treatment = require('../models/Treatment');
+const { sendAppointmentEmail } = require('../utils/mailer');
 
 // הוספת תור
 const addAppointment = async (req, res) => {
@@ -24,7 +25,18 @@ const addAppointment = async (req, res) => {
 
     await appointment.save();
 
-    res.status(201).json({ message: "✅ תור נשמר בהצלחה", appointment });
+    // ✅ שליחת מייל ללקוח
+    if (req.body.email) {
+      await sendAppointmentEmail({
+        to: req.body.email,
+        name: req.body.name,
+        date: req.body.date,
+        time: req.body.time,
+        description: req.body.description
+      });
+    }
+
+    res.status(201).json({ message: "✅ תור נשמר בהצלחה ונשלח מייל ללקוח", appointment });
   } catch (error) {
     console.error("❌ שגיאה ביצירת תור:", error);
     res.status(500).json({ message: "❌ שגיאה בשמירת תור", error: error.message });

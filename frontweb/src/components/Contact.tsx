@@ -9,17 +9,42 @@ const Contact = () => {
     message: ''
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log('Form submitted:', formData);
-    // כאן ניתן לשלוח את הנתונים לשרת
-  };
+  const [loading, setLoading] = useState(false);
 
+  // שינוי ערכים בטופס
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
     });
+  };
+
+  // שליחת טופס לשרת
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const res = await fetch("http://localhost:5000/api/inquiries", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData)
+      });
+
+      const result = await res.json();
+
+      if (res.ok) {
+        alert("✅ הפנייה נשלחה בהצלחה!");
+        setFormData({ name: "", email: "", phone: "", message: "" }); // ניקוי הטופס
+      } else {
+        alert("❌ " + result.message);
+      }
+    } catch (err) {
+      console.error("❌ שגיאה בשליחת הפנייה:", err);
+      alert("❌ שגיאה בשרת, נסה שוב מאוחר יותר");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -47,7 +72,7 @@ const Contact = () => {
                   </div>
                   <div>
                     <div className="text-white font-semibold">טלפון:</div>
-                    <div className="text-gray-400">972+ 0499301</div>
+                    <div className="text-gray-400">+972 04-99301</div>
                   </div>
                 </div>
 
@@ -78,22 +103,20 @@ const Contact = () => {
             </div>
 
             {/* Embedded Google Map */}
-  <div className="bg-black/40 backdrop-blur-sm border border-gray-800 rounded-2xl p-6">
-  <h3 className="text-xl font-bold text-white mb-4">מפת המסלול</h3>
-  <div className="w-full h-64 rounded-lg overflow-hidden">
-    <iframe
-      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3353.236239315319!2d35.067626!3d32.812505!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x151db0cc8b17a251%3A0xdd3ca761dc2908ca!2z15DXlteV16gg16rXotep15nXmdeU!5e0!3m2!1siw!2sil!4v1754044938841!5m2!1siw!2sil"
-      width="100%"
-      height="100%"
-      style={{ border: 0 }}
-      allowFullScreen
-      loading="lazy"
-      referrerPolicy="no-referrer-when-downgrade"
-    ></iframe>
-  </div>
-</div>
-
-
+            <div className="bg-black/40 backdrop-blur-sm border border-gray-800 rounded-2xl p-6">
+              <h3 className="text-xl font-bold text-white mb-4">מפת המסלול</h3>
+              <div className="w-full h-64 rounded-lg overflow-hidden">
+                <iframe
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3353.236239315319!2d35.067626!3d32.812505!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x151db0cc8b17a251%3A0xdd3ca761dc2908ca!2z15DXlteV16gg16rXotep15nXmdeU!5e0!3m2!1siw!2sil!4v1754044938841!5m2!1siw!2sil"
+                  width="100%"
+                  height="100%"
+                  style={{ border: 0 }}
+                  allowFullScreen
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                ></iframe>
+              </div>
+            </div>
           </div>
 
           {/* Contact Form */}
@@ -155,9 +178,10 @@ const Contact = () => {
 
               <button
                 type="submit"
-                className="w-full bg-red-600 hover:bg-red-700 text-white px-8 py-4 rounded-lg font-semibold transition-all duration-200 hover:scale-105"
+                disabled={loading}
+                className="w-full bg-red-600 hover:bg-red-700 text-white px-8 py-4 rounded-lg font-semibold transition-all duration-200 hover:scale-105 disabled:opacity-60"
               >
-                שלח הודעה
+                {loading ? "שולח..." : "שלח הודעה"}
               </button>
             </form>
           </div>

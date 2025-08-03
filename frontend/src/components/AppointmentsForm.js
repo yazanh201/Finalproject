@@ -16,6 +16,7 @@ const CreateAppointment = () => {
     description: '',
     idNumber: '',
     name: '',
+    email: '',
     phonePrefix: '050',
     phoneNumber: '',
     carNumber: '',
@@ -30,6 +31,7 @@ const CreateAppointment = () => {
         description: data.description || '',
         idNumber: data.idNumber || '',
         name: data.name || '',
+        email: data.email || '', // ✅ נוספה שליפת אימייל
         phonePrefix: data.phoneNumber ? data.phoneNumber.substring(0, 3) : '050',
         phoneNumber: data.phoneNumber ? data.phoneNumber.substring(3) : '',
         carNumber: data.carNumber || ''
@@ -45,6 +47,7 @@ const CreateAppointment = () => {
             description: data.description || '',
             idNumber: data.idNumber || '',
             name: data.name || '',
+            email: data.email || '', // ✅ נוספה שליפת אימייל מה־DB
             phonePrefix: data.phoneNumber ? data.phoneNumber.substring(0, 3) : '050',
             phoneNumber: data.phoneNumber ? data.phoneNumber.substring(3) : '',
             carNumber: data.carNumber || ''
@@ -54,6 +57,7 @@ const CreateAppointment = () => {
         .catch(err => console.error('❌ שגיאה בטעינת נתוני עריכה:', err));
     }
   }, [location.state, id]);
+
 
   const fetchAvailableTimes = async (date) => {
     if (!date) return;
@@ -66,6 +70,7 @@ const CreateAppointment = () => {
       console.error('❌ שגיאה בשליפת שעות פנויות:', error);
     }
   };
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -138,10 +143,12 @@ const CreateAppointment = () => {
         description: '',
         idNumber: '',
         name: '',
+        email: '', // ✅ נוספה איפוס אימייל
         phonePrefix: '050',
         phoneNumber: '',
         carNumber: '',
       });
+
 
       navigate('/Dashboard');
     } catch (error) {
@@ -215,6 +222,7 @@ const CreateAppointment = () => {
                                       phoneNumber: s.phone?.substring(3) || "",
                                       phonePrefix: s.phone?.substring(0, 3) || "050",
                                       carNumber: car,
+                                      email: s.email || "",
                                     }));
                                     setSuggestions([]);
                                   }}

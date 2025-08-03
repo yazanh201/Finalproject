@@ -1,17 +1,13 @@
 const mongoose = require('mongoose');
 
 const inquirySchema = new mongoose.Schema({
-  name: String,
-  email: String,
-  phone: String,
-  message: String,
-  status: {
-    type: String,
-    default: 'פתוחה'
-  }
+  name: { type: String, required: true },
+  email: { type: String, required: true },
+  phone: { type: String },
+  message: { type: String, required: true },
+  status: { type: String, default: 'פתוחה' }
 }, {
   timestamps: true,
 });
 
-const Inquiry = mongoose.model('Inquiry', inquirySchema);
-module.exports = Inquiry;
+module.exports = mongoose.model('Inquiry', inquirySchema);

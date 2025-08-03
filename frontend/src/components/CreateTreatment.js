@@ -206,7 +206,15 @@ const handleSubmit = async (e) => {
           <div className="row g-4">
             <div className="col-md-6">
               <label className="form-label">תאריך</label>
-              <input type="date" name="date" className="form-control" value={form.date} onChange={handleChange} required />
+              <input 
+                type="date" 
+                name="date" 
+                className="form-control" 
+                value={form.date} 
+                onChange={handleChange} 
+                min={new Date().toISOString().split("T")[0]} // ✅ תאריך מינימלי = היום
+                required 
+              />
               <label className="form-label mt-3">מספר רכב</label>
               <input type="text" name="carPlate" className="form-control" value={form.carPlate} onChange={handleChange} required />
               <label className="form-label mt-3">שם לקוח</label>
