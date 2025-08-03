@@ -3,8 +3,6 @@ services:
     name: garage-backend
     env: docker
     plan: free
-    repo: https://github.com/mahdir373/garage-backend
-    region: oregon
     rootDir: garage-backend
     dockerfilePath: Dockerfile
 
@@ -12,17 +10,13 @@ services:
     name: garage-frontweb
     env: docker
     plan: free
-    repo: https://github.com/mahdir373/frontweb
-    region: oregon
-    rootDir: garage-frontweb
+    rootDir: frontweb
     dockerfilePath: Dockerfile
 
   - type: web
     name: garage-frontend
     env: docker
     plan: free
-    repo: https://github.com/mahdir373/frontend
-    region: oregon
     rootDir: frontend
     dockerfilePath: Dockerfile
 
@@ -30,7 +24,5 @@ services:
     name: plate-detector
     env: docker
     plan: free
-    repo: https://github.com/mahdir373/plates
-    region: oregon
     rootDir: plates
     dockerfilePath: Dockerfile
