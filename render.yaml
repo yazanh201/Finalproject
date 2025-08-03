@@ -3,22 +3,34 @@ services:
     name: garage-backend
     env: docker
     plan: free
-    dockerCommand: docker-compose up garage-backend
+    repo: https://github.com/mahdir373/front-web
+    region: oregon
+    rootDir: garage-backend
+    dockerfilePath: Dockerfile
 
   - type: web
     name: garage-frontweb
     env: docker
     plan: free
-    dockerCommand: docker-compose up garage-frontweb
+    repo: https://github.com/mahdir373/front-web
+    region: oregon
+    rootDir: garage-frontweb
+    dockerfilePath: Dockerfile
 
   - type: web
     name: garage-frontend
     env: docker
     plan: free
-    dockerCommand: docker-compose up garage-frontend
+    repo: https://github.com/mahdir373/front-web
+    region: oregon
+    rootDir: frontend
+    dockerfilePath: Dockerfile
 
   - type: web
     name: plate-detector
     env: docker
     plan: free
-    dockerCommand: docker-compose up plate-detector
+    repo: https://github.com/mahdir373/front-web
+    region: oregon
+    rootDir: plates
+    dockerfilePath: Dockerfile
