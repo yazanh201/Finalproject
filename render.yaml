@@ -16,7 +16,7 @@ services:
     region: oregon
     rootDir: frontweb
     dockerfilePath: Dockerfile
-
+####################
   - type: web
     name: garage-frontend
     env: docker
