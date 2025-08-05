@@ -1,6 +1,9 @@
 const Employee = require("../models/Employee");
 
-// שליפת כל העובדים
+/**
+ * 📌 שליפת כל העובדים מהמסד
+ * ממוין לפי שם מלא בסדר עולה
+ */
 const getAllEmployees = async (req, res) => {
   try {
     const employees = await Employee.find().sort({ fullName: 1 });
@@ -10,7 +13,10 @@ const getAllEmployees = async (req, res) => {
   }
 };
 
-// הוספת עובד
+/**
+ * 📌 הוספת עובד חדש
+ * מבצע ולידציה לשדות ומוסיף למסד אם הכל תקין
+ */
 const addEmployee = async (req, res) => {
   try {
     console.log("📥 POST /api/employees BODY:", req.body); // Debug
@@ -38,10 +44,12 @@ const addEmployee = async (req, res) => {
   } catch (err) {
     console.error("❌ שגיאה בהוספת עובד:", err);
 
+    // שגיאה על כפילות בת"ז
     if (err.code === 11000) {
       return res.status(400).json({ message: "❌ עובד עם תעודת זהות זו כבר קיים" });
     }
 
+    // שגיאת ולידציה בסכמת המודל
     if (err.name === "ValidationError") {
       const messages = Object.values(err.errors).map(e => e.message);
       return res.status(400).json({ message: "❌ שגיאת ולידציה", errors: messages });
@@ -51,7 +59,10 @@ const addEmployee = async (req, res) => {
   }
 };
 
-// עדכון עובד
+/**
+ * 📌 עדכון פרטי עובד לפי מזהה
+ * מקבל נתונים חדשים ומעדכן את העובד הקיים במסד
+ */
 const updateEmployee = async (req, res) => {
   try {
     const updated = await Employee.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -61,7 +72,10 @@ const updateEmployee = async (req, res) => {
   }
 };
 
-// חיפוש לפי ת״ז או שם
+/**
+ * 📌 חיפוש עובדים לפי ת״ז או שם
+ * מבצע חיפוש חלקי ולא תלוי רישיות
+ */
 const searchEmployee = async (req, res) => {
   try {
     const search = req.params.term;
@@ -77,7 +91,9 @@ const searchEmployee = async (req, res) => {
   }
 };
 
-// מחיקה
+/**
+ * 📌 מחיקת עובד לפי מזהה
+ */
 const deleteEmployee = async (req, res) => {
   try {
     const { id } = req.params;
@@ -92,6 +108,7 @@ const deleteEmployee = async (req, res) => {
   }
 };
 
+// ייצוא הפונקציות לשימוש בראוטר
 module.exports = {
   getAllEmployees,
   addEmployee,

@@ -1,6 +1,9 @@
 const CarOrder = require('../models/CarOrder');
 
-// יצירת הזמנה חדשה
+/**
+ * יצירת הזמנת רכב חדשה
+ * מקבלת את כל פרטי ההזמנה מתוך גוף הבקשה (req.body)
+ */
 const createCarOrder = async (req, res) => {
   try {
     const newOrder = new CarOrder(req.body);
@@ -11,7 +14,10 @@ const createCarOrder = async (req, res) => {
   }
 };
 
-// שליפת כל ההזמנות
+/**
+ * שליפת כל ההזמנות במערכת
+ * מסודרות לפי תאריך יצירה מהחדש לישן
+ */
 const getAllCarOrders = async (req, res) => {
   try {
     const orders = await CarOrder.find().sort({ createdAt: -1 });
@@ -21,7 +27,9 @@ const getAllCarOrders = async (req, res) => {
   }
 };
 
-// עדכון הזמנה
+/**
+ * עדכון הזמנת רכב קיימת לפי מזהה
+ */
 const updateCarOrder = async (req, res) => {
   try {
     const { id } = req.params;
@@ -32,7 +40,9 @@ const updateCarOrder = async (req, res) => {
   }
 };
 
-// חיפוש לפי מספר רכב
+/**
+ * חיפוש הזמנות לפי מספר רכב
+ */
 const searchCarOrdersByCarNumber = async (req, res) => {
   try {
     const { carNumber } = req.params;
@@ -43,7 +53,9 @@ const searchCarOrdersByCarNumber = async (req, res) => {
   }
 };
 
-// 📌 מחיקת הזמנה לפי ID
+/**
+ * מחיקת הזמנה לפי מזהה
+ */
 const deleteCarOrder = async (req, res) => {
   try {
     const { id } = req.params;
@@ -60,6 +72,10 @@ const deleteCarOrder = async (req, res) => {
   }
 };
 
+/**
+ * שליפת הזמנות פעילות לפי מספר רכב
+ * מחזיר הזמנות שלא בוטלו ולא הושלמו
+ */
 const getActiveOrdersByCarNumber = async (req, res) => {
   try {
     const { carNumber } = req.params;
@@ -73,7 +89,10 @@ const getActiveOrdersByCarNumber = async (req, res) => {
   }
 };
 
-// שליפת הזמנות לפי חודש נוכחי
+/**
+ * שליפת הזמנות שבוצעו במהלך החודש הנוכחי בלבד
+ * מבוסס על שדה orderDate
+ */
 const getMonthlyCarOrders = async (req, res) => {
   try {
     const startOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
@@ -90,12 +109,13 @@ const getMonthlyCarOrders = async (req, res) => {
 };
 
 
+// ייצוא כל הפונקציות לשימוש בראוטר
 module.exports = {
   createCarOrder,
   getAllCarOrders,
   updateCarOrder,
   searchCarOrdersByCarNumber,
   deleteCarOrder,
-  getActiveOrdersByCarNumber ,
+  getActiveOrdersByCarNumber,
   getMonthlyCarOrders
 };

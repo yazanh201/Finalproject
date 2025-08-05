@@ -1,8 +1,12 @@
-// 📁 controllers/invoice.controller.js
 const Invoice = require("../models/Invoice");
 const Treatment = require("../models/Treatment");
 
-// ✅ יצירת חשבונית חדשה
+/**
+ * ✅ יצירת חשבונית חדשה
+ * מקבלת מזהה טיפול, פרטי פריטים וסטטוס תשלום
+ * מבצעת חישוב סכום כולל ומע"מ, שומרת במסד הנתונים,
+ * ומעדכנת את עלות הטיפול בטבלת הטיפולים.
+ */
 const createInvoice = async (req, res) => {
   try {
     const { treatmentId, items, isPaid } = req.body;
@@ -42,7 +46,10 @@ const createInvoice = async (req, res) => {
   }
 };
 
-// ✅ שליפת חשבונית לפי מזהה טיפול
+/**
+ * ✅ שליפת חשבונית לפי מזהה טיפול
+ * מחזירה את החשבונית המקושרת לטיפול מסוים
+ */
 const getInvoiceByTreatmentId = async (req, res) => {
   try {
     const invoice = await Invoice.findOne({ treatmentId: req.params.treatmentId });
@@ -53,7 +60,10 @@ const getInvoiceByTreatmentId = async (req, res) => {
   }
 };
 
-// ✅ עדכון חשבונית קיימת לפי מזהה טיפול (כולל סטטוס תשלום)
+/**
+ * ✅ עדכון חשבונית לפי מזהה טיפול
+ * כולל חישוב מחודש של סכומים ועדכון סטטוס תשלום
+ */
 const updateInvoiceByTreatmentId = async (req, res) => {
   const { treatmentId } = req.params;
   const { items, isPaid } = req.body;
@@ -92,7 +102,10 @@ const updateInvoiceByTreatmentId = async (req, res) => {
   }
 };
 
-// ✅ שליפת כל החשבוניות
+/**
+ * ✅ שליפת כל החשבוניות
+ * מסודרות לפי תאריך יצירה מהחדש לישן
+ */
 const getAllInvoices = async (req, res) => {
   try {
     const invoices = await Invoice.find().sort({ createdAt: -1 });
@@ -102,7 +115,10 @@ const getAllInvoices = async (req, res) => {
   }
 };
 
-// ✅ עדכון סטטוס בלבד (אם תרצה שימוש ייעודי)
+/**
+ * ✅ עדכון סטטוס חשבונית בלבד (שולם / לא שולם)
+ * משמש למקרים בהם רוצים רק לשנות את isPaid מבלי לשנות את הפריטים
+ */
 const updateInvoiceStatus = async (req, res) => {
   try {
     const { id } = req.params;
@@ -124,6 +140,7 @@ const updateInvoiceStatus = async (req, res) => {
   }
 };
 
+// ייצוא הפונקציות למערכת
 module.exports = {
   createInvoice,
   getInvoiceByTreatmentId,

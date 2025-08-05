@@ -2,7 +2,11 @@ const Appointment = require('../models/Appointment');
 const Treatment = require('../models/Treatment');
 const Client = require('../models/Customer');
 const Invoice = require('../models/Invoice');
-// שליפה כללית
+
+/**
+ * 📌 שליפה כללית של כל הטיפולים
+ * מסודרת מהחדשים לישנים לפי תאריך יצירה
+ */
 const getAllTreatments = async (req, res) => {
   try {
     const treatments = await Treatment.find().sort({ createdAt: -1 });
@@ -12,6 +16,9 @@ const getAllTreatments = async (req, res) => {
   }
 };
 
+/**
+ * 📌 שליפת טיפול לפי מזהה מספרי (treatmentNumber)
+ */
 const getTreatmentById = async (req, res) => {
   const treatmentId = parseInt(req.params.treatmentId);
   if (isNaN(treatmentId)) {
@@ -27,8 +34,9 @@ const getTreatmentById = async (req, res) => {
   }
 };
 
-
-// שליפה לפי מזהה תור
+/**
+ * 📌 שליפת טיפולים לפי מזהה תור (appointmentNumber)
+ */
 const getTreatmentsByAppointmentNumber = async (req, res) => {
   try {
     const treatments = await Treatment.find({ appointmentNumber: req.params.appointmentNumber });
@@ -38,7 +46,9 @@ const getTreatmentsByAppointmentNumber = async (req, res) => {
   }
 };
 
-// שליפה לפי תאריך
+/**
+ * 📌 שליפת טיפולים לפי תאריך
+ */
 const getTreatmentsByDate = async (req, res) => {
   try {
     const treatments = await Treatment.find({ date: req.params.date });
@@ -48,7 +58,9 @@ const getTreatmentsByDate = async (req, res) => {
   }
 };
 
-// שליפה לפי מספר רכב
+/**
+ * 📌 שליפת טיפולים לפי מספר רכב (carPlate)
+ */
 const getTreatmentsByCarPlate = async (req, res) => {
   try {
     const treatments = await Treatment.find({ carPlate: req.params.carPlate });
@@ -58,8 +70,10 @@ const getTreatmentsByCarPlate = async (req, res) => {
   }
 };
 
-// הוספת טיפול חדש
-// הוספת טיפול חדש
+/**
+ * 📌 הוספת טיפול חדש
+ * מייצרת מספר טיפול רץ, שומרת קבצים, תמונות, שירותים ומידע כללי
+ */
 const addTreatment = async (req, res) => {
   try {
     const last = await Treatment.findOne().sort({ treatmentNumber: -1 });
@@ -81,7 +95,7 @@ const addTreatment = async (req, res) => {
       treatmentServices // ✅ נוספה שורה זו
     } = req.body;
 
-    // ✅ עיבוד treatmentServices אם הוא מחרוזת (כמו שמתקבל מ־FormData)
+    // ✅ עיבוד treatmentServices אם התקבל כמחרוזת JSON
     if (treatmentServices && typeof treatmentServices === 'string') {
       try {
         treatmentServices = JSON.parse(treatmentServices);
@@ -114,7 +128,10 @@ const addTreatment = async (req, res) => {
   }
 };
 
-// עדכון טיפול
+/**
+ * 📌 עדכון טיפול קיים לפי מזהה
+ * כולל עדכון קבצים, שדות רגילים, רשימת שירותים, תמונות, ועוד
+ */
 const updateTreatment = async (req, res) => {
   try {
     const treatment = await Treatment.findById(req.params.id);
@@ -172,9 +189,10 @@ const updateTreatment = async (req, res) => {
   }
 };
 
-
-
-// אישור הגעה ויצירת טיפול מתור
+/**
+ * 📌 אישור הגעת לקוח ל־Appointment ויצירת Treatment חדש מקושר אליו
+ * יוצר טיפול אוטומטי מהתור עם נתוני ברירת מחדל
+ */
 const confirmArrivalAndAddTreatment = async (req, res) => {
   try {
     const { appointmentId } = req.body;
@@ -225,8 +243,9 @@ const confirmArrivalAndAddTreatment = async (req, res) => {
   }
 };
 
-
-// שליפה לפי אובייקט ID
+/**
+ * 📌 שליפת טיפול לפי ObjectId (מזהה MongoDB)
+ */
 const getTreatmentByObjectId = async (req, res) => {
   try {
     const treatment = await Treatment.findById(req.params.id);
@@ -237,7 +256,11 @@ const getTreatmentByObjectId = async (req, res) => {
   }
 };
 
-// בדיקה לפי מספר רכב
+/**
+ * 📌 בדיקה אם קיים טיפול לפי מספר רכב
+ * מחפש את הטיפול הראשון שמכיל את מספר הרכב לאחר ניקוי תווים
+ * ומחזיר מידע אם קיים טיפול ולמי שייך הרכב
+ */
 const checkTreatmentByPlate = async (req, res) => {
   const { plate } = req.query;
   if (!plate) return res.status(400).json({ message: 'חובה לציין plate' });
@@ -275,7 +298,10 @@ const checkTreatmentByPlate = async (req, res) => {
   }
 };
 
-
+/**
+ * 📌 שליפת הכנסות לפי קטגוריות של שירותים
+ * מסכמת את כל העלויות לפי קטגוריה שמופיעה ב־treatmentServices
+ */
 const getRevenueByCategory = async (req, res) => {
   try {
     const treatments = await Treatment.find({});
@@ -298,7 +324,6 @@ const getRevenueByCategory = async (req, res) => {
     const result = Object.entries(categoryMap).map(([name, value]) => ({ name, value }));
     console.log("🚀 נתוני תגובה:", result);
 
-
     res.json(result);
   } catch (err) {
     console.error("שגיאה בשליפת הכנסות לפי קטגוריה:", err);
@@ -306,8 +331,10 @@ const getRevenueByCategory = async (req, res) => {
   }
 };
 
-
-
+/**
+ * 📌 עדכון עלות טיפול לפי הסכום שבחשבונית
+ * מתאים אם הטיפול עודכן לאחר שהופקה חשבונית עם מחיר אחר
+ */
 const updateTreatmentCostFromInvoice = async (req, res) => {
   try {
     const { treatmentId } = req.params;
@@ -344,7 +371,10 @@ const updateTreatmentCostFromInvoice = async (req, res) => {
   }
 };
 
-// ✅ סכום כולל של טיפולים לחודש הנוכחי
+/**
+ * 📌 שליפת סכום ההכנסות החודשיות
+ * סוכם לפי עלויות טיפולים בטווח החודש הנוכחי
+ */
 const getMonthlyRevenue = async (req, res) => {
   try {
     const startOfMonth = new Date();
@@ -367,6 +397,9 @@ const getMonthlyRevenue = async (req, res) => {
   }
 };
 
+/**
+ * 📌 מחיקת טיפול לפי מזהה
+ */
 const deleteTreatment = async (req, res) => {
   try {
     const { id } = req.params;
@@ -383,8 +416,10 @@ const deleteTreatment = async (req, res) => {
   }
 };
 
-
-
+/**
+ * 📌 דוח חודשי – כולל טיפולים, הכנסות, לקוחות חדשים ומספר טיפולים
+ * מחזיר גם את רשימת הטיפולים של החודש
+ */
 const getMonthlyReportData = async (req, res) => {
   try {
     const treatments = await Treatment.find().sort({ createdAt: -1 });
@@ -418,10 +453,7 @@ const getMonthlyReportData = async (req, res) => {
   }
 };
 
-
-
-
-
+// ייצוא כל הפונקציות
 module.exports = {
   getAllTreatments,
   getTreatmentById,

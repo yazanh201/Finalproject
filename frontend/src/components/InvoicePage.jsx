@@ -6,6 +6,7 @@ import axios from 'axios';
 import styles from './cssfiles/InvoicePage.module.css';
 import html2pdf from 'html2pdf.js';
 import { toast } from 'react-hot-toast';
+import { FaPlus, FaTrash, FaDownload, FaEnvelope, FaSave, FaEdit } from 'react-icons/fa';
 
 const InvoicePage = () => {
   // רפרנס לכפתור הורדה (לשימוש עתידי)
@@ -21,6 +22,7 @@ const InvoicePage = () => {
   const [invoiceExists, setInvoiceExists] = useState(false); // האם קיימת חשבונית
   const [orders, setOrders] = useState([]); // הזמנות פעילות
   const [isPaid, setIsPaid] = useState(false); // סטטוס תשלום
+  const [customItems, setCustomItems] = useState([]); // פריטים מותאמים אישית
 
   // נתיבי API
   const BASE_URL = "http://localhost:5000/uploads/";
@@ -71,11 +73,23 @@ const InvoicePage = () => {
           // טעינת מחירים קיימים מהחשבונית
           if (invoiceRes.data.items && invoiceRes.data.items.length > 0) {
             const loadedPrices = {};
+            const customItemsFromInvoice = [];
+            
             invoiceRes.data.items.forEach((item) => {
-              const key = `${item.category}-${item.name}`;
-              loadedPrices[key] = item.price;
+              if (item.category === 'פריט מותאם אישית') {
+                customItemsFromInvoice.push({
+                  id: item._id || Math.random().toString(),
+                  name: item.name,
+                  price: item.price
+                });
+              } else {
+                const key = `${item.category}-${item.name}`;
+                loadedPrices[key] = item.price;
+              }
             });
+            
             setPrices(prev => ({ ...prev, ...loadedPrices }));
+            setCustomItems(customItemsFromInvoice);
           }
         }
       } catch (err) {
@@ -87,6 +101,30 @@ const InvoicePage = () => {
 
     fetchData();
   }, [treatmentId]);
+
+  // פונקציה להוספת פריט מותאם אישית
+  const addCustomItem = () => {
+    const newItem = {
+      id: Date.now().toString(),
+      name: '',
+      price: 0
+    };
+    setCustomItems([...customItems, newItem]);
+  };
+
+  // פונקציה לעדכון פריט מותאם אישית
+  const updateCustomItem = (id, field, value) => {
+    setCustomItems(prev => 
+      prev.map(item => 
+        item.id === id ? { ...item, [field]: value } : item
+      )
+    );
+  };
+
+  // פונקציה למחיקת פריט מותאם אישית
+  const removeCustomItem = (id) => {
+    setCustomItems(prev => prev.filter(item => item.id !== id));
+  };
 
   // ⬇ פונקציה לשמירת/עדכון החשבונית במסד הנתונים
   const handleSubmitInvoice = async () => {
@@ -122,6 +160,17 @@ const InvoicePage = () => {
         });
       });
 
+      // הוספת פריטים מותאמים אישית
+      customItems.forEach((item) => {
+        if (item.name.trim() && item.price > 0) {
+          items.push({
+            name: item.name,
+            category: 'פריט מותאם אישית',
+            price: item.price,
+          });
+        }
+      });
+
       // יצירת גוף החשבונית
       const invoiceData = {
         treatmentId: treatment._id,
@@ -145,7 +194,8 @@ const InvoicePage = () => {
   };
 
   // חישוב סה"כ ומע"מ
-  const total = Object.values(prices).reduce((sum, price) => sum + (price || 0), 0);
+  const total = Object.values(prices).reduce((sum, price) => sum + (price || 0), 0) + 
+                customItems.reduce((sum, item) => sum + (item.price || 0), 0);
   const VAT_PERCENT = 17;
   const vatAmount = (total * VAT_PERCENT) / 100;
   const totalWithVAT = total + vatAmount;
@@ -170,11 +220,22 @@ const InvoicePage = () => {
     hiddenElements.forEach(el => el.style.display = 'none');
 
     const opt = {
-      margin: 0.5,
+      margin: [0.2, 0.2, 0.2, 0.2], // מרווחים קטנים מאוד
       filename: `invoice-${treatmentId}.pdf`,
       image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2 },
-      jsPDF: { unit: 'cm', format: 'a4', orientation: 'portrait' }
+      html2canvas: { 
+        scale: 1.2, // קנה מידה קטן יותר
+        useCORS: true,
+        letterRendering: true,
+        backgroundColor: '#ffffff' // רקע לבן
+      },
+      jsPDF: { 
+        unit: 'cm', 
+        format: 'a4', 
+        orientation: 'portrait',
+        compress: true
+      },
+      pagebreak: { mode: 'avoid-all' } // מניעת שבירת דפים
     };
 
     html2pdf()
@@ -200,11 +261,22 @@ const InvoicePage = () => {
       hiddenElements.forEach(el => el.style.display = 'none');
 
       const opt = {
-        margin: 0.5,
+        margin: [0.2, 0.2, 0.2, 0.2], // מרווחים קטנים מאוד
         filename: 'invoice.pdf',
         image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: 'cm', format: 'a4', orientation: 'portrait' }
+        html2canvas: { 
+          scale: 1.2, // קנה מידה קטן יותר
+          useCORS: true,
+          letterRendering: true,
+          backgroundColor: '#ffffff' // רקע לבן
+        },
+        jsPDF: { 
+          unit: 'cm', 
+          format: 'a4', 
+          orientation: 'portrait',
+          compress: true
+        },
+        pagebreak: { mode: 'avoid-all' } // מניעת שבירת דפים
       };
 
       // יצירת Blob של PDF ושליחתו למייל דרך API
@@ -234,166 +306,224 @@ const InvoicePage = () => {
     }
   };
 
-
   return (
     <div id="invoiceContent" className={styles.invoiceContainer}>
-        <div className={styles.businessHeader}>
-            <div>
-                <img src="/img/invlogo.png" alt="לוגו מוסך" className={styles.logo} />
-            </div>
-            <div>
-                <h3>מוסך שירות מהיר</h3>
-                <p>רחוב התיקונים 5, חיפה</p>
-                <p>טלפון : 03-5551234</p>
-                <p> sherotmher12@gmail.com : אימייל</p>
-            </div>
-            </div>
-
-        <h2 className={styles.invoiceTitle}>חשבונית טיפול</h2>
-        {/* ✅ פרטי לקוח */}
-        <div className={styles.customerDetails}>
-          <p><strong>שם הלקוח:</strong> {treatment.customerName || 'לא זמין'}</p>
-          <p><strong>תעודת זהות:</strong> {treatment.idNumber || 'לא זמין'}</p>
-          <p><strong>מספר רכב:</strong> {treatment.carPlate}</p>
+      {/* כותרת עסק */}
+      <div className={styles.businessHeader}>
+        <div className={styles.logoSection}>
+          <img src="/img/invlogo.png" alt="לוגו מוסך" className={styles.logo} />
         </div>
+        <div className={styles.businessInfo}>
+          <h3>מוסך שירות מהיר</h3>
+          <p>רחוב התיקונים 5, חיפה</p>
+          <p>טלפון: 03-5551234</p>
+          <p>אימייל: sherotmher12@gmail.com</p>
+        </div>
+        <div className={styles.invoiceMeta}>
+          <h2 className={styles.invoiceTitle}>חשבונית טיפול</h2>
+          <p className={styles.invoiceDate}>תאריך: {new Date().toLocaleDateString('he-IL')}</p>
+        </div>
+      </div>
 
+      {/* פרטי לקוח */}
+      <div className={styles.customerDetails}>
+        <h4>פרטי לקוח</h4>
+        <div className={styles.customerGrid}>
+          <div className={styles.customerField}>
+            <label>שם הלקוח:</label>
+            <span>{treatment.customerName || 'לא זמין'}</span>
+          </div>
+          <div className={styles.customerField}>
+            <label>תעודת זהות:</label>
+            <span>{treatment.idNumber || 'לא זמין'}</span>
+          </div>
+          <div className={styles.customerField}>
+            <label>מספר רכב:</label>
+            <span>{treatment.carPlate}</span>
+          </div>
+          <div className={styles.customerField}>
+            <label>אימייל:</label>
+            <span>{treatment.email || 'לא זמין'}</span>
+          </div>
+        </div>
+      </div>
 
-        <div 
-          id="paymentStatusSection" 
-          className={styles.paymentStatus} 
-          style={{ marginBottom: "30px" }}
+      {/* סטטוס תשלום */}
+      <div id="paymentStatusSection" className={styles.paymentStatus}>
+        <label>סטטוס תשלום:</label>
+        <select
+          value={isPaid ? "paid" : "unpaid"}
+          onChange={(e) => setIsPaid(e.target.value === "paid")}
+          className={styles.paymentSelect}
         >
-          <label style={{ fontWeight: "bold", marginLeft: "10px" }}>סטטוס תשלום:</label>
-          <select
-            className="form-select w-auto d-inline-block"
-            value={isPaid ? "paid" : "unpaid"}
-            onChange={(e) => setIsPaid(e.target.value === "paid")}
-            style={{
-              display: "inline-block",
-              marginRight: "10px",
-              borderColor: isPaid ? "green" : "red",
-              color: isPaid ? "green" : "red",
-              fontWeight: "bold"
-            }}
+          <option value="unpaid">לא שולם</option>
+          <option value="paid">שולם</option>
+        </select>
+        <div className={styles.paymentIndicator}>
+          {isPaid ? '✅ שולם' : '❌ לא שולם'}
+        </div>
+      </div>
+
+      {/* טבלת פריטים */}
+      <div className={styles.itemsSection}>
+        <div className={styles.sectionHeader}>
+          <h4>פריטים ושירותים</h4>
+          <button 
+            className={`${styles.addItemBtn} no-print`}
+            onClick={addCustomItem}
+            type="button"
           >
-            <option value="unpaid">לא שולם</option>
-            <option value="paid">שולם</option>
-          </select>
+            <FaPlus /> הוסף פריט
+          </button>
         </div>
 
-        <div className={styles.section}>
-            <h4> שירותים שבוצעו</h4>
-            {treatment.treatmentServices?.length > 0 ? (
-            <table className={styles.servicesTable}>
-                <thead>
-                <tr>
-                    <th>שירות</th>
-                    <th>מחיר (₪)</th>
+        <div className={styles.tableContainer}>
+          <table className={styles.itemsTable}>
+            <thead>
+              <tr>
+                <th className={styles.descriptionColumn}>תיאור</th>
+                <th className={styles.priceColumn}>מחיר (₪)</th>
+                <th className={`${styles.actionsColumn} no-print`}>פעולות</th>
+              </tr>
+            </thead>
+            <tbody>
+              {/* שירותים שבוצעו */}
+              {treatment.treatmentServices?.map((group) =>
+                group.selectedOptions.map((option) => {
+                  const key = `${group.category}-${option}`;
+                  return (
+                    <tr key={key} className={styles.serviceRow}>
+                      <td className={styles.descriptionColumn}>{option}</td>
+                      <td className={styles.priceColumn}>
+                        <input
+                          type="number"
+                          min="0"
+                          value={prices[key] || ''}
+                          onChange={(e) => {
+                            const val = Number(e.target.value);
+                            if (val < 0) return;
+                            setPrices((prev) => ({
+                              ...prev,
+                              [key]: val,
+                            }));
+                          }}
+                          className={styles.priceInput}
+                        />
+                      </td>
+                      <td className={`${styles.actionsColumn} no-print`}></td>
+                    </tr>
+                  );
+                })
+              )}
+
+              {/* הזמנות פעילות */}
+              {orders.map((order) => {
+                const key = `הזמנה-${order._id}`;
+                return (
+                  <tr key={key} className={styles.orderRow}>
+                    <td className={styles.descriptionColumn}>הזמנה: {order.details}</td>
+                    <td className={styles.priceColumn}>
+                      <input
+                        type="number"
+                        min="0"
+                        value={prices[key] || ''}
+                        onChange={(e) => {
+                          const val = Number(e.target.value);
+                          if (val < 0) return;
+                          setPrices((prev) => ({
+                            ...prev,
+                            [key]: val,
+                          }));
+                        }}
+                        className={styles.priceInput}
+                      />
+                    </td>
+                    <td className={`${styles.actionsColumn} no-print`}></td>
+                  </tr>
+                );
+              })}
+
+              {/* פריטים מותאמים אישית */}
+              {customItems.map((item) => (
+                <tr key={item.id} className={styles.customRow}>
+                  <td className={styles.descriptionColumn}>
+                    <input
+                      type="text"
+                      value={item.name}
+                      onChange={(e) => updateCustomItem(item.id, 'name', e.target.value)}
+                      placeholder="תיאור הפריט"
+                      className={styles.itemNameInput}
+                    />
+                  </td>
+                  <td className={styles.priceColumn}>
+                    <input
+                      type="number"
+                      min="0"
+                      value={item.price}
+                      onChange={(e) => updateCustomItem(item.id, 'price', Number(e.target.value))}
+                      className={styles.priceInput}
+                    />
+                  </td>
+                  <td className={`${styles.actionsColumn} no-print`}>
+                    <button
+                      className={styles.removeBtn}
+                      onClick={() => removeCustomItem(item.id)}
+                      type="button"
+                    >
+                      <FaTrash />
+                    </button>
+                  </td>
                 </tr>
-                </thead>
-                <tbody>
-                  {/* ✅ הצגת השירותים שבוצעו */}
-                  {treatment.treatmentServices.map((group) =>
-                    group.selectedOptions.map((option) => {
-                      const key = `${group.category}-${option}`;
-                      return (
-                        <tr key={key}>
-                          <td>{option}</td>
-                          <td>
-                            <input
-                              type="number"
-                              min="0"
-                              value={prices[key] || ''}
-                              onChange={(e) => {
-                                const val = Number(e.target.value);
-                                if (val < 0) return;
-                                setPrices((prev) => ({
-                                  ...prev,
-                                  [key]: val,
-                                }));
-                              }}
-                              className={styles.priceInput}
-                            />
-                          </td>
-                        </tr>
-                      );
-                    })
-                  )}
-
-                  {/* ✅ הצגת ההזמנות הפעילות של הרכב */}
-                  {orders.map((order) => {
-                    const key = `הזמנה-${order._id}`;
-                    return (
-                      <tr key={key}>
-                        <td>הזמנה: {order.details}</td>
-                        <td>
-                          <input
-                            type="number"
-                            min="0"
-                            value={prices[key] || ''}
-                            onChange={(e) => {
-                              const val = Number(e.target.value);
-                              if (val < 0) return;
-                              setPrices((prev) => ({
-                                ...prev,
-                                [key]: val,
-                              }));
-                            }}
-                            className={styles.priceInput}
-                          />
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-
-            </table>
-            ) : (
-            <p>לא הוזנו שירותים</p>
-            )}
+              ))}
+            </tbody>
+          </table>
         </div>
+      </div>
 
-        <div className={styles.summary}>
-            <p><strong>סה״כ לפני מע״מ:</strong> {total.toLocaleString('he-IL', { style: 'currency', currency: 'ILS' })}</p>
-            <p><strong>מע״מ (17%):</strong> {vatAmount.toLocaleString('he-IL', { style: 'currency', currency: 'ILS' })}</p>
-            <p><strong>סה״כ כולל מע״מ:</strong> {totalWithVAT.toLocaleString('he-IL', { style: 'currency', currency: 'ILS' })}</p>
+      {/* סיכום תשלום */}
+      <div className={styles.summary}>
+        <div className={styles.summaryRow}>
+          <span>סה״כ לפני מע״מ:</span>
+          <span>{total.toLocaleString('he-IL', { style: 'currency', currency: 'ILS' })}</span>
         </div>
-        {dueDate && (
-            <div className={styles.dueDateNotice}>
-                <p><strong>לתשומת לבך:</strong> יש לשלם את הסכום עד לתאריך: <u>{dueDate.toLocaleDateString('he-IL')}</u></p>
-            </div>
-            )}
-
-
-        <div className="text-center mt-3 no-print">
-            <button className="btn btn-success" onClick={handleSubmitInvoice}>
-                {invoiceExists ? 'עדכן חשבונית' : 'שמור חשבונית'}
-            </button>
-            </div>
-
-            {/* כפתור הורדת PDF */}
-            <div className="text-center mt-3 no-print">
-            <button
-                className="btn btn-secondary"
-                onClick={handleDownloadPdf}
-                ref={downloadButtonRef}
-            >
-                הורד כ־PDF
-            </button>
-            </div>
-
-            {/* כפתור שליחת מייל */}
-            <div className="text-center mt-3 no-print">
-            <button className="btn btn-primary mt-2" onClick={handleSendEmail}>
-                שלח חשבונית במייל
-            </button>
-            </div>
-
-
-            
-            
+        <div className={styles.summaryRow}>
+          <span>מע״מ (17%):</span>
+          <span>{vatAmount.toLocaleString('he-IL', { style: 'currency', currency: 'ILS' })}</span>
         </div>
+        <div className={styles.summaryRow + ' ' + styles.totalRow}>
+          <span>סה״כ כולל מע״מ:</span>
+          <span>{totalWithVAT.toLocaleString('he-IL', { style: 'currency', currency: 'ILS' })}</span>
+        </div>
+      </div>
+
+      {/* הודעה על תאריך פירעון */}
+      {dueDate && (
+        <div className={styles.dueDateNotice}>
+          <p>
+            <strong>לתשומת לבך:</strong> יש לשלם את הסכום עד לתאריך: 
+            <u>{dueDate.toLocaleDateString('he-IL')}</u>
+          </p>
+        </div>
+      )}
+
+      {/* כפתורי פעולה */}
+      <div className={`${styles.actionButtons} no-print`}>
+        <button className={styles.saveBtn} onClick={handleSubmitInvoice}>
+          <FaSave />
+          {invoiceExists ? 'עדכן חשבונית' : 'שמור חשבונית'}
+        </button>
         
+        <button className={styles.downloadBtn} onClick={handleDownloadPdf}>
+          <FaDownload />
+          הורד PDF
+        </button>
+        
+        <button className={styles.emailBtn} onClick={handleSendEmail}>
+          <FaEnvelope />
+          שלח במייל
+        </button>
+      </div>
+    </div>
   );
 };
 

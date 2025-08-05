@@ -1,15 +1,23 @@
 const nodemailer = require('nodemailer');
 require('dotenv').config();
 
+// יצירת אובייקט לשליחת מיילים באמצעות Gmail דרך Nodemailer
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
+    user: process.env.EMAIL_USER, // שם משתמש מהמייל (מתוך .env)
+    pass: process.env.EMAIL_PASS  // סיסמה או אפליקציה של Gmail (מתוך .env)
   }
 });
 
-// פונקציה לשליחת חשבוניות (קיימת אצלך)
+/**
+ * 📤 שליחת מייל עם חשבונית מצורפת כ-PDF
+ * מקבלת:
+ * - כתובת דוא"ל של הלקוח (`to`)
+ * - נושא (`subject`) – לא חובה
+ * - טקסט לתוכן
+ * - מצרפת קובץ PDF מתוך buffer
+ */
 const sendInvoiceEmail = async ({ to, subject, text, attachments }) => {
   const mailOptions = {
     from: `"מוסך שירות מהיר" <${process.env.EMAIL_USER}>`,
@@ -50,8 +58,14 @@ const sendInvoiceEmail = async ({ to, subject, text, attachments }) => {
   await transporter.sendMail(mailOptions);
 };
 
-
-// 🆕 פונקציה לשליחת מייל על קביעת תור
+/**
+ * 📤 שליחת מייל עם אישור קביעת תור
+ * מקבלת:
+ * - כתובת דוא"ל של הלקוח (`to`)
+ * - שם הלקוח (`name`)
+ * - תאריך ושעה של התור
+ * - תיאור השירות
+ */
 const sendAppointmentEmail = async ({ to, name, date, time, description }) => {
   const mailOptions = {
     from: `"מוסך שירות מהיר" <${process.env.EMAIL_USER}>`,
@@ -90,7 +104,5 @@ const sendAppointmentEmail = async ({ to, name, date, time, description }) => {
   await transporter.sendMail(mailOptions);
 };
 
-
-
-// ייצוא שתי הפונקציות
+// ייצוא שתי הפונקציות לשימוש חיצוני
 module.exports = { sendInvoiceEmail, sendAppointmentEmail };

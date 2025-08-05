@@ -4,7 +4,9 @@ const Appointment = require('../models/Appointment');
 const Treatment = require('../models/Treatment');
 const { sendAppointmentEmail } = require('../utils/mailer');
 
-// הוספת תור
+/**
+ * יצירת תור חדש כולל מספר מזהה רץ ושליחת מייל ללקוח במידת הצורך
+ */
 const addAppointment = async (req, res) => {
   try {
     const lastAppointment = await Appointment.findOne().sort({ appointmentNumber: -1 });
@@ -43,7 +45,9 @@ const addAppointment = async (req, res) => {
   }
 };
 
-// שליפת כל התורים
+/**
+ * שליפת כל התורים מהמחשב לפי תאריך ושעה, כולל מידע על טיפולים
+ */
 const getAppointments = async (req, res) => {
   try {
     const appointments = await Appointment.find()
@@ -55,7 +59,9 @@ const getAppointments = async (req, res) => {
   }
 };
 
-// חיפוש לפי ת"ז
+/**
+ * שליפת תורים לפי מספר תעודת זהות
+ */
 const getByIdNumber = async (req, res) => {
   try {
     const appointments = await Appointment.find({ idNumber: req.params.idNumber });
@@ -65,7 +71,9 @@ const getByIdNumber = async (req, res) => {
   }
 };
 
-// חיפוש לפי תאריך
+/**
+ * שליפת תורים לפי תאריך מסוים
+ */
 const getByDate = async (req, res) => {
   try {
     const appointments = await Appointment.find({ date: req.params.date });
@@ -75,7 +83,9 @@ const getByDate = async (req, res) => {
   }
 };
 
-// חיפוש לפי מספר רכב
+/**
+ * שליפת תורים לפי מספר רכב
+ */
 const getByCarNumber = async (req, res) => {
   try {
     const appointments = await Appointment.find({ carNumber: req.params.carNumber });
@@ -85,7 +95,9 @@ const getByCarNumber = async (req, res) => {
   }
 };
 
-// עדכון תור
+/**
+ * עדכון תור קיים לפי מזהה
+ */
 const updateAppointment = async (req, res) => {
   try {
     const updated = await Appointment.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -95,7 +107,9 @@ const updateAppointment = async (req, res) => {
   }
 };
 
-// חיפוש לפי ת"ז או מספר רכב
+/**
+ * חיפוש תור לפי ת"ז או מספר רכב (OR)
+ */
 const getByIdOrCar = async (req, res) => {
   try {
     const search = req.params.term;
@@ -111,7 +125,9 @@ const getByIdOrCar = async (req, res) => {
   }
 };
 
-// שליפה לפי appointmentNumber
+/**
+ * שליפה לפי מזהה תור (appointmentNumber) כולל טיפול מקושר
+ */
 const getAppointmentByNumber = async (req, res) => {
   try {
     const appointment = await Appointment.findOne({ appointmentNumber: req.params.appointmentNumber }).populate("treatment");
@@ -124,7 +140,9 @@ const getAppointmentByNumber = async (req, res) => {
   }
 };
 
-// תורים של החודש הנוכחי
+/**
+ * שליפת תורים של החודש הנוכחי
+ */
 const getAppointmentsThisMonth = async (req, res) => {
   try {
     const now = new Date();
@@ -144,9 +162,12 @@ const getAppointmentsThisMonth = async (req, res) => {
   }
 };
 
-// שליפת שעות פנויות לפי תאריך
+// רשימת שעות עבודה זמינות
 const availableTimes = ["08:00", "10:00", "12:00", "14:00", "16:00"];
 
+/**
+ * שליפת שעות פנויות בתאריך מסוים
+ */
 const getAvailableTimes = async (req, res) => {
   try {
     const date = req.params.date;
@@ -160,7 +181,9 @@ const getAvailableTimes = async (req, res) => {
   }
 };
 
-// אישור הגעה
+/**
+ * אישור הגעת לקוח לתור
+ */
 const confirmArrival = async (req, res) => {
   try {
     const { id } = req.params;
@@ -171,7 +194,9 @@ const confirmArrival = async (req, res) => {
   }
 };
 
-// דחיית הגעה
+/**
+ * דחיית הגעת לקוח לתור (לא הגיע)
+ */
 const rejectArrival = async (req, res) => {
   try {
     const { id } = req.params;
@@ -182,6 +207,9 @@ const rejectArrival = async (req, res) => {
   }
 };
 
+/**
+ * חיפוש לקוחות לפי שם (autocomplete)
+ */
 const searchCustomersByName = async (req, res) => {
   try {
     const nameQuery = req.query.name || '';
@@ -195,7 +223,9 @@ const searchCustomersByName = async (req, res) => {
   }
 };
 
-
+/**
+ * מחיקת תור לפי מזהה
+ */
 const deleteAppointment = async (req, res) => {
   try {
     const { id } = req.params;

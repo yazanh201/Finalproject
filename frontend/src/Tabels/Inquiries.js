@@ -140,8 +140,8 @@ const Inquiries = () => {
 
       {/* טבלה להצגת הפניות */}
       <div className="table-responsive">
-        <table className="table table-striped">
-          <thead>
+        <table className="table table-striped table-bordered text-center align-middle">
+          <thead className="table">
             <tr>
               <th>#</th>
               <th>שם לקוח</th>
@@ -164,18 +164,12 @@ const Inquiries = () => {
                 <td className={inquiry.status === "פתוחה" ? "text-success" : "text-danger"}>
                   {inquiry.status}
                 </td>
-                <td>{new Date(inquiry.createdAt).toLocaleDateString('he-IL')}</td>
+                <td>{new Date(inquiry.createdAt).toLocaleDateString("he-IL")}</td>
                 <td>
-                  <button
-                    className="btn btn-sm btn-primary"
-                    onClick={() => handleShowModal("edit", inquiry)}
-                  >
+                  <button className="btn btn-sm btn-primary me-2" onClick={() => handleShowModal("edit", inquiry)}>
                     ערוך
                   </button>
-                  <button
-                    className="btn btn-sm btn-danger me-2"
-                    onClick={() => handleDelete(inquiry._id)}
-                  >
+                  <button className="btn btn-sm btn-danger me-2" onClick={() => handleDelete(inquiry._id)}>
                     מחק
                   </button>
                 </td>
@@ -184,6 +178,7 @@ const Inquiries = () => {
           </tbody>
         </table>
       </div>
+
 
       {/* מודאל עריכה */}
       {modalType === "edit" && selectedInquiry && (

@@ -2,7 +2,6 @@ const Vehicle = require('../models/Vehicle');
 const Customer = require("../models/Customer");
 
 // 📌 הוספת רכב חדש
-// 📌 הוספת רכב חדש
 const addVehicle = async (req, res) => {
   try {
     const { vehicleNumber, ownerName, ownerIdNumber, manufacturer, model, year, color, mileage } = req.body;

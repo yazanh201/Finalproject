@@ -1,4 +1,3 @@
-// 📁 models/Invoice.js
 const mongoose = require("mongoose");
 
 // ✅ סכמה לפריטי החשבונית (שירותים, חלקים וכו')

@@ -3,13 +3,19 @@ const router = express.Router();
 const multer = require('multer');
 const { sendInvoiceEmail } = require('../utils/mailer');
 
+// הגדרת multer לשמירה זמנית בזיכרון (ולא בקובץ)
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
+/*
+  📩 שליחת חשבונית בפורמט PDF למייל
+  מקבל את כתובת המייל מה־body ואת קובץ ה־PDF מה־form-data
+*/
 router.post('/send-invoice', upload.single('pdf'), async (req, res) => {
   try {
     const { email } = req.body;
 
+    // יצירת קובץ מצורף מסוג PDF מתוך buffer
     const attachments = [
       {
         filename: 'invoice.pdf',
@@ -18,6 +24,7 @@ router.post('/send-invoice', upload.single('pdf'), async (req, res) => {
       }
     ];
 
+    // שליחת המייל עם החשבונית
     await sendInvoiceEmail({
       to: email,
       subject: '📄 חשבונית מהמוסך',
@@ -32,4 +39,5 @@ router.post('/send-invoice', upload.single('pdf'), async (req, res) => {
   }
 });
 
+// ייצוא הראוטר לשימוש באפליקציה הראשית
 module.exports = router;

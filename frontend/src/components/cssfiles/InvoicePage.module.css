@@ -1,127 +1,509 @@
+/* 🎨 InvoicePage Modern Design - עיצוב מודרני לחשבונית */
+
 .invoiceContainer {
-  max-width: 850px;
-  margin: auto;
-  padding: 30px;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 0 10px #ccc;
+  max-width: 900px;
+  margin: 20px auto;
+  padding: 30px; /* הקטנת הפדינג */
+  background: #ffffff; /* רקע לבן נקי */
+  border-radius: 20px;
+  box-shadow: 
+    0 20px 60px rgba(0, 0, 0, 0.1),
+    0 8px 25px rgba(124, 77, 255, 0.05);
   direction: rtl;
-  font-family: 'Heebo', sans-serif;
-  color: #333;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #1a1a1a; /* טקסט כהה יותר */
+  border: 1px solid rgba(124, 77, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+  /* הסרת הגבלת גובה מהדף הרגיל */
+  box-sizing: border-box;
 }
 
-.invoiceTitle {
-  text-align: center;
-  font-size: 28px;
-  margin-bottom: 25px;
+.invoiceContainer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
 }
 
-.invoiceHeader {
-  display: flex;
-  justify-content: space-between;
-  border-bottom: 2px solid #ddd;
-  padding-bottom: 15px;
-  margin-bottom: 20px;
-}
-
-.section {
-  margin-bottom: 30px;
-}
-
-.servicesTable {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.servicesTable th,
-.servicesTable td {
-  border: 1px solid #ddd;
-  padding: 10px;
-  text-align: right;
-}
-
-.servicesTable th {
-  background-color: #f7f7f7;
-  color: #333;
-}
-
-.priceInput {
-  width: 80px;
-  padding: 5px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-}
-
-.summary {
-  text-align: left;
-  font-size: 18px;
-  font-weight: bold;
-  background-color: #f0f8ff;
-  padding: 15px;
-  border-radius: 8px;
-  border-top: 2px solid #ccc;
-  display: flex;
-  justify-content: space-between;
-}
-
-
+/* כותרת עסק */
 .businessHeader {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 20px; /* הקטנת הגאפ */
   align-items: center;
-  background-color: #f5f7fa;
-  padding: 20px;
-  border-radius: 8px;
-  border: 1px solid #ddd;
-  margin-bottom: 20px;
-  direction: ltr;
-  font-family: 'Segoe UI', sans-serif;
+  background: #f8f9fa; /* רקע אפור בהיר */
+  padding: 20px; /* הקטנת הפדינג */
+  border-radius: 16px;
+  border: 1px solid #e9ecef;
+  margin-bottom: 20px; /* הקטנת המרווח */
+  position: relative;
+  overflow: hidden;
+}
+
+.businessHeader::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, transparent 50%, rgba(255,255,255,0.1) 100%);
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0%, 100% { transform: translateX(-100%); }
+  50% { transform: translateX(100%); }
+}
+
+.logoSection {
+  position: relative;
+  z-index: 1;
 }
 
 .logo {
-  height: 140px;
+  height: 80px; /* הקטנת הלוגו */
+  width: 80px;
   object-fit: contain;
-  border-radius: 25%;
+  border-radius: 16px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  border: 2px solid rgba(124, 77, 255, 0.1);
+  transition: transform 0.3s ease;
 }
 
-.businessHeader h3 {
-  font-size: 1.5rem;
-  color: #333;
+.logo:hover {
+  transform: scale(1.05);
 }
 
-.businessHeader p {
-  margin: 3px 0;
-  color: #555;
-  font-size: 0.95rem;
+.businessInfo {
+  position: relative;
+  z-index: 1;
 }
 
-.summary {
-  margin-top: 20px;
-  padding: 20px;
-  background-color: #f9f9f9;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  display: block; /* ✅ חשוב: הסר flex אם היה */
-  text-align: left;
+.businessInfo h3 {
+  font-size: 1.5rem; /* הקטנת הגופן */
+  font-weight: 700;
+  color: #1a1a1a; /* טקסט כהה */
+  margin: 0 0 8px 0; /* הקטנת המרווח */
+  text-shadow: none; /* הסרת הצל */
 }
 
-.summary p {
-  margin: 10px 0;
-  font-size: 1rem;
+.businessInfo p {
+  margin: 3px 0; /* הקטנת המרווח */
+  color: #495057; /* טקסט אפור כהה */
+  font-size: 0.9rem; /* הקטנת הגופן */
   font-weight: 500;
 }
 
-.dueDateNotice {
-  margin-top: 30px;
-  padding: 12px;
-  background-color: #fff9e6;
-  border: 1px solid #ffe58f;
-  border-radius: 6px;
-  text-align: right;
-  font-size: 1rem;
-  color: #8a6d3b;
+.invoiceMeta {
+  text-align: left;
+  position: relative;
+  z-index: 1;
 }
 
+.invoiceTitle {
+  font-size: 1.6rem; /* הקטנת הגופן */
+  font-weight: 700;
+  color: #495057; /* טקסט אפור כהה */
+  margin: 0 0 8px 0; /* הקטנת המרווח */
+  text-shadow: none; /* הסרת הצל */
+}
+
+.invoiceDate {
+  font-size: 0.9rem; /* הקטנת הגופן */
+  color: #6c757d; /* טקסט אפור */
+  margin: 3px 0; /* הקטנת המרווח */
+}
+
+/* פרטי לקוח */
+.customerDetails {
+  background: #f8f9fa; /* רקע אפור בהיר */
+  padding: 15px; /* הקטנת הפדינג */
+  border-radius: 16px;
+  border: 1px solid #e9ecef;
+  margin-bottom: 20px; /* הקטנת המרווח */
+}
+
+.customerDetails h4 {
+  font-size: 1.1rem; /* הקטנת הגופן */
+  font-weight: 600;
+  color: #1a1a1a; /* טקסט כהה */
+  margin: 0 0 15px 0; /* הקטנת המרווח */
+  text-align: center;
+}
+
+.customerGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* הקטנת הרוחב המינימלי */
+  gap: 10px; /* הקטנת הגאפ */
+}
+
+.customerField {
+  display: flex;
+  flex-direction: column;
+  gap: 3px; /* הקטנת הגאפ */
+}
+
+.customerField label {
+  font-size: 0.8rem; /* הקטנת הגופן */
+  font-weight: 600;
+  color: #495057; /* טקסט אפור כהה */
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.customerField span {
+  font-size: 0.9rem; /* הקטנת הגופן */
+  font-weight: 500;
+  color: #1a1a1a; /* טקסט כהה */
+  padding: 6px 10px; /* הקטנת הפדינג */
+  background: #ffffff; /* רקע לבן */
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+}
+
+/* סטטוס תשלום */
+.paymentStatus {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* הקטנת הגאפ */
+  background: #fff3cd; /* רקע צהוב בהיר */
+  padding: 15px; /* הקטנת הפדינג */
+  border-radius: 12px;
+  border: 1px solid #ffeaa7;
+  margin-bottom: 20px; /* הקטנת המרווח */
+}
+
+.paymentStatus label {
+  font-size: 1rem; /* הקטנת הגופן */
+  font-weight: 600;
+  color: #856404; /* טקסט צהוב כהה */
+}
+
+.paymentSelect {
+  padding: 8px 12px; /* הקטנת הפדינג */
+  border: 2px solid #ced4da;
+  border-radius: 8px;
+  font-size: 0.9rem; /* הקטנת הגופן */
+  font-weight: 500;
+  background: white;
+  color: #1a1a1a; /* טקסט כהה */
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.paymentSelect:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.paymentIndicator {
+  font-size: 0.9rem; /* הקטנת הגופן */
+  font-weight: 600;
+  padding: 6px 12px; /* הקטנת הפדינג */
+  border-radius: 20px;
+  background: #ffffff; /* רקע לבן */
+  border: 1px solid #dee2e6;
+  color: #1a1a1a; /* טקסט כהה */
+}
+
+/* סקציית פריטים */
+.itemsSection {
+  margin-bottom: 20px; /* הקטנת המרווח */
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px; /* הקטנת המרווח */
+}
+
+.sectionHeader h4 {
+  font-size: 1.2rem; /* הקטנת הגופן */
+  font-weight: 600;
+  color: #1a1a1a; /* טקסט כהה */
+  margin: 0;
+}
+
+.addItemBtn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 10px 16px; /* הקטנת הפדינג */
+  font-size: 0.9rem; /* הקטנת הגופן */
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px; /* הקטנת הגאפ */
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.addItemBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.addItemBtn:active {
+  transform: translateY(0);
+}
+
+/* טבלה */
+.tableContainer {
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  border: 1px solid #dee2e6;
+  overflow-x: auto;
+  /* הסרת הגבלת גובה מהדף הרגיל */
+}
+
+.itemsTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem; /* הקטנת הגופן */
+  min-width: 600px;
+}
+
+.itemsTable th {
+  background: #495057; /* רקע אפור כהה */
+  color: white;
+  padding: 10px 12px; /* הקטנת הפדינג */
+  text-align: right;
+  font-weight: 600;
+  font-size: 0.9rem; /* הקטנת הגופן */
+  white-space: nowrap;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.itemsTable td {
+  padding: 8px 12px; /* הקטנת הפדינג */
+  border-bottom: 1px solid #dee2e6;
+  vertical-align: middle;
+  color: #1a1a1a; /* טקסט כהה */
+}
+
+.itemsTable tr:hover {
+  background: #f8f9fa; /* רקע אפור בהיר */
+}
+
+.serviceRow {
+  background: #e3f2fd; /* רקע כחול בהיר */
+}
+
+.orderRow {
+  background: #fff3e0; /* רקע כתום בהיר */
+}
+
+.customRow {
+  background: #e8f5e8; /* רקע ירוק בהיר */
+}
+
+/* עמודות הטבלה */
+.descriptionColumn {
+  width: 60%;
+  min-width: 300px;
+}
+
+.priceColumn {
+  width: 30%;
+  min-width: 150px;
+  text-align: center;
+}
+
+.actionsColumn {
+  width: 10%;
+  min-width: 80px;
+  text-align: center;
+}
+
+/* שדות קלט */
+.priceInput {
+  width: 100%;
+  max-width: 100px; /* הקטנת הרוחב המקסימלי */
+  padding: 6px 10px; /* הקטנת הפדינג */
+  border: 2px solid #ced4da;
+  border-radius: 8px;
+  font-size: 0.9rem; /* הקטנת הגופן */
+  text-align: center;
+  background: white;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+  color: #1a1a1a; /* טקסט כהה */
+}
+
+.priceInput:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.itemNameInput {
+  width: 100%;
+  padding: 6px 10px; /* הקטנת הפדינג */
+  border: 2px solid #ced4da;
+  border-radius: 8px;
+  font-size: 0.9rem; /* הקטנת הגופן */
+  background: white;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+  color: #1a1a1a; /* טקסט כהה */
+}
+
+.itemNameInput:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.removeBtn {
+  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  width: 28px; /* הקטנת הגודל */
+  height: 28px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+  font-size: 0.8rem; /* הקטנת הגופן */
+}
+
+.removeBtn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
+}
+
+/* סיכום */
+.summary {
+  background: #f8f9fa; /* רקע אפור בהיר */
+  padding: 20px; /* הקטנת הפדינג */
+  border-radius: 16px;
+  border: 1px solid #e9ecef;
+  margin-bottom: 20px; /* הקטנת המרווח */
+}
+
+.summaryRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0; /* הקטנת הפדינג */
+  font-size: 1rem; /* הקטנת הגופן */
+  font-weight: 500;
+  color: #1a1a1a; /* טקסט כהה */
+}
+
+.totalRow {
+  font-size: 1.2rem; /* הקטנת הגופן */
+  font-weight: 700;
+  color: #495057; /* טקסט אפור כהה */
+  border-top: 2px solid #dee2e6;
+  margin-top: 8px; /* הקטנת המרווח */
+  padding-top: 12px; /* הקטנת הפדינג */
+}
+
+/* הודעה על תאריך פירעון */
+.dueDateNotice {
+  background: #fff3cd; /* רקע צהוב בהיר */
+  padding: 15px; /* הקטנת הפדינג */
+  border-radius: 12px;
+  border: 1px solid #ffeaa7;
+  margin-bottom: 20px; /* הקטנת המרווח */
+  text-align: center;
+}
+
+.dueDateNotice p {
+  margin: 0;
+  font-size: 1rem; /* הקטנת הגופן */
+  font-weight: 500;
+  color: #856404; /* טקסט צהוב כהה */
+}
+
+/* כפתורי פעולה */
+.actionButtons {
+  display: flex;
+  gap: 12px; /* הקטנת הגאפ */
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 20px; /* הקטנת המרווח */
+}
+
+.saveBtn, .downloadBtn, .emailBtn {
+  padding: 10px 20px; /* הקטנת הפדינג */
+  border: none;
+  border-radius: 12px;
+  font-size: 0.9rem; /* הקטנת הגופן */
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px; /* הקטנת הגאפ */
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.saveBtn {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  color: white;
+}
+
+.saveBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+}
+
+.downloadBtn {
+  background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+  color: white;
+}
+
+.downloadBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(108, 117, 125, 0.4);
+}
+
+.emailBtn {
+  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+  color: white;
+}
+
+.emailBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+}
+
+/* מצבי טעינה ושגיאה */
+.loading {
+  text-align: center;
+  padding: 40px;
+  font-size: 1.2rem;
+  color: #495057; /* טקסט אפור כהה */
+  font-weight: 500;
+}
+
+.error {
+  text-align: center;
+  padding: 40px;
+  font-size: 1.2rem;
+  color: #dc3545;
+  font-weight: 500;
+}
+
+/* הדפסה */
 .no-print {
   display: block;
 }
@@ -130,17 +512,260 @@
   .no-print {
     display: none !important;
   }
+  
+  .invoiceContainer {
+    box-shadow: none;
+    border: none;
+    margin: 0;
+    padding: 15px; /* הקטנת הפדינג בהדפסה */
+    max-height: 29.7cm; /* הגבלת גובה לדף אחד בהדפסה */
+    background: white !important; /* רקע לבן בהדפסה */
+    color: black !important; /* טקסט שחור בהדפסה */
+  }
+  
+  .actionButtons {
+    display: none !important;
+  }
+  
+  .tableContainer {
+    box-shadow: none;
+    border: 1px solid #ddd;
+    max-height: 200px; /* הגבלת גובה הטבלה בהדפסה */
+    overflow: visible;
+  }
+  
+  .itemsTable {
+    min-width: auto;
+  }
+  
+  .descriptionColumn {
+    width: 70%;
+  }
+  
+  .priceColumn {
+    width: 30%;
+  }
+  
+  .actionsColumn {
+    display: none !important;
+  }
+  
+  /* הקטנת מרווחים בהדפסה */
+  .businessHeader {
+    padding: 15px;
+    margin-bottom: 15px;
+    background: white !important;
+  }
+  
+  .customerDetails {
+    padding: 12px;
+    margin-bottom: 15px;
+    background: white !important;
+  }
+  
+  .paymentStatus {
+    padding: 12px;
+    margin-bottom: 15px;
+    background: white !important;
+  }
+  
+  .itemsSection {
+    margin-bottom: 15px;
+  }
+  
+  .summary {
+    padding: 15px;
+    margin-bottom: 15px;
+    background: white !important;
+  }
+  
+  .dueDateNotice {
+    padding: 12px;
+    margin-bottom: 15px;
+    background: white !important;
+  }
+  
+  /* הסתרת אלמנטים לא נחוצים בהדפסה */
+  .businessHeader::after {
+    display: none !important;
+  }
+  
+  /* וידוא שכל הטקסטים נראים בהדפסה */
+  * {
+    color: black !important;
+  }
+  
+  /* רקע לבן לכל האלמנטים */
+  .businessInfo h3,
+  .businessInfo p,
+  .invoiceTitle,
+  .invoiceDate,
+  .customerDetails h4,
+  .customerField span,
+  .paymentStatus label,
+  .paymentIndicator,
+  .sectionHeader h4,
+  .summaryRow,
+  .totalRow,
+  .dueDateNotice p {
+    color: black !important;
+  }
 }
 
-.customerDetails {
-  margin-bottom: 20px;
-  padding: 15px;
-  background-color: #f4f8fb;
-  border: 1px solid #cce1f5;
-  border-radius: 8px;
-  font-size: 1rem;
-  line-height: 1.6;
-  color: #333;
+/* רספונסיביות */
+@media (max-width: 768px) {
+  .invoiceContainer {
+    margin: 10px;
+    padding: 20px;
+  }
+  
+  .businessHeader {
+    grid-template-columns: 1fr;
+    gap: 15px;
+    text-align: center;
+  }
+  
+  .customerGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .paymentStatus {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .sectionHeader {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .actionButtons {
+    flex-direction: column;
+  }
+  
+  .itemsTable {
+    font-size: 0.8rem;
+    min-width: 500px;
+  }
+  
+  .itemsTable th,
+  .itemsTable td {
+    padding: 6px 8px;
+  }
+  
+  .priceInput {
+    max-width: 80px;
+    font-size: 0.8rem;
+  }
+  
+  .itemNameInput {
+    font-size: 0.8rem;
+  }
+  
+  .descriptionColumn {
+    min-width: 250px;
+  }
+  
+  .priceColumn {
+    min-width: 120px;
+  }
+  
+  .actionsColumn {
+    min-width: 60px;
+  }
+}
+
+/* אנימציות נוספות */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.invoiceContainer {
+  animation: fadeInUp 0.5s ease-out;
+}
+
+/* אפקטים נוספים */
+.itemsTable tr {
+  transition: all 0.3s ease;
+}
+
+.itemsTable tr:hover {
+  transform: translateX(-5px);
+}
+
+/* מצב כשל */
+.paymentSelect.error {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+}
+
+/* אפקטים למובייל */
+@media (max-width: 480px) {
+  .invoiceContainer {
+    padding: 15px;
+    border-radius: 12px;
+  }
+  
+  .businessHeader {
+    padding: 15px;
+  }
+  
+  .logo {
+    height: 60px;
+    width: 60px;
+  }
+  
+  .businessInfo h3 {
+    font-size: 1.2rem;
+  }
+  
+  .invoiceTitle {
+    font-size: 1.4rem;
+  }
+  
+  .customerDetails,
+  .paymentStatus,
+  .summary {
+    padding: 12px;
+  }
+  
+  .itemsTable {
+    font-size: 0.7rem;
+    min-width: 400px;
+  }
+  
+  .itemsTable th,
+  .itemsTable td {
+    padding: 4px 6px;
+  }
+  
+  .priceInput {
+    max-width: 70px;
+    font-size: 0.7rem;
+  }
+  
+  .itemNameInput {
+    font-size: 0.7rem;
+  }
+  
+  .descriptionColumn {
+    min-width: 200px;
+  }
+  
+  .priceColumn {
+    min-width: 100px;
+  }
+  
+  .actionsColumn {
+    min-width: 50px;
+  }
 }
 
 
