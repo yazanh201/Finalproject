@@ -1,34 +1,42 @@
 import React, { useEffect, useState } from "react";
+// ✅ קומפוננטת הטבלה הכללית להצגת נתונים
 import DashboardTables from "../advanceddashboard/DashboardTables";
+// ✅ hook לניווט בין דפים באפליקציה
 import { useNavigate } from "react-router-dom";
+// ✅ אייקונים להצגה בלחצנים
 import { FaEye, FaFileInvoice } from "react-icons/fa";
 
+// ✅ קומפוננטה להצגת טיפולים שהסתיימו היום בלבד
 const CompletedTreatments = ({ onClose }) => {
-  const [completedTreatments, setCompletedTreatments] = useState([]);
-  const navigate = useNavigate();
+  const [completedTreatments, setCompletedTreatments] = useState([]); // סטייט לשמירת טיפולים שהסתיימו
+  const navigate = useNavigate(); // ניווט בין עמודים
 
+  // ⬅️ עם טעינת הקומפוננטה נשלוף את הטיפולים שהסתיימו היום
   useEffect(() => {
     const fetchCompletedTreatments = async () => {
       try {
         const res = await fetch("http://localhost:5000/api/treatments");
         const data = await res.json();
-        const today = new Date().toISOString().slice(0, 10);
 
+        const today = new Date().toISOString().slice(0, 10); // תאריך היום (בפורמט YYYY-MM-DD)
+
+        // ✅ סינון טיפולים שהסתיימו ושעודכנו היום
         const completedToday = data.filter(
           (t) =>
             t.status === "הסתיים" &&
             new Date(t.updatedAt).toISOString().slice(0, 10) === today
         );
 
-        setCompletedTreatments(completedToday);
+        setCompletedTreatments(completedToday); // שמירת הטיפולים הרלוונטיים
       } catch (error) {
         console.error("❌ שגיאה בשליפת טיפולים שהסתיימו:", error);
       }
     };
 
-    fetchCompletedTreatments();
+    fetchCompletedTreatments(); // קריאה לפונקציה בעת טעינה
   }, []);
 
+  // ✅ כותרות עמודות הטבלה
   const tableHeaders = [
     "מזהה טיפול",
     "רכב",
@@ -40,12 +48,15 @@ const CompletedTreatments = ({ onClose }) => {
     "עריכה"
   ];
 
+  // ✅ מיפוי הנתונים של כל טיפול למבנה טבלה
   const tableData = completedTreatments.map((treatment) => ({
     "מזהה טיפול": treatment.treatmentNumber,
     "רכב": treatment.carPlate,
     "לקוח": treatment.customerName,
     "תיאור": treatment.description,
-    "תאריך עדכון": new Date(treatment.updatedAt).toLocaleDateString("he-IL"),
+    "תאריך עדכון": new Date(treatment.updatedAt).toLocaleDateString("he-IL"), // תאריך מעוצב
+
+    // כפתור צפייה בחשבונית
     "חשבונית": (
       <button
         className="btn btn-outline-success btn-sm"
@@ -55,6 +66,8 @@ const CompletedTreatments = ({ onClose }) => {
         <FaFileInvoice size={18} /> חשבונית
       </button>
     ),
+
+    // כפתור לצפייה בפרטי הטיפול
     "צפייה": (
       <button
         className="btn btn-outline-secondary btn-sm"
@@ -64,6 +77,8 @@ const CompletedTreatments = ({ onClose }) => {
         <FaEye size={18} />
       </button>
     ),
+
+    // כפתור לעריכת הטיפול – כולל העברת מידע דרך state
     "עריכה": (
       <button
         className="btn btn-outline-secondary btn-sm"
@@ -92,12 +107,13 @@ const CompletedTreatments = ({ onClose }) => {
     )
   }));
 
+  // ✅ הצגת הטבלה עם נתוני טיפולים שהסתיימו
   return (
     <DashboardTables
       tableTitle="📅 טיפולים שהסתיימו היום"
       tableHeaders={tableHeaders}
       tableData={tableData}
-      onClose={onClose}
+      onClose={onClose} // כפתור לסגירת התצוגה
     />
   );
 };

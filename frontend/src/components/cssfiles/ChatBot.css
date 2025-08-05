@@ -1,107 +1,721 @@
-
+/* 🎨 ChatBot Modern Design - עיצוב מודרני לצ'אטבוט */
 
 /* חלון הצ'אט */
 .chat-container {
   position: fixed;
   bottom: 90px;
   right: 24px;
-  width: 340px;
-  height: 460px;
-  background: white;
-  border-radius: 16px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  width: 380px;
+  height: 520px;
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%);
+  border-radius: 24px;
+  box-shadow: 
+    0 20px 60px rgba(0, 0, 0, 0.15),
+    0 8px 25px rgba(124, 77, 255, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  font-family: sans-serif;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   z-index: 1001;
+  border: 1px solid rgba(124, 77, 255, 0.1);
+  animation: slideInUp 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 /* כותרת הצ'אט */
 .chat-header {
-  background-color: #7c4dff;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
-  padding: 14px 16px;
-  font-size: 16px;
-  font-weight: bold;
+  padding: 20px 24px;
+  font-size: 18px;
+  font-weight: 600;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.chat-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, transparent 50%, rgba(255,255,255,0.1) 100%);
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0%, 100% { transform: translateX(-100%); }
+  50% { transform: translateX(100%); }
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+  z-index: 1;
+}
+
+.bot-icon {
+  font-size: 20px;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.chat-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  position: relative;
+  z-index: 1;
 }
 
 /* כפתור סגירה */
 .close-btn {
-  background: none;
+  background: rgba(255, 255, 255, 0.2);
   border: none;
   color: white;
-  font-size: 18px;
+  font-size: 16px;
   cursor: pointer;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 1;
+  backdrop-filter: blur(10px);
+}
+
+.close-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
 }
 
 /* תיבת ההודעות */
 .chat-box {
   flex: 1;
-  padding: 16px;
+  padding: 20px;
   overflow-y: auto;
-  background: #f4f4f8;
+  background: linear-gradient(180deg, #f8f9ff 0%, #ffffff 100%);
   display: flex;
   flex-direction: column;
+  gap: 12px;
+  scroll-behavior: smooth;
+}
+
+/* עיצוב scrollbar */
+.chat-box::-webkit-scrollbar {
+  width: 6px;
+}
+
+.chat-box::-webkit-scrollbar-track {
+  background: rgba(124, 77, 255, 0.05);
+  border-radius: 3px;
+}
+
+.chat-box::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+  border-radius: 3px;
+}
+
+.chat-box::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #5a6fd8 0%, #6a4190 100%);
 }
 
 /* הודעת משתמש */
 .user-msg {
   align-self: flex-end;
-  background: #7c4dff;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
-  padding: 10px 14px;
-  border-radius: 16px 16px 4px 16px;
-  margin-bottom: 10px;
-  max-width: 75%;
+  padding: 12px 18px;
+  border-radius: 20px 20px 6px 20px;
+  margin-bottom: 8px;
+  max-width: 80%;
   font-size: 14px;
-  line-height: 1.4;
+  line-height: 1.5;
   display: inline-block;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  position: relative;
+  animation: slideInRight 0.3s ease-out;
+}
+
+.user-msg::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: -8px;
+  width: 0;
+  height: 0;
+  border: 8px solid transparent;
+  border-left-color: #667eea;
+  border-bottom: none;
+  border-right: none;
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 /* הודעת בוט */
 .bot-msg {
   align-self: flex-start;
-  background: #eeeeee;
-  color: #333;
-  padding: 10px 14px;
-  border-radius: 16px 16px 16px 4px;
-  margin-bottom: 10px;
-  max-width: 75%;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  color: #2c3e50;
+  padding: 12px 18px;
+  border-radius: 20px 20px 20px 6px;
+  margin-bottom: 8px;
+  max-width: 80%;
   font-size: 14px;
-  line-height: 1.4;
+  line-height: 1.5;
   display: inline-block;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(124, 77, 255, 0.1);
+  position: relative;
+  animation: slideInLeft 0.3s ease-out;
+}
+
+.bot-msg::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: -8px;
+  width: 0;
+  height: 0;
+  border: 8px solid transparent;
+  border-right-color: #f8f9fa;
+  border-bottom: none;
+  border-left: none;
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* תוכן ההודעה */
+.message-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.message-time {
+  font-size: 11px;
+  opacity: 0.7;
+  align-self: flex-end;
+  margin-top: 4px;
+}
+
+/* הודעת שגיאה */
+.error-msg {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%) !important;
+  color: white !important;
+  border: 1px solid rgba(255, 107, 107, 0.2) !important;
+}
+
+.error-msg::before {
+  border-right-color: #ff6b6b !important;
+}
+
+/* מצב הקלדה */
+.typing-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 18px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 20px 20px 20px 6px;
+  max-width: 120px;
+}
+
+.typing-dots {
+  display: flex;
+  gap: 4px;
+}
+
+.typing-dots span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #667eea;
+  animation: typingBounce 1.4s ease-in-out infinite both;
+}
+
+.typing-dots span:nth-child(1) { animation-delay: -0.32s; }
+.typing-dots span:nth-child(2) { animation-delay: -0.16s; }
+.typing-dots span:nth-child(3) { animation-delay: 0s; }
+
+@keyframes typingBounce {
+  0%, 80%, 100% {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.typing-text {
+  font-size: 12px;
+  color: #6c757d;
+  font-style: italic;
+}
+
+/* הצעות מהירות */
+.quick-suggestions {
+  margin-top: 16px;
+  padding: 16px;
+  background: linear-gradient(135deg, #f8f9ff 0%, #e8f2ff 100%);
+  border-radius: 16px;
+  border: 1px solid rgba(124, 77, 255, 0.1);
+  animation: fadeInUp 0.5s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.suggestions-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #667eea;
+}
+
+.suggestions-header svg {
+  font-size: 16px;
+  animation: glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+  from { filter: drop-shadow(0 0 2px rgba(102, 126, 234, 0.5)); }
+  to { filter: drop-shadow(0 0 6px rgba(102, 126, 234, 0.8)); }
+}
+
+.suggestions-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.suggestion-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 8px 12px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+  text-align: center;
+  line-height: 1.3;
+}
+
+.suggestion-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.suggestion-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
 }
 
 /* שורת ההקלדה */
 .input-container {
   display: flex;
-  padding: 12px;
-  border-top: 1px solid #ddd;
-  background: #fafafa;
+  padding: 16px 20px;
+  border-top: 1px solid rgba(124, 77, 255, 0.1);
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%);
+  gap: 12px;
+  align-items: center;
 }
 
 .input-container input {
   flex: 1;
-  padding: 10px;
-  border: none;
-  border-radius: 24px;
+  padding: 12px 18px;
+  border: 2px solid rgba(124, 77, 255, 0.1);
+  border-radius: 25px;
   outline: none;
   font-size: 14px;
-  box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+  font-family: inherit;
 }
 
-.input-container button {
-  background: #7c4dff;
+.input-container input:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  background: white;
+}
+
+.input-container input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.input-container input::placeholder {
+  color: #9ca3af;
+  font-style: italic;
+}
+
+/* כפתור הקלטה קולית */
+.voice-btn {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
   color: white;
   border: none;
   border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  margin-left: 8px;
+  width: 44px;
+  height: 44px;
   font-size: 16px;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+  position: relative;
+  overflow: hidden;
 }
+
+.voice-btn.recording {
+  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+  animation: recordingPulse 1s ease-in-out infinite;
+  box-shadow: 0 4px 15px rgba(220, 53, 69, 0.4);
+}
+
+@keyframes recordingPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+.voice-btn:hover:not(:disabled) {
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+}
+
+.voice-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.input-container button {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.input-container button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.input-container button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s;
+}
+
+.input-container button:hover:not(:disabled)::before {
+  left: 100%;
+}
+
+.input-container button:hover:not(:disabled) {
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.input-container button:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+/* ספינר טעינה */
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* כפתור הצ'אט הצף */
+.chat-toggle {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 64px;
+  height: 64px;
+  font-size: 24px;
+  cursor: pointer;
+  box-shadow: 
+    0 8px 25px rgba(102, 126, 234, 0.3),
+    0 4px 15px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.chat-toggle::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, transparent 50%, rgba(255,255,255,0.1) 100%);
+  border-radius: 50%;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { 
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  50% { 
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
+}
+
+.chat-toggle:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 
+    0 12px 35px rgba(102, 126, 234, 0.4),
+    0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.chat-toggle:active {
+  transform: translateY(0) scale(0.95);
+}
+
+.chat-toggle svg {
+  position: relative;
+  z-index: 1;
+  transition: transform 0.3s ease;
+}
+
+.chat-toggle:hover svg {
+  transform: scale(1.1);
+}
+
+/* אנימציה לכפתור הצ'אט */
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-10px);
+  }
+  60% {
+    transform: translateY(-5px);
+  }
+}
+
+.chat-toggle {
+  animation: bounce 2s infinite;
+}
+
+/* מצב לא פעיל - עצירת האנימציה */
+.chat-toggle.inactive {
+  animation: none;
+}
+
+/* רספונסיביות */
+@media (max-width: 768px) {
+  .chat-container {
+    width: calc(100vw - 48px);
+    height: calc(100vh - 120px);
+    bottom: 80px;
+    right: 24px;
+    left: 24px;
+  }
+  
+  .chat-toggle {
+    width: 56px;
+    height: 56px;
+    font-size: 20px;
+  }
+  
+  .chat-header {
+    padding: 16px 20px;
+  }
+  
+  .header-content h3 {
+    font-size: 16px;
+  }
+  
+  .bot-icon {
+    font-size: 18px;
+  }
+  
+  .suggestions-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* אפקטים נוספים */
+.chat-container::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(124, 77, 255, 0.3), transparent);
+}
+
+/* מצב טעינה */
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  color: #667eea;
+  font-style: italic;
+}
+
+/* אפקט טיפוגרפי */
+.chat-header h3 {
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.user-msg, .bot-msg {
+  word-wrap: break-word;
+  hyphens: auto;
+}
+
+/* אנימציות נוספות */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.chatbot-wrapper {
+  animation: fadeIn 0.5s ease-out;
+}
+
+/* מצב כשל */
+.input-container button.loading {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+  box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+}
+
+/* אפקטים למובייל */
+@media (max-width: 480px) {
+  .chat-container {
+    width: calc(100vw - 32px);
+    height: calc(100vh - 100px);
+    bottom: 70px;
+    right: 16px;
+    left: 16px;
+    border-radius: 20px;
+  }
+  
+  .chat-toggle {
+    width: 52px;
+    height: 52px;
+    font-size: 18px;
+    bottom: 20px;
+    right: 20px;
+  }
+  
+  .input-container {
+    padding: 12px 16px;
+  }
+  
+  .input-container input {
+    padding: 10px 16px;
+    font-size: 13px;
+  }
+  
+  .input-container button,
+  .voice-btn {
+    width: 40px;
+    height: 40px;
+    font-size: 14px;
+  }
+  
+  .suggestions-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .suggestion-btn {
+    font-size: 11px;
+    padding: 6px 10px;
+  }
+}
+

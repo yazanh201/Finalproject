@@ -1,3 +1,5 @@
+// InvoicePage – קומפוננטת חשבונית המציגה נתוני טיפול, פריטים, מחירים, וכוללת יצוא PDF ושליחת מייל
+
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
@@ -5,246 +7,232 @@ import styles from './cssfiles/InvoicePage.module.css';
 import html2pdf from 'html2pdf.js';
 import { toast } from 'react-hot-toast';
 
-
 const InvoicePage = () => {
+  // רפרנס לכפתור הורדה (לשימוש עתידי)
   const downloadButtonRef = useRef(null);
+
+  // ID של הטיפול מה־URL
   const { treatmentId } = useParams();
-  const [treatment, setTreatment] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [prices, setPrices] = useState({});
-  const [invoiceExists, setInvoiceExists] = useState(false);
-  const [orders, setOrders] = useState([]);
-  const [isPaid, setIsPaid] = useState(false);
 
+  // סטייטים לשמירת מידע חשוב
+  const [treatment, setTreatment] = useState(null); // נתוני טיפול
+  const [loading, setLoading] = useState(true); // סטטוס טעינה
+  const [prices, setPrices] = useState({}); // מילון של מחירים לכל פריט
+  const [invoiceExists, setInvoiceExists] = useState(false); // האם קיימת חשבונית
+  const [orders, setOrders] = useState([]); // הזמנות פעילות
+  const [isPaid, setIsPaid] = useState(false); // סטטוס תשלום
 
-
+  // נתיבי API
   const BASE_URL = "http://localhost:5000/uploads/";
   const BASE_API_URL = "http://localhost:5000/";
 
+  // טוען את כל הנתונים בעת טעינת הקומפוננטה
   useEffect(() => {
-  const fetchData = async () => {
-    try {
-      const treatmentRes = await axios.get(`${BASE_API_URL}api/treatments/${treatmentId}`);
-      const treatmentData = treatmentRes.data;
-
-      // שליפת פרטי לקוח
+    const fetchData = async () => {
       try {
-        const customerRes = await axios.get(`${BASE_API_URL}api/customers/id-by-plate/${treatmentData.carPlate}`);
-        treatmentData.idNumber = customerRes.data.idNumber;
-        treatmentData.customerName = customerRes.data.name;
-      } catch {}
+        // שליפת נתוני טיפול
+        const treatmentRes = await axios.get(`${BASE_API_URL}api/treatments/${treatmentId}`);
+        const treatmentData = treatmentRes.data;
 
-      try {
-        const emailRes = await axios.get(`${BASE_API_URL}api/customers/email-by-plate/${treatmentData.carPlate}`);
-        treatmentData.email = emailRes.data.email;
-      } catch {}
+        // שליפת פרטי לקוח לפי מספר רכב
+        try {
+          const customerRes = await axios.get(`${BASE_API_URL}api/customers/id-by-plate/${treatmentData.carPlate}`);
+          treatmentData.idNumber = customerRes.data.idNumber;
+          treatmentData.customerName = customerRes.data.name;
+        } catch {}
 
-      setTreatment(treatmentData);
+        // שליפת אימייל של הלקוח
+        try {
+          const emailRes = await axios.get(`${BASE_API_URL}api/customers/email-by-plate/${treatmentData.carPlate}`);
+          treatmentData.email = emailRes.data.email;
+        } catch {}
 
-      // שליפת הזמנות פעילות
-      try {
-        const ordersRes = await axios.get(`${BASE_API_URL}api/carorders/active/${treatmentData.carPlate}`);
-        const activeOrders = ordersRes.data;
-        const orderPrices = {};
-        activeOrders.forEach(order => {
-          const key = `הזמנה-${order._id}`;
-          orderPrices[key] = order.cost;
-        });
-        setOrders(activeOrders);
-        setPrices(prev => ({ ...prev, ...orderPrices }));
-      } catch {}
+        setTreatment(treatmentData);
 
-      // שליפת חשבונית קיימת
-      const invoiceRes = await axios.get(`${BASE_API_URL}api/invoices/by-treatment/${treatmentId}`);
-      if (invoiceRes.data) {
-        setInvoiceExists(true);
-        setIsPaid(invoiceRes.data.isPaid || false); // ✅ טוען את סטטוס התשלום
-
-        // ✅ טעינת מחירים קיימים
-        if (invoiceRes.data.items && invoiceRes.data.items.length > 0) {
-          const loadedPrices = {};
-          invoiceRes.data.items.forEach((item) => {
-            const key = `${item.category}-${item.name}`;
-            loadedPrices[key] = item.price;
+        // שליפת הזמנות פעילות לרכב
+        try {
+          const ordersRes = await axios.get(`${BASE_API_URL}api/carorders/active/${treatmentData.carPlate}`);
+          const activeOrders = ordersRes.data;
+          const orderPrices = {};
+          activeOrders.forEach(order => {
+            const key = `הזמנה-${order._id}`;
+            orderPrices[key] = order.cost;
           });
-          setPrices(prev => ({ ...prev, ...loadedPrices }));
+          setOrders(activeOrders);
+          setPrices(prev => ({ ...prev, ...orderPrices }));
+        } catch {}
+
+        // טעינת חשבונית קיימת אם קיימת
+        const invoiceRes = await axios.get(`${BASE_API_URL}api/invoices/by-treatment/${treatmentId}`);
+        if (invoiceRes.data) {
+          setInvoiceExists(true);
+          setIsPaid(invoiceRes.data.isPaid || false); // סטטוס תשלום
+
+          // טעינת מחירים קיימים מהחשבונית
+          if (invoiceRes.data.items && invoiceRes.data.items.length > 0) {
+            const loadedPrices = {};
+            invoiceRes.data.items.forEach((item) => {
+              const key = `${item.category}-${item.name}`;
+              loadedPrices[key] = item.price;
+            });
+            setPrices(prev => ({ ...prev, ...loadedPrices }));
+          }
         }
+      } catch (err) {
+        console.warn('❌ שגיאה בטעינת נתונים לחשבונית:', err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [treatmentId]);
+
+  // ⬇ פונקציה לשמירת/עדכון החשבונית במסד הנתונים
+  const handleSubmitInvoice = async () => {
+    try {
+      if (!treatment?._id) {
+        toast.error("לא ניתן לשמור חשבונית – אין מזהה טיפול");
+        return;
       }
 
-    } catch (err) {
-      console.warn('❌ שגיאה בטעינת נתונים לחשבונית:', err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+      const items = [];
 
-  fetchData();
-}, [treatmentId]);
+      // מעבר על שירותים שבוצעו והוספתם לרשימת פריטים
+      treatment.treatmentServices.forEach((serviceGroup) => {
+        serviceGroup.selectedOptions.forEach((option) => {
+          const key = `${serviceGroup.category}-${option}`;
+          const price = prices[key] || 0;
+          items.push({
+            name: option,
+            category: serviceGroup.category,
+            price,
+          });
+        });
+      });
 
-
-
-
-
- const handleSubmitInvoice = async () => {
-  try {
-    if (!treatment?._id) {
-      toast.error("לא ניתן לשמור חשבונית – אין מזהה טיפול");
-      return;
-    }
-
-    const items = [];
-
-    // שירותים שבוצעו
-    treatment.treatmentServices.forEach((serviceGroup) => {
-      serviceGroup.selectedOptions.forEach((option) => {
-        const key = `${serviceGroup.category}-${option}`;
+      // הוספת הזמנות פעילות לרשימת הפריטים
+      orders.forEach((order) => {
+        const key = `הזמנה-${order._id}`;
         const price = prices[key] || 0;
         items.push({
-          name: option,
-          category: serviceGroup.category,
+          name: `הזמנה: ${order.details}`,
+          category: 'הזמנות',
           price,
         });
       });
-    });
 
-    // הזמנות פעילות
-    orders.forEach((order) => {
-      const key = `הזמנה-${order._id}`;
-      const price = prices[key] || 0;
-      items.push({
-        name: `הזמנה: ${order.details}`,
-        category: 'הזמנות',
-        price,
-      });
-    });
+      // יצירת גוף החשבונית
+      const invoiceData = {
+        treatmentId: treatment._id,
+        items,
+        isPaid, // האם שולם
+      };
 
-    const invoiceData = {
-      treatmentId: treatment._id,
-      items,
-      isPaid, // ✅ שמירה של סטטוס התשלום
-    };
-
-    if (invoiceExists) {
-      await axios.put(`${BASE_API_URL}api/invoices/${treatment._id}`, invoiceData);
-      toast.success("החשבונית עודכנה בהצלחה");
-    } else {
-      await axios.post(`${BASE_API_URL}api/invoices`, invoiceData);
-      toast.success("החשבונית נשמרה בהצלחה");
-      setInvoiceExists(true);
+      // שליחה לשרת – POST אם לא קיים, PUT אם כן
+      if (invoiceExists) {
+        await axios.put(`${BASE_API_URL}api/invoices/${treatment._id}`, invoiceData);
+        toast.success("החשבונית עודכנה בהצלחה");
+      } else {
+        await axios.post(`${BASE_API_URL}api/invoices`, invoiceData);
+        toast.success("החשבונית נשמרה בהצלחה");
+        setInvoiceExists(true);
+      }
+    } catch (err) {
+      console.error("❌ שגיאה בשמירת/עדכון חשבונית:", err);
+      toast.error("שגיאה בשמירת או עדכון החשבונית");
     }
-  } catch (err) {
-    console.error("❌ שגיאה בשמירת/עדכון חשבונית:", err);
-    toast.error("שגיאה בשמירת או עדכון החשבונית");
-  }
-};
+  };
 
-
-
-
+  // חישוב סה"כ ומע"מ
   const total = Object.values(prices).reduce((sum, price) => sum + (price || 0), 0);
   const VAT_PERCENT = 17;
-    const vatAmount = (total * VAT_PERCENT) / 100;
-    const totalWithVAT = total + vatAmount;
+  const vatAmount = (total * VAT_PERCENT) / 100;
+  const totalWithVAT = total + vatAmount;
 
-
+  // מציג הודעות במצב טעינה או שגיאה
   if (loading) return <p className={styles.loading}>טוען חשבונית...</p>;
   if (!treatment) return <p className={styles.error}>לא נמצאה חשבונית עבור טיפול זה.</p>;
 
+  // תאריך פירעון – חודש קדימה מתאריך הטיפול
   const dueDate = treatment?.date
     ? new Date(new Date(treatment.date).setMonth(new Date(treatment.date).getMonth() + 1))
     : null;
 
-
+  // הורדת החשבונית כ־PDF
   const handleDownloadPdf = () => {
     const element = document.querySelector(`.${styles.invoiceContainer}`);
+    const paymentStatus = document.getElementById('paymentStatusSection');
 
-    // הסתר זמנית את כל האלמנטים שלא אמורים להיות ב־PDF
+    // הסתרה זמנית של סטטוס תשלום וכפתורים
+    if (paymentStatus) paymentStatus.style.display = 'none';
     const hiddenElements = document.querySelectorAll('.no-print');
     hiddenElements.forEach(el => el.style.display = 'none');
 
-    const opt = {
-        margin: 0.5,
-        filename: `invoice-${treatmentId}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: 'cm', format: 'a4', orientation: 'portrait' }
-    };
-
-    html2pdf()
-        .set(opt)
-        .from(element)
-        .save()
-        .then(() => {
-        // החזרת האלמנטים לאחר ההורדה
-        hiddenElements.forEach(el => el.style.display = 'block');
-        });
-    };
-
-
-    const handleSendEmail = async () => {
-  try {
-    const element = document.getElementById('invoiceContent');
-
-    // הסתרת כפתורים זמנית
-    const hiddenElements = document.querySelectorAll('.no-print');
-    hiddenElements.forEach(el => el.style.display = 'none');
-
-    // הגדרות PDF
     const opt = {
       margin: 0.5,
-      filename: 'invoice.pdf',
+      filename: `invoice-${treatmentId}.pdf`,
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: { scale: 2 },
       jsPDF: { unit: 'cm', format: 'a4', orientation: 'portrait' }
     };
 
-    const worker = html2pdf().set(opt).from(element);
+    html2pdf()
+      .set(opt)
+      .from(element)
+      .save()
+      .then(() => {
+        // החזרת אלמנטים שהוסתרו
+        if (paymentStatus) paymentStatus.style.display = 'block';
+        hiddenElements.forEach(el => el.style.display = 'block');
+      });
+  };
 
-    // יצירת ה־PDF כ־Blob
-    const pdfBlob = await worker.outputPdf('blob');
+  // שליחת החשבונית למייל הלקוח
+  const handleSendEmail = async () => {
+    try {
+      const element = document.getElementById('invoiceContent');
+      const paymentStatus = document.getElementById('paymentStatusSection');
 
-    // יצירת FormData
-    const formData = new FormData();
-    formData.append('email', treatment.email);        // כתובת המייל
-    formData.append('pdf', pdfBlob, 'invoice.pdf');   // הקובץ עצמו
+      // הסתרת פרטים זמנית
+      if (paymentStatus) paymentStatus.style.display = 'none';
+      const hiddenElements = document.querySelectorAll('.no-print');
+      hiddenElements.forEach(el => el.style.display = 'none');
 
-    // שליחת המייל לשרת
-    await axios.post(
-      'http://localhost:5000/api/email/send-invoice',
-      formData,
-      {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      }
-    );
+      const opt = {
+        margin: 0.5,
+        filename: 'invoice.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'cm', format: 'a4', orientation: 'portrait' }
+      };
 
-    toast.success(' החשבונית נשלחה למייל בהצלחה!');
-  } catch (err) {
-    console.error(' שגיאה בשליחת מייל:', err);
-    toast.error(' שגיאה בשליחת המייל');
-  } finally {
-    // החזרת כפתורים לאחר השליחה
-    const hiddenElements = document.querySelectorAll('.no-print');
-    hiddenElements.forEach(el => el.style.display = 'block');
-  }
-};
+      // יצירת Blob של PDF ושליחתו למייל דרך API
+      const worker = html2pdf().set(opt).from(element);
+      const pdfBlob = await worker.outputPdf('blob');
 
+      const formData = new FormData();
+      formData.append('email', treatment.email);
+      formData.append('pdf', pdfBlob, 'invoice.pdf');
 
-const handleTogglePaid = async () => {
-  try {
-    await axios.put(`http://localhost:5000/api/invoices/${treatment._id}/status`, {
-      isPaid: !isPaid
-    });
-    setIsPaid(!isPaid);
-    toast.success(!isPaid ? "החשבונית סומנה כשולמה" : "החשבונית סומנה כלא שולמה");
-  } catch (err) {
-    toast.error("❌ שגיאה בעדכון סטטוס");
-  }
-};
+      await axios.post(
+        'http://localhost:5000/api/email/send-invoice',
+        formData,
+        { headers: { 'Content-Type': 'multipart/form-data' } }
+      );
 
-
-
+      toast.success('החשבונית נשלחה למייל בהצלחה!');
+    } catch (err) {
+      console.error('שגיאה בשליחת מייל:', err);
+      toast.error('שגיאה בשליחת המייל');
+    } finally {
+      // החזרת האלמנטים שהוסתרו
+      const paymentStatus = document.getElementById('paymentStatusSection');
+      if (paymentStatus) paymentStatus.style.display = 'block';
+      const hiddenElements = document.querySelectorAll('.no-print');
+      hiddenElements.forEach(el => el.style.display = 'block');
+    }
+  };
 
 
   return (
@@ -262,19 +250,19 @@ const handleTogglePaid = async () => {
             </div>
 
         <h2 className={styles.invoiceTitle}>חשבונית טיפול</h2>
-
-        <div className={styles.invoiceHeader}>
-            <div>
-            <p><strong>תאריך:</strong> {new Date(treatment.date).toLocaleDateString()}</p>
-            <p><strong>מספר רכב:</strong> {treatment.carPlate}</p>
-            </div>
-            <div>
-            <p><strong>לקוח:</strong> {treatment.customerName}</p>
-            <p><strong>תעודת זהות:</strong> {treatment.idNumber || '—'}</p>
-            </div>
+        {/* ✅ פרטי לקוח */}
+        <div className={styles.customerDetails}>
+          <p><strong>שם הלקוח:</strong> {treatment.customerName || 'לא זמין'}</p>
+          <p><strong>תעודת זהות:</strong> {treatment.idNumber || 'לא זמין'}</p>
+          <p><strong>מספר רכב:</strong> {treatment.carPlate}</p>
         </div>
 
-        <div className={styles.paymentStatus} style={{ marginTop: "20px" }}>
+
+        <div 
+          id="paymentStatusSection" 
+          className={styles.paymentStatus} 
+          style={{ marginBottom: "30px" }}
+        >
           <label style={{ fontWeight: "bold", marginLeft: "10px" }}>סטטוס תשלום:</label>
           <select
             className="form-select w-auto d-inline-block"
@@ -292,7 +280,6 @@ const handleTogglePaid = async () => {
             <option value="paid">שולם</option>
           </select>
         </div>
-
 
         <div className={styles.section}>
             <h4> שירותים שבוצעו</h4>

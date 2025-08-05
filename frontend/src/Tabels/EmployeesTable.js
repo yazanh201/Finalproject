@@ -3,8 +3,8 @@ import Modal from "./Modal";
 import "../Pages/cssfiles/TablesResponsive.css";
 
 const Employees = () => {
-  const [employees, setEmployees] = useState([]);
-  const [modalType, setModalType] = useState(null);
+  const [employees, setEmployees] = useState([]); // רשימת העובדים
+  const [modalType, setModalType] = useState(null); // סוג המודאל: add/edit
   const [selectedEmployee, setSelectedEmployee] = useState({
     idNumber: "",
     fullName: "",
@@ -13,6 +13,7 @@ const Employees = () => {
     phone: "",
   });
 
+  // ✅ שליפת עובדים בעת טעינה
   useEffect(() => {
     fetch("http://localhost:5000/api/employees")
       .then((res) => res.json())
@@ -20,9 +21,11 @@ const Employees = () => {
       .catch((err) => console.error("❌ שגיאה בשליפת עובדים:", err));
   }, []);
 
+  // ✅ פתיחת מודאל
   const handleShowModal = (type, employee = null) => {
     setModalType(type);
     if (type === "add") {
+      // אם הוספה – נקה את השדות
       setSelectedEmployee({
         idNumber: "",
         fullName: "",
@@ -31,17 +34,20 @@ const Employees = () => {
         phone: "",
       });
     } else if (type === "edit" && employee) {
+      // אם עריכה – טען את הנתונים לעובד שנבחר
       setSelectedEmployee(employee);
     }
   };
 
+  // ✅ סגירת מודאל
   const handleCloseModal = () => {
     setModalType(null);
     setSelectedEmployee(null);
   };
 
+  // ✅ שמירה – הוספה או עדכון
   const handleSave = async () => {
-    // ✅ ולידציה – בדיקה שכל השדות מלאים
+    // בדיקת ולידציה – כל השדות חובה
     if (
       !selectedEmployee.idNumber ||
       !selectedEmployee.fullName ||
@@ -69,11 +75,13 @@ const Employees = () => {
       const data = await res.json();
 
       if (modalType === "edit") {
+        // עדכון עובד קיים
         setEmployees((prev) =>
           prev.map((emp) => (emp._id === data._id ? data : emp))
         );
         alert("✅ עובד עודכן בהצלחה!");
       } else {
+        // הוספת עובד חדש
         setEmployees((prev) => [data, ...prev]);
         alert("✅ עובד נוסף בהצלחה!");
       }
@@ -85,6 +93,7 @@ const Employees = () => {
     }
   };
 
+  // ✅ מחיקת עובד
   const handleDelete = async (id) => {
     if (!window.confirm("האם אתה בטוח שברצונך למחוק את העובד הזה?")) return;
     try {
@@ -98,6 +107,7 @@ const Employees = () => {
       alert("❌ שגיאה במחיקת עובד");
     }
   };
+
 
   return (
     <div className="container mt-4">

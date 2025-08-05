@@ -131,3 +131,16 @@
     display: none !important;
   }
 }
+
+.customerDetails {
+  margin-bottom: 20px;
+  padding: 15px;
+  background-color: #f4f8fb;
+  border: 1px solid #cce1f5;
+  border-radius: 8px;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #333;
+}
+
+

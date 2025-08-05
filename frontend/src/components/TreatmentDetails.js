@@ -2,13 +2,20 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import "./cssfiles/TreatmentDetails.css";
 
+/**
+ * קומפוננטה להצגת פרטי טיפול ספציפי.
+ * נטענת לפי מזהה הטיפול מתוך ה־URL ומציגה את כלל המידע עליו:
+ * לקוח, רכב, סטטוס, עלות, שירותים, תמונות וחשבונית (אם קיימת).
+ */
 const TreatmentDetails = () => {
-  const { id } = useParams();
-  const [treatment, setTreatment] = useState(null);
+  const { id } = useParams(); // 🔄 שליפת מזהה הטיפול מה־URL
+  const [treatment, setTreatment] = useState(null); // 🔄 משתנה לאחסון פרטי הטיפול
 
+  // 🔗 כתובות בסיס לטעינת קבצים ו־API
   const BASE_URL = "http://localhost:5000/uploads/";
   const BASE_API_URL = "http://localhost:5000/";
 
+  // 📥 שליפת הטיפול מהשרת ברגע שהקומפוננטה נטענת או שה-id משתנה
   useEffect(() => {
     fetch(`${BASE_API_URL}api/treatments/${id}`)
       .then((res) => res.json())
@@ -16,6 +23,7 @@ const TreatmentDetails = () => {
       .catch((err) => console.error("❌ שגיאה בשליפת טיפול:", err));
   }, [id]);
 
+  // ⏳ מצב טעינה - אם עוד אין טיפול
   if (!treatment) {
     return <div className="text-center mt-5">טוען פרטי טיפול...</div>;
   }
@@ -25,6 +33,7 @@ const TreatmentDetails = () => {
       <div className="treatment-card">
         <h2 className="treatment-title">פרטי טיפול</h2>
 
+        {/* ✅ פרטי טיפול בסיסיים */}
         <div className="treatment-info-grid">
           <div><strong>שם לקוח:</strong> {treatment.customerName || "—"}</div>
           <div><strong>מספר רכב:</strong> {treatment.carPlate}</div>
@@ -33,19 +42,21 @@ const TreatmentDetails = () => {
           <div><strong>עלות:</strong> {treatment.cost} ₪</div>
           <div><strong>סטטוס:</strong> {treatment.status || "—"}</div>
 
+          {/* 📝 תיאור טיפול */}
           <div className="description">
             <strong>תיאור:</strong>
             <div>{treatment.description || "—"}</div>
           </div>
         </div>
 
+        {/* 🛠️ שירותים שבוצעו */}
         {Array.isArray(treatment.treatmentServices) && treatment.treatmentServices.length > 0 && (
           <div className="mt-4">
             <h4>שירותים שבוצעו:</h4>
             {treatment.treatmentServices.map((category, idx) => {
               let options = category?.selectedOptions;
 
-              // אם selectedOptions הוא מחרוזת – ננסה לפענח אותו
+              // 🛠️ אם הערך הוא מחרוזת JSON – נבצע פענוח
               if (typeof options === "string") {
                 try {
                   options = JSON.parse(options);
@@ -73,6 +84,7 @@ const TreatmentDetails = () => {
           </div>
         )}
 
+        {/* 🧾 תצוגת חשבונית */}
         {treatment.invoiceFile && (
           <>
             <h4 className="mt-4">חשבונית:</h4>
@@ -97,6 +109,7 @@ const TreatmentDetails = () => {
           </>
         )}
 
+        {/* 🖼️ תמונות שצולמו במהלך הטיפול */}
         {Array.isArray(treatment.images) && treatment.images.length > 0 && (
           <>
             <h4 className="mt-4">תמונות מהטיפול:</h4>

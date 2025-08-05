@@ -4,27 +4,36 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import '../Pages/cssfiles/TablesResponsive.css'
 
-
 const Customers = () => {
   const navigate = useNavigate();
+
+  // סטייטים לניהול מצב המודל
   const [modalType, setModalType] = useState(null);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
+
+  // רשימת כל הלקוחות
   const [customers, setCustomers] = useState([]);
 
+  // שדות טופס לקוח
   const [name, setName] = useState('');
   const [idNumber, setIdNumber] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [vehicleNumber, setvehicleNumber] = useState('');
 
+  // טלפון מפוצל לקידומת וסיומת
   const [phonePrefix, setPhonePrefix] = useState('052');
   const [phoneSuffix, setPhoneSuffix] = useState('');
+
+  // שדה חיפוש
   const [searchQuery, setSearchQuery] = useState('');
 
+  // שליפת לקוחות בעת טעינה ראשונית
   useEffect(() => {
     fetchCustomers();
   }, []);
 
+  // שליפת לקוחות מהשרת
   const fetchCustomers = async () => {
     try {
       const response = await axios.get('http://localhost:5000/api/customers');
@@ -34,9 +43,12 @@ const Customers = () => {
     }
   };
 
+  // פתיחת מודל (edit בלבד)
   const handleShowModal = (type, customer = null) => {
     setModalType(type);
     setSelectedCustomer(customer);
+
+    // אם עריכה - ממלא את השדות הקיימים
     if (type === 'edit' && customer) {
       setName(customer.name);
       setIdNumber(customer.idNumber);
@@ -55,13 +67,16 @@ const Customers = () => {
     }
   };
 
+  // סגירת המודל ואיפוס
   const handleCloseModal = () => {
     setModalType(null);
     setSelectedCustomer(null);
   };
 
+  // שמירת הלקוח לאחר עריכה
   const handleSave = async () => {
     try {
+      // בדיקות תקינות
       const idRegex = /^\d{9}$/;
       const carRegex = /^\d{1,9}$/;
       const nameRegex = /^[\u0590-\u05FFa-zA-Z\s]{2,}$/;
@@ -76,6 +91,7 @@ const Customers = () => {
       const phoneRegex = /^05[0-9]{8}$/;
       if (!phoneRegex.test(fullPhone)) return alert("❌ מספר טלפון לא תקין. יש להזין קידומת חוקית ו-7 ספרות.");
 
+      // מבנה הנתונים לשליחה
       const customerData = {
         name,
         idNumber,
@@ -84,11 +100,11 @@ const Customers = () => {
         vehicleNumber: [vehicleNumber],
       };
 
+      // אם עריכה - שליחת עדכון לשרת
       if (modalType === "edit" && selectedCustomer) {
         await axios.put(`http://localhost:5000/api/customers/${selectedCustomer._id}`, customerData);
         alert("✅ פרטי הלקוח עודכנו בהצלחה!");
       }
-
 
       handleCloseModal();
       fetchCustomers();
@@ -98,6 +114,7 @@ const Customers = () => {
     }
   };
 
+  // חיפוש לקוחות
   const handleSearch = async () => {
     try {
       if (searchQuery.trim() === '') {
@@ -114,6 +131,7 @@ const Customers = () => {
     }
   };
 
+  // הוספת רכב ללקוח
   const handleAddCar = async () => {
     try {
       if (!vehicleNumber || vehicleNumber.length < 5) {
@@ -135,26 +153,25 @@ const Customers = () => {
     }
   };
 
-
+  // עיצוב טלפון לפורמט ישראלי
   const formatPhone = (phone) => {
     const digits = phone.replace(/\D/g, '');
     return digits.startsWith("0") ? "972" + digits.slice(1) : digits;
   };
 
-
+  // מחיקת לקוח + רכבים
   const handleDeleteCustomer = async (id) => {
-  if (!window.confirm("האם אתה בטוח שברצונך למחוק את הלקוח וכל הרכבים שלו?")) return;
+    if (!window.confirm("האם אתה בטוח שברצונך למחוק את הלקוח וכל הרכבים שלו?")) return;
 
-  try {
-    await axios.delete(`http://localhost:5000/api/customers/${id}`);
-    alert("✅ הלקוח וכל הרכבים שלו נמחקו בהצלחה!");
-    fetchCustomers();
-  } catch (error) {
-    console.error("❌ שגיאה במחיקת לקוח:", error.message);
-    alert(error.response?.data?.message || "❌ שגיאה במחיקה");
-  }
-};
-
+    try {
+      await axios.delete(`http://localhost:5000/api/customers/${id}`);
+      alert("✅ הלקוח וכל הרכבים שלו נמחקו בהצלחה!");
+      fetchCustomers();
+    } catch (error) {
+      console.error("❌ שגיאה במחיקת לקוח:", error.message);
+      alert(error.response?.data?.message || "❌ שגיאה במחיקה");
+    }
+  };
 
   return (
     <div>

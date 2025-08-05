@@ -44,7 +44,7 @@ const Header = () => {
         {/* Main navigation */}
         <div className="flex justify-between items-center py-4">
           <Link to="/" className="text-2xl font-bold text-white hover:text-red-400 transition-colors">
-            <span className="text-red-500">מוסך</span> חיפה
+            <span className="text-red-500">מוסך</span> שירות מהיר
           </Link>
 
           {/* Desktop Navigation */}
@@ -73,12 +73,7 @@ const Header = () => {
             >
               צור קשר
             </button>
-            <button
-              onClick={() => scrollToSection('contact')}
-              className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-full transition-all duration-200 hover:scale-105"
-            >
-              קבע תור
-            </button>
+
           </nav>
 
           {/* Mobile menu button */}

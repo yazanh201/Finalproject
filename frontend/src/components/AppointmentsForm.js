@@ -2,14 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 
+// קומפוננטה ליצירת או עריכת תור
 const CreateAppointment = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const { id } = useParams();
-  const [availableTimes, setAvailableTimes] = useState([]);
-  const [suggestions, setSuggestions] = useState([]);
-  const [typingTimeout, setTypingTimeout] = useState(null);
+  const navigate = useNavigate();          // מאפשר ניווט בין דפים
+  const location = useLocation();          // קבלת מידע שהועבר דרך הניווט
+  const { id } = useParams();              // קבלת מזהה תור מה-URL אם קיים
 
+  // סטייטים לניהול זמני תורים והצעות לקוח
+  const [availableTimes, setAvailableTimes] = useState([]); // שעות פנויות בתאריך מסוים
+  const [suggestions, setSuggestions] = useState([]);        // הצעות ללקוח בזמן הקלדה
+  const [typingTimeout, setTypingTimeout] = useState(null);  // טיימר לדיליי בהשלמה אוטומטית
+
+  // סטייט לטופס קביעת תור
   const [form, setForm] = useState({
     date: '',
     time: '',
@@ -22,8 +26,10 @@ const CreateAppointment = () => {
     carNumber: '',
   });
 
+  // useEffect - בעת טעינת הדף או שינוי ב־location / id
   useEffect(() => {
     if (location.state) {
+      // אם הגיע עם state (לדוגמה דרך ניווט) – נשתמש בנתונים
       const data = location.state;
       setForm({
         date: data.date || '',
@@ -36,8 +42,9 @@ const CreateAppointment = () => {
         phoneNumber: data.phoneNumber ? data.phoneNumber.substring(3) : '',
         carNumber: data.carNumber || ''
       });
-      fetchAvailableTimes(data.date);
+      fetchAvailableTimes(data.date); // שליפת שעות לתאריך
     } else if (id) {
+      // אם הגענו עם מזהה תור – נטען מהשרת
       fetch(`http://localhost:5000/api/appointments/by-number/${id}`)
         .then(res => res.json())
         .then(data => {
@@ -58,23 +65,24 @@ const CreateAppointment = () => {
     }
   }, [location.state, id]);
 
-
+  // שליפת שעות פנויות לתאריך מסוים
   const fetchAvailableTimes = async (date) => {
     if (!date) return;
     try {
       const res = await fetch(`http://localhost:5000/api/appointments/available-times/${date}`);
       const data = await res.json();
       const times = data.includes(form.time) || !form.time ? data : [...data, form.time];
-      setAvailableTimes(times);
+      setAvailableTimes(times); // עדכון זמני תור אפשריים
     } catch (error) {
       console.error('❌ שגיאה בשליפת שעות פנויות:', error);
     }
   };
 
-
+  // שינוי בשדות הטופס
   const handleChange = (e) => {
     const { name, value } = e.target;
 
+    // אם מדובר על תאריך – נבדוק שהוא לא תאריך עבר
     if (name === 'date') {
       const today = new Date().toISOString().slice(0, 10);
       if (value < today) {
@@ -84,21 +92,24 @@ const CreateAppointment = () => {
       fetchAvailableTimes(value);
     }
 
-    if (name === 'idNumber' && !/^\d{0,9}$/.test(value)) return;
+    // ולידציות:
+    if (name === 'idNumber' && !/^\d{0,9}$/.test(value)) return; // ת"ז עד 9 ספרות
     if (name === 'name') {
-      if (!/^[א-תa-zA-Z\s]*$/.test(value)) return;
-      fetchCustomerSuggestions(value);
+      if (!/^[א-תa-zA-Z\s]*$/.test(value)) return; // שם בעברית/אנגלית בלבד
+      fetchCustomerSuggestions(value); // הצעות ללקוח
     }
 
-    if (name === 'phoneNumber' && !/^\d{0,7}$/.test(value)) return;
-    if (name === 'carNumber' && !/^\d{0,8}$/.test(value)) return;
+    if (name === 'phoneNumber' && !/^\d{0,7}$/.test(value)) return; // טלפון - 7 ספרות
+    if (name === 'carNumber' && !/^\d{0,8}$/.test(value)) return;   // רכב - עד 8 ספרות
 
-    setForm((prev) => ({ ...prev, [name]: value }));
+    setForm((prev) => ({ ...prev, [name]: value })); // עדכון טופס
   };
 
+  // שליחת טופס – שמירה או עדכון תור
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // בדיקות תקינות
     if (form.idNumber.length !== 9) {
       toast.error(' תעודת זהות חייבת להכיל בדיוק 9 ספרות');
       return;
@@ -116,16 +127,18 @@ const CreateAppointment = () => {
       return;
     }
 
+    // הרכבת מספר טלפון מלא והכנת payload
     const fullPhone = form.phonePrefix + form.phoneNumber;
     const payload = { ...form, phoneNumber: fullPhone };
 
     try {
-      const isEdit = location.state?._id || id;
+      const isEdit = location.state?._id || id; // האם מדובר על עריכה
       const url = isEdit
         ? `http://localhost:5000/api/appointments/${location.state?._id || id}`
         : 'http://localhost:5000/api/appointments';
       const method = isEdit ? 'PUT' : 'POST';
 
+      // שליחה לשרת
       const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
@@ -137,6 +150,7 @@ const CreateAppointment = () => {
 
       toast.success(` התור ${isEdit ? 'עודכן' : 'נשמר'} בהצלחה!`);
 
+      // איפוס טופס לאחר הצלחה
       setForm({
         date: '',
         time: '',
@@ -149,33 +163,34 @@ const CreateAppointment = () => {
         carNumber: '',
       });
 
-
-      navigate('/Dashboard');
+      navigate('/Dashboard'); // מעבר ללוח הבקרה
     } catch (error) {
       console.error(error);
       toast.error(` שגיאה: ${error.message}`);
     }
   };
 
+  // שליפת הצעות ללקוחות בזמן הקלדת שם
   const fetchCustomerSuggestions = (value) => {
     if (value.length < 2) {
-      setSuggestions([]);
+      setSuggestions([]); // אם ההקלדה קצרה מדי – ננקה
       return;
     }
 
-    if (typingTimeout) clearTimeout(typingTimeout);
+    if (typingTimeout) clearTimeout(typingTimeout); // מניעת קריאה כפולה
     setTypingTimeout(
       setTimeout(async () => {
         try {
           const res = await fetch(`http://localhost:5000/api/customers/search?query=${value}`);
           const data = await res.json();
-          setSuggestions(data);
+          setSuggestions(data); // עדכון הצעות
         } catch (error) {
           console.error('שגיאה בחיפוש לקוחות:', error);
         }
-      }, 300)
+      }, 300) // דיליי למניעת עומס
     );
   };
+
 
   return (
     <div className="container mt-5" dir="rtl">
@@ -274,7 +289,6 @@ const CreateAppointment = () => {
               <input type="text" name="carNumber" className="form-control" value={form.carNumber} onChange={handleChange} required />
             </div>
 
-            {/* 🟢 צד שמאל: תאריך, שעה ותיאור */}
             <div className="col-md-6">
               <label className="form-label">תאריך</label>
               <input type="date" name="date" className="form-control" value={form.date} onChange={handleChange} required />

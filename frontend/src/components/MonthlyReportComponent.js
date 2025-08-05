@@ -2,12 +2,22 @@ import React, { useEffect, useState, useRef } from "react";
 import html2pdf from "html2pdf.js";
 import "./cssfiles/MonthlyReport.css";
 
+/**
+ * קומפוננטה המציגה דוח חודשי של פעילות המוסך – כולל טיפולים, הזמנות ולקוחות חדשים.
+ * מאפשרת הורדת הדוח כקובץ PDF.
+ */
 const MonthlyReportComponent = () => {
+  // רפרנס לתוכן הדוח – משמש ליצירת PDF
   const reportRef = useRef(null);
-  const [data, setData] = useState(null);
-  const [orders, setOrders] = useState([]); // ✅ הזמנות
-  const [newCustomersList, setNewCustomersList] = useState([]); // ✅ לקוחות חדשים
 
+  // סטייטים לניהול נתונים:
+  const [data, setData] = useState(null); // ✅ נתוני טיפולים כולל סה"כ טיפולים והכנסות
+  const [orders, setOrders] = useState([]); // ✅ רשימת הזמנות רכבים שבוצעו החודש
+  const [newCustomersList, setNewCustomersList] = useState([]); // ✅ רשימת לקוחות חדשים החודש
+
+  /**
+   * useEffect – בעת טעינת הקומפוננטה מתבצעת שליפה של הדוחות מהשרת
+   */
   useEffect(() => {
     const fetchReport = async () => {
       try {
@@ -33,6 +43,9 @@ const MonthlyReportComponent = () => {
     fetchReport();
   }, []);
 
+  /**
+   * handleDownloadPdf – יצירת קובץ PDF מהדוח המוצג
+   */
   const handleDownloadPdf = () => {
     const element = reportRef.current;
     const opt = {
@@ -45,13 +58,13 @@ const MonthlyReportComponent = () => {
     html2pdf().set(opt).from(element).save();
   };
 
+  // אם הנתונים עדיין לא נטענו – הצגת הודעת טעינה
   if (!data) return <p className="loading">טוען דוח חודשי...</p>;
 
   return (
     <div className="report-wrapper">
       <div className="report-box" ref={reportRef}>
-        
-        {/* ✅ כותרת דוח */}
+        {/* ✅ כותרת דוח + פרטי העסק */}
         <div className="businessHeader">
           <div>
             <img src="/img/invlogo.png" alt="לוגו מוסך" className="logo" />
@@ -64,12 +77,13 @@ const MonthlyReportComponent = () => {
           </div>
         </div>
 
+        {/* ✅ כותרת ותאריך */}
         <h2 className="reportTitle">דוח חודשי</h2>
         <p className="reportDate">
           {new Date().toLocaleString("he-IL", { month: "long", year: "numeric" })}
         </p>
 
-        {/* ✅ סיכומים */}
+        {/* ✅ סיכום מספרי של הדוח */}
         <div className="report-stats">
           <div className="stat-card">סה"כ טיפולים: {data.totalTreatments}</div>
           <div className="stat-card">סה"כ הכנסות: ₪{data.totalRevenue}</div>
@@ -77,7 +91,7 @@ const MonthlyReportComponent = () => {
           <div className="stat-card">סה"כ הזמנות: {orders.length}</div>
         </div>
 
-        {/* ✅ טבלת טיפולים */}
+        {/* ✅ טבלת טיפולים שבוצעו */}
         <h3 className="table-title">טיפולים שבוצעו :</h3>
         <table className="report-table">
           <thead>
@@ -98,7 +112,7 @@ const MonthlyReportComponent = () => {
           </tbody>
         </table>
 
-        {/* ✅ טבלת הזמנות רכבים */}
+        {/* ✅ טבלת הזמנות */}
         {orders.length > 0 && (
           <>
             <h3 className="table-title">הזמנות רכבים :</h3>
@@ -153,9 +167,9 @@ const MonthlyReportComponent = () => {
             </table>
           </>
         )}
-
       </div>
 
+      {/* ✅ כפתור הורדת הדוח כ־PDF */}
       <button className="download-btn" onClick={handleDownloadPdf}>
         📥 הורד דוח כ־PDF
       </button>

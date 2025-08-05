@@ -7,7 +7,9 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import ServicesPage from "./pages/Services";
 import NotFound from "./pages/NotFound";
-
+import ChatBot from "../../frontend/src/components/ChatBot"; 
+import Contact from "./components/Contact";
+import "./pages/chatbot.css" 
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -16,15 +18,23 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        {/* ✅ הוספת ChatBot כך שיופיע בכל העמודים */}
+        <div className="chatbot-wrapper">
+          <ChatBot />
+        </div>
+
+
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/services" element={<ServicesPage />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
+          <Route path="/contact" element={<Contact />} />
+
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
 );
+
 
 export default App;

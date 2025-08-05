@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from "react-hot-toast";
 
-
+// 🛠️ רשימת סוגי תיקונים לפי קטגוריה
 const repairOptions = {
   "שירותים וטיפולים": [
     "הכנה לטסט שנתי",
@@ -46,17 +46,19 @@ const repairOptions = {
   ],
 };
 
+// 🔁 סטטוסים מותרים לטיפול
 const allowedStatuses = ['בטיפול', 'ממתין לחלקים', 'בעיכוב', 'הסתיים'];
 
 const CreateTreatment = () => {
-  const location = useLocation();
-  const navigate = useNavigate();
-  const state = location.state || {};
-  const [employees, setEmployees] = useState([]); // ✅ שמירת רשימת עובדים
+  const location = useLocation();             // קבלת פרטים מהניווט
+  const navigate = useNavigate();             // נווט לדפים אחרים
+  const state = location.state || {};         // נתוני עריכה אם קיימים
+  const [employees, setEmployees] = useState([]); // ✅ שמירת רשימת עובדים מהשרת
 
-
+  // הגדרת סטטוס ברירת מחדל לפי ערך קודם אם קיים
   const initialStatus = allowedStatuses.includes(state.status) ? state.status : 'בטיפול';
 
+  // הגדרת הטופס עם ערכים התחלתיים (או מה־state)
   const [form, setForm] = useState({
     date: state.date || new Date().toISOString().split("T")[0],
     cost: state.cost || '',
@@ -72,11 +74,13 @@ const CreateTreatment = () => {
     idNumber: state.idNumber || ''
   });
 
+  // קטגוריה שנבחרה כעת לתוספת
   const [selectedCategory, setSelectedCategory] = useState('');
+  // קטגוריות שנבחרו בפועל
   const [selectedCategories, setSelectedCategories] = useState([]);
 
   useEffect(() => {
-    // ✅ טעינת קטגוריות קיימות
+    // ✅ טעינת קטגוריות אם קיימות בעריכה
     if (state.treatmentServices) {
       try {
         const parsed = typeof state.treatmentServices === 'string'
@@ -88,29 +92,36 @@ const CreateTreatment = () => {
       }
     }
 
-    // ✅ טעינת רשימת עובדים מהשרת
+    // ✅ שליפת עובדים מהשרת
     fetch("http://localhost:5000/api/employees")
       .then(res => res.json())
       .then(data => setEmployees(data))
       .catch(err => console.error("❌ שגיאה בשליפת עובדים:", err));
-
   }, [state.treatmentServices]);
 
-
+  // שינוי בשדות טופס בסיסיים
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+    // בדיקת תאריך – לא לאפשר תאריך עבר
+    if (name === 'date') {
+      const today = new Date().toISOString().split("T")[0];
+      if (value < today) {
+        toast.error("❌ לא ניתן לבחור תאריך שכבר עבר!");
+        return;
+      }
+    }
+
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleFileChange = (e) => {
-    setForm((prev) => ({ ...prev, invoiceFile: e.target.files[0] }));
-  };
-
+  // שינוי תמונות – קבצים שהועלו
   const handleImagesChange = (e) => {
     const files = Array.from(e.target.files);
     setForm((prev) => ({ ...prev, images: files }));
   };
 
+  // הוספת קטגוריית טיפולים
   const handleAddCategory = (category) => {
     if (!category) return;
     const exists = selectedCategories.some(c => c.category === category);
@@ -120,6 +131,7 @@ const CreateTreatment = () => {
     setSelectedCategory('');
   };
 
+  // סימון/ביטול של תת-טיפול בקטגוריה מסוימת
   const handleChecklistChange = (category, task) => {
     setSelectedCategories(prev =>
       prev.map(c =>
@@ -128,74 +140,82 @@ const CreateTreatment = () => {
           : {
               ...c,
               selectedOptions: c.selectedOptions.includes(task)
-                ? c.selectedOptions.filter(t => t !== task)
-                : [...c.selectedOptions, task]
+                ? c.selectedOptions.filter(t => t !== task) // הסרה
+                : [...c.selectedOptions, task] // הוספה
             }
       )
     );
   };
-const handleSubmit = async (e) => {
-  e.preventDefault();
 
-  const API_BASE = process.env.REACT_APP_API_BASE || 'http://localhost:5000';
-  const isEdit = form.treatmentId && form.treatmentId.trim() !== '';
-  const url = isEdit
-    ? `${API_BASE}/api/treatments/${form.treatmentId}`
-    : `${API_BASE}/api/treatments`;
-  const method = isEdit ? 'PUT' : 'POST';
+  // שליחת טופס – שמירה או עדכון
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  const formData = new FormData();
-  for (const key in form) {
-    if (key === "images") {
-      form.images.forEach((img) => formData.append("images", img));
-    } else if (key !== "treatmentId") {
-      formData.append(key, form[key]);
+    const API_BASE = process.env.REACT_APP_API_BASE || 'http://localhost:5000';
+    const isEdit = form.treatmentId && form.treatmentId.trim() !== '';
+    const url = isEdit
+      ? `${API_BASE}/api/treatments/${form.treatmentId}`
+      : `${API_BASE}/api/treatments`;
+    const method = isEdit ? 'PUT' : 'POST';
+
+    // יצירת FormData כולל קבצים
+    const formData = new FormData();
+    for (const key in form) {
+      if (key === "images") {
+        form.images.forEach((img) => formData.append("images", img));
+      } else if (key !== "treatmentId") {
+        formData.append(key, form[key]);
+      }
     }
-  }
 
-  formData.append("treatmentServices", JSON.stringify(selectedCategories));
+    // הוספת קטגוריות הטיפול כ־JSON
+    formData.append("treatmentServices", JSON.stringify(selectedCategories));
 
-  try {
-    const response = await fetch(url, { method, body: formData });
-    const contentType = response.headers.get("content-type");
-    const data = contentType?.includes("application/json")
-      ? await response.json()
-      : await response.text();
+    try {
+      const response = await fetch(url, { method, body: formData });
+      const contentType = response.headers.get("content-type");
+      const data = contentType?.includes("application/json")
+        ? await response.json()
+        : await response.text();
 
-    if (!response.ok) throw new Error(data.message || data || 'שגיאה בשמירה');
+      if (!response.ok) throw new Error(data.message || data || 'שגיאה בשמירה');
 
-    toast.success(` הטיפול ${isEdit ? 'עודכן בהצלחה' : 'נשמר בהצלחה'}!`);
-    if (!isEdit) {
-  navigate("/dashboard");
-} else {
-  navigate("/dashboard");
-}
+      toast.success(` הטיפול ${isEdit ? 'עודכן בהצלחה' : 'נשמר בהצלחה'}!`);
 
-    if (!isEdit) {
-      setForm({
-        date: new Date().toISOString().split("T")[0],
-        cost: '',
-        carPlate: '',
-        description: '',
-        workerName: '',
-        customerName: '',
-        images: [],
-        repairTypeId: '',
-        status: 'בטיפול',
-        treatmentId: '',
-        workerId: '',
-        idNumber: ''
-      });
-      setSelectedCategories([]);
-      setSelectedCategory('');
-    } else {
-      navigate(-1);
+      if (!isEdit) {
+        navigate("/dashboard");
+      } else {
+        navigate("/dashboard");
+      }
+
+      if (!isEdit) {
+        // איפוס הטופס לאחר יצירה
+        setForm({
+          date: new Date().toISOString().split("T")[0],
+          cost: '',
+          carPlate: '',
+          description: '',
+          workerName: '',
+          customerName: '',
+          images: [],
+          repairTypeId: '',
+          status: 'בטיפול',
+          treatmentId: '',
+          workerId: '',
+          idNumber: ''
+        });
+        setSelectedCategories([]);
+        setSelectedCategory('');
+      } else {
+        navigate(-1); // חזרה לעמוד הקודם לאחר עדכון
+      }
+
+    } catch (err) {
+      console.error(" שגיאה בבקשה:", err);
+      toast.error(` שגיאה: ${err.message}`);
     }
-  } catch (err) {
-    console.error(" שגיאה בבקשה:", err);
-    toast.error(` שגיאה: ${err.message}`);
-  }
-};
+  };
+
 
 
   return (
@@ -212,9 +232,9 @@ const handleSubmit = async (e) => {
                 className="form-control" 
                 value={form.date} 
                 onChange={handleChange} 
-                min={new Date().toISOString().split("T")[0]} // ✅ תאריך מינימלי = היום
                 required 
               />
+
               <label className="form-label mt-3">מספר רכב</label>
               <input type="text" name="carPlate" className="form-control" value={form.carPlate} onChange={handleChange} required />
               <label className="form-label mt-3">שם לקוח</label>

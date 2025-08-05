@@ -2,19 +2,22 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-import Modal from "../Tabels/Modal";
+import Modal from "../Tabels/Modal"; // ✅ קומפוננטת מודאל לעריכת רכב
 
 const CustomerVehicles = () => {
-  const { customerId } = useParams();
-  const navigate = useNavigate();
-  const [vehicles, setVehicles] = useState([]);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [selectedVehicle, setSelectedVehicle] = useState(null);
+  const { customerId } = useParams(); // שליפת מזהה לקוח מה-URL
+  const navigate = useNavigate();     // נווט לדפים אחרים
 
+  const [vehicles, setVehicles] = useState([]);             // רשימת רכבים
+  const [modalOpen, setModalOpen] = useState(false);        // האם המודאל פתוח
+  const [selectedVehicle, setSelectedVehicle] = useState(null); // הרכב שנבחר לעריכה
+
+  // useEffect - טוען את רכבי הלקוח כאשר משתנה ה־customerId
   useEffect(() => {
     fetchVehicles();
   }, [customerId]);
 
+  // שליפת רכבים לפי מזהה לקוח
   const fetchVehicles = async () => {
     try {
       const res = await axios.get(`http://localhost:5000/api/cars/by-customer/${customerId}`);
@@ -24,26 +27,30 @@ const CustomerVehicles = () => {
     }
   };
 
+  // פתיחת חלונית עריכה לרכב
   const handleEdit = (vehicle) => {
-    setSelectedVehicle({ ...vehicle });
+    setSelectedVehicle({ ...vehicle }); // שיבוט הנתונים לתוך state
     setModalOpen(true);
   };
 
+  // סגירת מודאל
   const handleCloseModal = () => {
     setModalOpen(false);
     setSelectedVehicle(null);
   };
 
+  // שמירת שינויים שנעשו ברכב
   const handleSave = async () => {
     try {
       const { _id, vehicleNumber, manufacturer, model, year, color, mileage } = selectedVehicle;
 
-      // אימותים בסיסיים
+      // אימות שדות חובה
       if (!vehicleNumber || !manufacturer || !model || !year || !color) {
         alert("אנא מלא את כל השדות הנדרשים");
         return;
       }
 
+      // שליחת PUT לעדכון רכב
       await axios.put(`http://localhost:5000/api/cars/${_id}`, {
         vehicleNumber,
         manufacturer,
@@ -54,26 +61,27 @@ const CustomerVehicles = () => {
       });
 
       alert("✅ רכב עודכן בהצלחה!");
-      handleCloseModal();
-      fetchVehicles();
+      handleCloseModal(); // סגור מודאל
+      fetchVehicles();    // רענן רשימת רכבים
     } catch (error) {
       console.error("❌ שגיאה בעדכון רכב:", error.message);
       alert("❌ שגיאה בעדכון רכב");
     }
   };
 
+  // יצרנים לבחירה במודאל העריכה
   const carMakers = [
-  "טויוטה", "יונדאי", "קיה", "מאזדה", "פורד", "סובארו", "שברולט",
-  "פיאט", "אאודי", "ב.מ.וו", "מרצדס", "וולוו", "פיג'ו", "סיטרואן",
-  "סקודה", "ניסאן", "רנו", "הונדה", "לקסוס"
-];
-
+    "טויוטה", "יונדאי", "קיה", "מאזדה", "פורד", "סובארו", "שברולט",
+    "פיאט", "אאודי", "ב.מ.וו", "מרצדס", "וולוו", "פיג'ו", "סיטרואן",
+    "סקודה", "ניסאן", "רנו", "הונדה", "לקסוס"
+  ];
 
   return (
     <div className="container mt-4" style={{ direction: 'rtl' }}>
       <h3 className="mb-4">רכבים של הלקוח</h3>
       <button className="btn btn-secondary mb-3" onClick={() => navigate(-1)}>⬅ חזור</button>
 
+      {/* טבלת הצגת רכבים */}
       <table className="table table-bordered table-striped">
         <thead>
           <tr>
@@ -110,6 +118,7 @@ const CustomerVehicles = () => {
         <Modal isOpen={true} onClose={handleCloseModal} onSave={handleSave}>
           <h4>עריכת רכב</h4>
           <form>
+            {/* שדה יצרן */}
             <label>יצרן</label>
             <select
               className="form-control"
@@ -124,6 +133,7 @@ const CustomerVehicles = () => {
               ))}
             </select>
 
+            {/* שדה דגם */}
             <div className="form-group mb-2">
               <label>דגם</label>
               <input
@@ -132,6 +142,8 @@ const CustomerVehicles = () => {
                 onChange={(e) => setSelectedVehicle({ ...selectedVehicle, model: e.target.value })}
               />
             </div>
+
+            {/* שדה שנת ייצור */}
             <div className="form-group mb-2">
               <label>שנת ייצור</label>
               <input
@@ -141,6 +153,8 @@ const CustomerVehicles = () => {
                 onChange={(e) => setSelectedVehicle({ ...selectedVehicle, year: e.target.value })}
               />
             </div>
+
+            {/* שדה צבע */}
             <div className="form-group mb-2">
               <label>צבע</label>
               <input
@@ -149,6 +163,8 @@ const CustomerVehicles = () => {
                 onChange={(e) => setSelectedVehicle({ ...selectedVehicle, color: e.target.value })}
               />
             </div>
+
+            {/* שדה קילומטראז' */}
             <div className="form-group mb-2">
               <label>קילומטראז'</label>
               <input

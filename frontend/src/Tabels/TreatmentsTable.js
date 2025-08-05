@@ -5,7 +5,6 @@ import "../Pages/cssfiles/TablesResponsive.css";
 import DynamicTable from "./DynamicTable";
 import { FaEye, FaFileInvoice } from "react-icons/fa";
 
-
 const TreatmentsTable = ({
   filterAppointment,
   filterTreatmentNumber,
@@ -13,6 +12,9 @@ const TreatmentsTable = ({
   onNavigateToAppointment
 }) => {
   const navigate = useNavigate();
+  const role = localStorage.getItem("role");
+
+  // מצב ניהול מודלים, חיפוש, טיפולים וטיפול נבחר
   const [modalType, setModalType] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [treatments, setTreatments] = useState([]);
@@ -26,6 +28,7 @@ const TreatmentsTable = ({
     invoiceId: ""
   });
 
+  // שליפת טיפולים מהשרת לפי סינון (מספר תור או טיפול)
   useEffect(() => {
     let url = "http://localhost:5000/api/treatments";
 
@@ -44,6 +47,7 @@ const TreatmentsTable = ({
       .catch((err) => console.error("❌ שגיאה בשליפת טיפולים:", err));
   }, [filterAppointment, filterTreatmentNumber]);
 
+  // פתיחת מודל (עריכה או חיפוש)
   const handleShowModal = (type, treatment = null) => {
     setModalType(type);
     setSearchTerm("");
@@ -52,13 +56,14 @@ const TreatmentsTable = ({
     }
   };
 
-
+  // סגירת מודל
   const handleCloseModal = () => {
     setModalType(null);
     setSelectedTreatment(null);
     setSearchTerm("");
   };
 
+  // שמירת טיפול (עדכון או יצירה)
   const handleSave = async () => {
     try {
       const method = modalType === "edit" ? "PUT" : "POST";
@@ -76,10 +81,12 @@ const TreatmentsTable = ({
       const data = await res.json();
 
       if (modalType === "edit") {
+        // עדכון טיפול קיים
         setTreatments((prev) =>
           prev.map((t) => (t._id === data._id ? data : t))
         );
       } else {
+        // הוספת טיפול חדש
         setTreatments((prev) => [data.treatment, ...prev]);
       }
 
@@ -91,6 +98,7 @@ const TreatmentsTable = ({
     }
   };
 
+  // חיפוש לפי תאריך
   const handleSearchByDate = async () => {
     try {
       const res = await fetch(
@@ -104,6 +112,7 @@ const TreatmentsTable = ({
     }
   };
 
+  // חיפוש לפי מספר רכב
   const handleSearchByCar = async () => {
     try {
       const res = await fetch(
@@ -117,20 +126,21 @@ const TreatmentsTable = ({
     }
   };
 
-
+  // מחיקת טיפול
   const handleDelete = async (id) => {
-  if (!window.confirm("האם אתה בטוח שברצונך למחוק את הטיפול הזה?")) return;
-  try {
-    await fetch(`http://localhost:5000/api/treatments/${id}`, {
-      method: "DELETE",
-    });
-    setTreatments((prev) => prev.filter((t) => t._id !== id));
-    alert("✅ הטיפול נמחק בהצלחה!");
-  } catch (err) {
-    console.error("❌ שגיאה במחיקת טיפול:", err);
-    alert("❌ שגיאה במחיקה");
-  }
-};
+    if (!window.confirm("האם אתה בטוח שברצונך למחוק את הטיפול הזה?")) return;
+    try {
+      await fetch(`http://localhost:5000/api/treatments/${id}`, {
+        method: "DELETE",
+      });
+      setTreatments((prev) => prev.filter((t) => t._id !== id));
+      alert("✅ הטיפול נמחק בהצלחה!");
+    } catch (err) {
+      console.error("❌ שגיאה במחיקת טיפול:", err);
+      alert("❌ שגיאה במחיקה");
+    }
+  };
+
 
 
   return (
@@ -157,7 +167,7 @@ const TreatmentsTable = ({
               <th>מספר רכב</th>
               <th>שם לקוח</th>
               <th>צפייה</th>
-              <th>חשבונית</th>
+              {role === "admin" && <th>חשבונית</th>}
               <th>עריכה</th>
             </tr>
           </thead>
@@ -166,28 +176,31 @@ const TreatmentsTable = ({
               <tr key={treatment._id}>
                 <td>{treatment.treatmentId}</td>
                 <td>{treatment.date}</td>
-
                 <td>{treatment.carPlate}</td>
                 <td>{treatment.customerName || "—"}</td>
-                
+
                 <td>
                   <button
                     className="btn btn-outline-secondary btn-sm"
                     onClick={() => navigate(`/treatment/${treatment._id}`)}
                     title="צפייה בפרטי הטיפול"
                   >
-                    <FaEye size={18} /> {/* אייקון עין איכותי */}
+                    <FaEye size={18} />
                   </button>
                 </td>
-                <td>
-                  <button
-                    className="btn btn-outline-success btn-sm"
-                    onClick={() => navigate(`/invoice/${treatment._id}`)}
-                    title="צפייה בחשבונית"
-                  >
-                    <FaFileInvoice size={18} /> חשבונית {/* אייקון חשבונית מקצועי */}
-                  </button>
-                </td>
+
+                {role === "admin" && (   // ✅ מציג את עמודת החשבונית רק למנהל
+                  <td>
+                    <button
+                      className="btn btn-outline-success btn-sm"
+                      onClick={() => navigate(`/invoice/${treatment._id}`)}
+                      title="צפייה בחשבונית"
+                    >
+                      <FaFileInvoice size={18} /> חשבונית
+                    </button>
+                  </td>
+                )}
+
                 <td>
                   <button
                     className="btn btn-primary btn-sm"
@@ -205,27 +218,24 @@ const TreatmentsTable = ({
                           treatmentId: treatment._id || "",
                           repairTypeId: treatment.typeId || "",
                           workerId: treatment.workerId || "",
-                          // ✅ תוסיף את זה:
                           treatmentServices: treatment.treatmentServices || []
                         }
                       })
                     }
-
-                    title="עריכת טיפול"
                   >
                     עריכה
                   </button>
-                    <button
-                      className="btn btn-primary btn-sm me-2"
-                      onClick={() => handleDelete(treatment._id)}
-                      title="מחיקת טיפול"
-                    >
-                      מחיקה
-                    </button>
+                  <button
+                    className="btn btn-primary btn-sm ms-2 me-2"
+                    onClick={() => handleDelete(treatment._id)}
+                  >
+                    מחיקה
+                  </button>
                 </td>
               </tr>
             ))}
           </tbody>
+
         </table>
       </div>
 

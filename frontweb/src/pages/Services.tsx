@@ -191,7 +191,7 @@ const ServicesPage = () => {
       <section className="relative min-h-[60vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0">
           <img
-            src="https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=1920&h=1080&fit=crop&crop=center"
+            src="https://cdn.prod.website-files.com/678cca1dba65076a9fd94f2d/678fd14e0f4bbe06039930ea_646be3adce622fc3c2d0b54a_62a3614cf23bdd729af9ff43_Tekmetric-Auto-Repair-Shop%2525201-min.webp"
             alt="Professional garage services"
             className="w-full h-full object-cover"
           />
@@ -355,7 +355,7 @@ const ServicesPage = () => {
                       </h4>
                       <ul className="space-y-3">
                         {selectedService.detailedInfo.benefits.map((benefit, idx) => (
-                          <li key={idx} className="flex items-center gap-3 text-gray-200">
+                          <li key={idx} className="flex items-center gap-3 text-200">
                             <div className="w-6 h-6 bg-blue-500/20 rounded-full flex items-center justify-center flex-shrink-0">
                               <CheckCircle className="w-4 h-4 text-blue-400" />
                             </div>
@@ -368,12 +368,7 @@ const ServicesPage = () => {
                 </div>
               </div>
 
-              <Card className="mt-8 bg-gradient-to-r from-purple-900/30 to-purple-800/20 border-purple-600/30">
-                <CardContent className="p-6 text-center">
-                  <h5 className="font-bold text-purple-400 mb-2 text-lg">אחריות</h5>
-                  <p className="text-white text-lg">{selectedService.detailedInfo.warranty}</p>
-                </CardContent>
-              </Card>
+     
 
               <div className="mt-8 text-center p-8 bg-gradient-to-r from-red-600/20 to-red-700/10 rounded-2xl border border-red-600/30">
                 <h5 className="text-2xl font-bold text-white mb-3">מעוניינים בשירות זה?</h5>

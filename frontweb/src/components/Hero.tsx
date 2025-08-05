@@ -14,7 +14,7 @@ const Hero = () => {
       {/* High-quality automotive background */}
       <div className="absolute inset-0">
         <img
-          src="https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=1920&h=1080&fit=crop&crop=center"
+          src="https://cdn.prod.website-files.com/678cca1dba65076a9fd94f2d/678fd14e0f4bbe06039930ea_646be3adce622fc3c2d0b54a_62a3614cf23bdd729af9ff43_Tekmetric-Auto-Repair-Shop%2525201-min.webp"
           alt="Professional garage background"
           className="w-full h-full object-cover"
         />

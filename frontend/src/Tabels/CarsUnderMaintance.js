@@ -2,36 +2,41 @@ import React, { useState, useEffect } from "react";
 import Modal from "./Modal";
 import "../Pages/cssfiles/TablesResponsive.css";
 
+// קומפוננטה להצגת רכבים שנמצאים כרגע בטיפול או בתיקון
 const CarsInService = () => {
-  const [modalType, setModalType] = useState(null);
-  const [treatments, setTreatments] = useState([]);
-  const [selectedTreatment, setSelectedTreatment] = useState(null);
+  const [modalType, setModalType] = useState(null); // סוג המודל (כעת רק "edit")
+  const [treatments, setTreatments] = useState([]); // רשימת הטיפולים מהרשומות
+  const [selectedTreatment, setSelectedTreatment] = useState(null); // הטיפול הנבחר לעריכה
 
-  // ✅ שליפת טיפולים
+  // ✅ שליפת כל הטיפולים בעת טעינת הקומפוננטה
   useEffect(() => {
     fetch("http://localhost:5000/api/treatments")
       .then(res => res.json())
       .then(data => {
+        // דואג שגם אם התשובה אינה מערך עדיין יומר למערך
         const result = Array.isArray(data) ? data : [data];
         setTreatments(result);
       })
       .catch(err => console.error("❌ שגיאה בשליפת טיפולים:", err));
   }, []);
 
+  // פתיחת מודל לעריכת טיפול נבחר
   const handleShowModal = (treatment) => {
     setModalType("edit");
     setSelectedTreatment({
       ...treatment,
-      delayReason: treatment.delayReason || "",
-      estimatedReleaseDate: treatment.estimatedReleaseDate || ""
+      delayReason: treatment.delayReason || "", // סיבת עיכוב אם קיימת
+      estimatedReleaseDate: treatment.estimatedReleaseDate || "" // תאריך שחרור אם קיים
     });
   };
 
+  // סגירת המודל ואיפוס
   const handleCloseModal = () => {
     setModalType(null);
     setSelectedTreatment(null);
   };
 
+  // שמירת השינויים בטיפול לשרת
   const handleSave = async () => {
     try {
       const res = await fetch(`http://localhost:5000/api/treatments/${selectedTreatment._id}`, {
@@ -45,9 +50,11 @@ const CarsInService = () => {
 
       if (!res.ok) throw new Error("❌ שגיאה בשמירה");
 
+      // עדכון המערך המקומי עם הטיפול שעודכן
       setTreatments(prev =>
         prev.map(t => (t._id === selectedTreatment._id ? selectedTreatment : t))
       );
+
       alert("✅ הנתונים נשמרו בהצלחה!");
       handleCloseModal();
     } catch (err) {
@@ -58,10 +65,12 @@ const CarsInService = () => {
 
   return (
     <div>
+      {/* כותרת */}
       <div className="text-center mb-4">
         <h2 className="me-3">רכבים בטיפול/תיקון</h2>
       </div>
 
+      {/* טבלה רספונסיבית */}
       <div className="responsiveTableContainer">
         <table className="table table-striped">
           <thead>
@@ -75,6 +84,7 @@ const CarsInService = () => {
             </tr>
           </thead>
           <tbody>
+            {/* סינון רק טיפולים שלא הסתיימו */}
             {treatments
               .filter(t => t.status !== "הסתיים")
               .map(treatment => (
@@ -102,9 +112,12 @@ const CarsInService = () => {
         </table>
       </div>
 
+      {/* מודל עריכה – מוצג רק אם נבחר טיפול לעריכה */}
       {modalType === "edit" && selectedTreatment && (
         <Modal isOpen={true} onClose={handleCloseModal} onSave={handleSave}>
           <h3>עריכת פרטי רכב בטיפול</h3>
+
+          {/* שדה סיבת עיכוב */}
           <div className="form-group mb-3">
             <label>סיבת עיכוב</label>
             <textarea
@@ -115,6 +128,8 @@ const CarsInService = () => {
               }
             />
           </div>
+
+          {/* שדה תאריך משוער לשחרור */}
           <div className="form-group mb-3">
             <label>תאריך משוער לשחרור</label>
             <input

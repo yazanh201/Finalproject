@@ -3,11 +3,12 @@ import Modal from "./Modal";
 import axios from "axios";
 
 const CarsTable = () => {
-  const [modalType, setModalType] = useState(null);
-  const [selectedCar, setSelectedCar] = useState(null);
-  const [cars, setCars] = useState([]);
+  // סטייטים כלליים
+  const [modalType, setModalType] = useState(null); // 'edit' או 'search'
+  const [selectedCar, setSelectedCar] = useState(null); // אובייקט הרכב הנבחר לעריכה
+  const [cars, setCars] = useState([]); // כל הרכבים
 
-  // סטייטים לשדות רכב
+  // סטייטים לשדות של הרכב
   const [vehicleNumber, setvehicleNumber] = useState('');
   const [owner, setOwner] = useState('');
   const [ownerID, setOwnerID] = useState('');
@@ -18,168 +19,162 @@ const CarsTable = () => {
   const [mileage, setMileage] = useState('');
   const [maker, setMaker] = useState('');
 
-
-
+  // שליפת רכבים מהשרת בעת טעינה
   useEffect(() => {
     fetchCars();
   }, []);
 
+  // שליפת רכבים מהשרת
   const fetchCars = async () => {
     try {
       const response = await axios.get('http://localhost:5000/api/cars');
-      setCars(response.data);
+      setCars(response.data); // שמירת הרכבים בסטייט
     } catch (error) {
       console.error('❌ שגיאה בשליפת רכבים:', error.message);
     }
   };
 
+  // הצגת מודל
   const handleShowModal = (type, car = null) => {
     setModalType(type);
     setSelectedCar(car);
 
+    // אם מדובר בעריכה, נטען את הערכים לתוך השדות
     if (type === 'edit' && car) {
-    setvehicleNumber(car.vehicleNumber);
-    setOwner(car.ownerName);
-    setOwnerID(car.ownerIdNumber);
-    setMaker(car.manufacturer || ''); // ✅ שורה קריטית
-    setModel(car.model);
-    setYear(car.year);
-    setColor(car.color);
-    setMileage(car.mileage || '');
-  }
-
+      setvehicleNumber(car.vehicleNumber);
+      setOwner(car.ownerName);
+      setOwnerID(car.ownerIdNumber);
+      setMaker(car.manufacturer || ''); // 🧠 שומר על תקינות אם שדה לא קיים
+      setModel(car.model);
+      setYear(car.year);
+      setColor(car.color);
+      setMileage(car.mileage || '');
+    }
   };
 
+  // סגירת מודל
   const handleCloseModal = () => {
     setModalType(null);
     setSelectedCar(null);
   };
 
+  // שמירת שינויים או עדכון רכב
   const handleSave = async () => {
-  try {
-    const currentYear = new Date().getFullYear();
+    try {
+      const currentYear = new Date().getFullYear();
 
-    // ✅ אימות מספר רכב
-    if (!vehicleNumber.trim()) {
-      alert("❌ חובה להזין מספר רכב!");
-      return;
+      // ולידציות
+      if (!vehicleNumber.trim()) {
+        alert("❌ חובה להזין מספר רכב!");
+        return;
+      }
+
+      if (modalType === "add" && !owner.trim()) {
+        alert("❌ חובה להזין שם בעל הרכב!");
+        return;
+      }
+
+      if (modalType === "add" && (!ownerID || !/^\d{9}$/.test(ownerID))) {
+        alert("❌ תעודת זהות חייבת להכיל בדיוק 9 ספרות");
+        return;
+      }
+
+      if (!maker || maker.trim().length < 2) {
+        alert("❌ יש לבחור יצרן רכב");
+        return;
+      }
+
+      if (!model || model.trim().length < 1) {
+        alert("❌ חובה להזין דגם הרכב");
+        return;
+      }
+
+      if (!year || isNaN(year) || year < 1950 || year > currentYear) {
+        alert(`❌ שנת ייצור לא חוקית. יש להזין שנה בין 1950 ל-${currentYear}`);
+        return;
+      }
+
+      if (!color || color.trim().length < 2) {
+        alert("❌ חובה להזין צבע הרכב");
+        return;
+      }
+
+      if (!mileage || isNaN(mileage) || mileage < 0) {
+        alert("❌ קילומטראז' חייב להיות מספר חיובי בלבד");
+        return;
+      }
+
+      let carData;
+
+      if (modalType === "edit" && selectedCar) {
+        // מבנה האובייקט לשליחה
+        carData = {
+          vehicleNumber,
+          owner,
+          ownerID,
+          manufacturer: maker,
+          model,
+          year,
+          color,
+          mileage,
+        };
+
+        // שליחת עדכון לשרת
+        await axios.put(`http://localhost:5000/api/cars/${selectedCar._id}`, carData);
+        alert("✅ פרטי הרכב עודכנו בהצלחה!");
+      } else {
+        // לא ניתן להוסיף כאן רכב חדש
+        alert("❌ לא ניתן להוסיף רכב בדף זה.");
+        return;
+      }
+
+      // סגירה ורענון
+      handleCloseModal();
+      fetchCars();
+
+    } catch (error) {
+      console.error('❌ שגיאה בשמירה:', error.message);
+      alert('❌ שגיאה בשמירה');
     }
+  };
 
-    // ✅ אימות שם בעלים
-    if (modalType === "add" && !owner.trim()) {
-      alert("❌ חובה להזין שם בעל הרכב!");
-      return;
-    }
-
-    // ✅ אימות תעודת זהות
-    if (modalType === "add" && (!ownerID || !/^\d{9}$/.test(ownerID))) {
-      alert("❌ תעודת זהות חייבת להכיל בדיוק 9 ספרות");
-      return;
-    }
-
-    // ✅ אימות יצרן (brand)
-    if (!maker || maker.trim().length < 2) {
-      alert("❌ יש לבחור יצרן רכב");
-      return;
-    }
-
-    // ✅ אימות דגם
-    if (!model || model.trim().length < 1) {
-      alert("❌ חובה להזין דגם הרכב");
-      return;
-    }
-
-    // ✅ אימות שנת ייצור
-    if (!year || isNaN(year) || year < 1950 || year > currentYear) {
-      alert(`❌ שנת ייצור לא חוקית. יש להזין שנה בין 1950 ל-${currentYear}`);
-      return;
-    }
-
-    // ✅ אימות צבע (רשות – אפשר לשפר בעתיד)
-    if (!color || color.trim().length < 2) {
-      alert("❌ חובה להזין צבע הרכב");
-      return;
-    }
-
-    // ✅ אימות קילומטראז'
-    if (!mileage || isNaN(mileage) || mileage < 0) {
-      alert("❌ קילומטראז' חייב להיות מספר חיובי בלבד");
-      return;
-    }
-
-    let carData;
-
-    if (modalType === "edit" && selectedCar) {
-      // ✏️ בעריכה - שמות שדות פשוטים
-      carData = {
-        vehicleNumber,
-        owner,
-        ownerID,
-        manufacturer: maker,
-        model,
-        year,
-        color,
-        mileage,
-      };
-
-      await axios.put(`http://localhost:5000/api/cars/${selectedCar._id}`, carData);
-      alert("✅ פרטי הרכב עודכנו בהצלחה!");
-
-    } else {
-      alert("❌ לא ניתן להוסיף רכב בדף זה.");
-      return;
-}
-
-
-    handleCloseModal();
-    fetchCars();
-
-  } catch (error) {
-    console.error('❌ שגיאה בשמירה:', error.message);
-    alert('❌ שגיאה בשמירה');
-  }
-};
-
-  
-  
-
+  // חיפוש רכב לפי שאילתה
   const handleSearch = async () => {
     try {
       if (searchQuery.trim() === '') {
-        fetchCars();
+        fetchCars(); // אם החיפוש ריק נחזיר את כל הרשומות
         return;
       }
 
       const response = await axios.get(`http://localhost:5000/api/cars/search?query=${searchQuery}`);
       setCars(response.data);
-      handleCloseModal();
+      handleCloseModal(); // סגירת המודל אחרי החיפוש
     } catch (error) {
       console.error('❌ שגיאה בחיפוש:', error.message);
       alert('❌ שגיאה בחיפוש');
     }
   };
 
+  // רשימת יצרני רכבים קבועה
   const carMakers = [
-  "טויוטה", "יונדאי", "קיה", "מאזדה", "פורד", "סובארו", "שברולט",
-  "פיאט", "אאודי", "ב.מ.וו", "מרצדס", "וולוו", "פיג'ו", "סיטרואן",
-  "סקודה", "ניסאן", "רנו", "הונדה", "לקסוס"
-];
+    "טויוטה", "יונדאי", "קיה", "מאזדה", "פורד", "סובארו", "שברולט",
+    "פיאט", "אאודי", "ב.מ.וו", "מרצדס", "וולוו", "פיג'ו", "סיטרואן",
+    "סקודה", "ניסאן", "רנו", "הונדה", "לקסוס"
+  ];
 
-const handleDelete = async (id) => {
-  if (!window.confirm("האם אתה בטוח שברצונך למחוק את הרכב הזה?")) return;
+  // מחיקת רכב לפי מזהה
+  const handleDelete = async (id) => {
+    if (!window.confirm("האם אתה בטוח שברצונך למחוק את הרכב הזה?")) return;
 
-  try {
-    await axios.delete(`http://localhost:5000/api/cars/${id}`);
-    alert("✅ הרכב נמחק בהצלחה!");
-    fetchCars(); // רענון הטבלה אחרי המחיקה
-  } catch (error) {
-    console.error("❌ שגיאה במחיקת רכב:", error);
-    alert(error.response?.data?.message || "❌ שגיאה במחיקת רכב");
-  }
-};
-
-
-
+    try {
+      await axios.delete(`http://localhost:5000/api/cars/${id}`);
+      alert("✅ הרכב נמחק בהצלחה!");
+      fetchCars(); // רענון הטבלה אחרי המחיקה
+    } catch (error) {
+      console.error("❌ שגיאה במחיקת רכב:", error);
+      alert(error.response?.data?.message || "❌ שגיאה במחיקת רכב");
+    }
+  };
 
   return (
     <div>

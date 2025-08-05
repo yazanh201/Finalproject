@@ -67,7 +67,7 @@ const Footer = () => {
               </div>
               <div className="flex items-center gap-3">
                 <Mail className="w-5 h-5 text-red-500 flex-shrink-0" />
-                <span className="text-gray-400">info@garage-haifa.co.il</span>
+                <span className="text-gray-400">sherotmaher@gmail.com</span>
               </div>
             </div>
           </div>
@@ -75,7 +75,7 @@ const Footer = () => {
 
         <div className="border-t border-gray-800 mt-12 pt-8 text-center">
           <p className="text-gray-400">
-            © 2024 מוסך חיפה. כל הזכויות שמורות.
+            © 2024 מוסך שירות מהיר. כל הזכויות שמורות.
           </p>
         </div>
       </div>
