@@ -3,58 +3,46 @@ services:
     name: garage-backend
     env: docker
     plan: free
-    repo: https://github.com/your-user/your-repo
-    dockerContext: ./garage-backend
-    dockerfilePath: ./garage-backend/Dockerfile
-    buildFilter:
-      paths:
-        - garage-backend/**
-
-  - type: web
-    name: plate-detector
-    env: docker
-    plan: free
-    repo: https://github.com/your-user/your-repo
-    dockerContext: ./plates
-    dockerfilePath: ./plates/Dockerfile
-    buildCommand: ""
-    startCommand: python app.py
-    buildFilter:
-      paths:
-        - plates/**
+    repo: https://github.com/mahdir373/Finalproject
+    region: oregon
+    rootDir: garage-backend
+    dockerfilePath: Dockerfile
 
   - type: web
     name: garage-frontweb
     env: docker
     plan: free
-    repo: https://github.com/your-user/your-repo
-    dockerContext: ./frontweb
-    dockerfilePath: ./frontweb/Dockerfile
-    buildFilter:
-      paths:
-        - frontweb/**
+    repo: https://github.com/mahdir373/Finalproject
+    region: oregon
+    rootDir: frontweb
+    dockerfilePath: Dockerfile
 
   - type: web
     name: garage-frontend
     env: docker
     plan: free
-    repo: https://github.com/your-user/your-repo
-    dockerContext: ./frontend
-    dockerfilePath: ./frontend/Dockerfile
-    buildFilter:
-      paths:
-        - frontend/**
+    repo: https://github.com/mahdir373/Finalproject
+    region: oregon
+    rootDir: frontend
+    dockerfilePath: Dockerfile
+
+  - type: web
+    name: plate-detector
+    env: docker
+    plan: free
+    repo: https://github.com/mahdir373/Finalproject
+    region: oregon
+    rootDir: plates
+    dockerfilePath: Dockerfile
 
   - type: web
     name: garage-chatbot
     env: docker
     plan: free
-    repo: https://github.com/your-user/your-repo
-    dockerContext: ./garage-chatbot
-    dockerfilePath: ./garage-chatbot/Dockerfile
-    buildFilter:
-      paths:
-        - garage-chatbot/**
+    repo: https://github.com/mahdir373/Finalproject
+    region: oregon
+    rootDir: garage-chatbot
+    dockerfilePath: Dockerfile
     envVars:
       - key: OPENAI_API_KEY
         sync: false
