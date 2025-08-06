@@ -44,5 +44,17 @@ services:
       - garage-net
     command: ["python", "app.py"]
 
+  chatbot:
+    build: ./garage-chatbot
+    container_name: garage-chatbot
+    ports:
+      - "5001:5001"
+    env_file:
+      - ./garage-chatbot/.env
+    networks:
+      - garage-net
+    depends_on:
+      - backend
+
 networks:
   garage-net:
