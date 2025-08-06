@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -7,9 +6,10 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import ServicesPage from "./pages/Services";
 import NotFound from "./pages/NotFound";
-import ChatBot from "../../frontend/src/components/ChatBot"; 
 import Contact from "./components/Contact";
-import "./pages/chatbot.css" 
+import ChatAPI from "./components/ChatAPI"; // ✅ הקומפוננטה החדשה
+import "./pages/chatbot.css"; // אם אתה משתמש בעיצוב מותאם
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -18,23 +18,20 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        {/* ✅ הוספת ChatBot כך שיופיע בכל העמודים */}
+        {/* ✅ ChatAPI – מופיע בכל המסכים בצד ימין למטה */}
         <div className="chatbot-wrapper">
-          <ChatBot />
+          <ChatAPI />
         </div>
-
 
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/services" element={<ServicesPage />} />
-          <Route path="*" element={<NotFound />} />
           <Route path="/contact" element={<Contact />} />
-
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
 );
-
 
 export default App;
