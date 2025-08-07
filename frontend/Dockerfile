@@ -1,28 +1,28 @@
-\# שלב 1: בניית אפליקציית React
+# שלב 1: בניית אפליקציית React
 FROM node:20 AS build
 
 # הגדרת תיקיית העבודה
 WORKDIR /app
 
-# העתקת קבצי package.json ו-lock בלבד בשלב ראשון (כדי להשתמש ב-layer cache)
-COPY package*.json ./
-
-# התקנת התלויות
-RUN npm install
-
-# העתקת שאר קבצי הפרויקט
+# העתקת קבצי הפרויקט
 COPY . .
 
-# הרצת הבנייה
+# התקנת חבילות
+RUN npm install
+
+# בניית האפליקציה
 RUN npm run build
 
-# שלב 2: הגשה עם Nginx
+# שלב 2: הגשת האפליקציה באמצעות Nginx
 FROM nginx:alpine
 
-# העתקת קבצי הבנייה ל-nginx
-COPY --from=build /app/build /usr/share/nginx/html
+# אם אתה משתמש ב-Vite, השתמש בתיקיית dist
+# אם אתה משתמש ב-create-react-app, השתמש בתיקיית build
 
-# קובץ קונפיגורציה מותאם ל־React Router (אם צריך)
+# כאן נניח שאתה משתמש ב-Vite (אפשר לשנות ל-build אם צריך)
+COPY --from=build /app/dist /usr/share/nginx/html
+
+# העתקת קובץ קונפיג של nginx (אם יש לך אחד מותאם אישית)
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # פתיחת פורט
