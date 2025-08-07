@@ -70,7 +70,7 @@ const ChatBot = () => {
 
     try {
       // שליחת בקשה ל-Backend וקבלת תשובה מהבוט
-      const { data } = await axios.post("http://localhost:5001/chat", { 
+      const { data } = await axios.post("https://garage-chatbot.onrender.com/chat", {
         message: messageToSend 
       });
 
