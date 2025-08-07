@@ -16,7 +16,7 @@ services:
     region: oregon
     rootDir: frontweb
     dockerfilePath: Dockerfile
-####################
+
   - type: web
     name: garage-frontend
     env: docker
@@ -34,3 +34,15 @@ services:
     region: oregon
     rootDir: plates
     dockerfilePath: Dockerfile
+
+  - type: web
+    name: garage-chatbot
+    env: docker
+    plan: free
+    repo: https://github.com/mahdir373/Finalproject
+    region: oregon
+    rootDir: garage-chatbot
+    dockerfilePath: Dockerfile
+    envVars:
+      - key: OPENAI_API_KEY
+        sync: false
