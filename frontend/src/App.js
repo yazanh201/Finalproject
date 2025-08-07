@@ -5,7 +5,6 @@ import Login from './Pages/Login';
 import Dashboard from './Pages/Dashboard';
 import PrivateRoute from './PrivateRoute';
 import AdvancedDashboard from "./Pages/advanceddashboard/AdvancedDashboard"; 
-import ChatBot from "./components/ChatBot";
 import TreatmentsTable from "./Tabels/TreatmentsTable";
 import TreatmentDetails from './components/TreatmentDetails';
 import CreateTreatment from './components/CreateTreatment';

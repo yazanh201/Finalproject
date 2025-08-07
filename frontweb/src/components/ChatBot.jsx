@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { FaPaperPlane, FaComments, FaTimes, FaRobot, FaSpinner, FaMicrophone, FaMicrophoneSlash, FaLightbulb } from "react-icons/fa";
-import "./cssfiles/ChatBot.css";
+import "./ChatBot.css";
 
 /**
  * 🎤 **ChatBot Component** - צ'אט חכם עם עיצוב מודרני ואינטראקטיבי.
@@ -216,7 +216,7 @@ const ChatBot = () => {
             )}
 
             {/* הצעות מהירות */}
-            {showQuickSuggestions && chatHistory.length === 1 && (
+            {showQuickSuggestions  && (
               <div className="quick-suggestions">
                 <div className="suggestions-header">
                   <FaLightbulb />
@@ -250,17 +250,17 @@ const ChatBot = () => {
               disabled={isLoading}
               maxLength={500}
             />
-            
-            {/* כפתור הקלטה קולית */}
+
+            {/* כפתור להצגת הצעות מהירות */}
             <button 
-              className={`voice-btn ${isRecording ? 'recording' : ''}`}
-              onClick={handleVoiceRecording}
+              className="quick-suggestions-btn"
+              onClick={() => setShowQuickSuggestions(true)}
               disabled={isLoading}
-              aria-label="הקלט הודעה קולית"
+              aria-label="הצג הצעות מהירות"
             >
-              {isRecording ? <FaMicrophoneSlash /> : <FaMicrophone />}
+              <FaLightbulb />
             </button>
-            
+
             <button 
               onClick={() => sendMessage()}
               disabled={isLoading || !message.trim()}
@@ -270,6 +270,7 @@ const ChatBot = () => {
               {isLoading ? <FaSpinner className="spinner" /> : <FaPaperPlane />}
             </button>
           </div>
+
         </div>
       )}
     </div>

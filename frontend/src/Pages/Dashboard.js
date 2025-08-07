@@ -149,12 +149,6 @@ const Dashboard = () => {
       <header className={`${styles["dashboard-header"]} d-flex justify-content-between align-items-center p-3 sticky-top shadow-sm`}>
         <div className="d-flex align-items-center gap-3">
           <span className={`${styles["role-label"]} fw-bold`}>תפקיד: {role === "admin" ? "מנהל" : "עובד"}</span>
-          {role === "admin" && (
-            <Link to="/AdvancedDashboard" className={`${styles["menu-button"]} ms-2`}>
-              <FaTachometerAlt /> לוח מתקדם
-            </Link>
-
-          )}
 
           {/* Dropdown רק למחשב */}
             <div
@@ -207,7 +201,13 @@ const Dashboard = () => {
                 </div>
               )}
             </div>
+            {role === "admin" && (
+              <Link to="/AdvancedDashboard" className={`${styles["menu-button"]} ms-2`}>
+                <FaTachometerAlt /> לוח מתקדם
+              </Link>
+            )}
         </div>
+        
 
         <div className="d-none d-md-block">
           <span className={`${styles["dashboard-title"]} fw-bold fs-4 text-gradient`}>מערכת ניהול מוסך</span>
