@@ -20,7 +20,7 @@ FROM nginx:alpine
 # אם אתה משתמש ב-create-react-app, השתמש בתיקיית build
 
 # כאן נניח שאתה משתמש ב-Vite (אפשר לשנות ל-build אם צריך)
-COPY --from=build /app/dist /usr/share/nginx/html
+COPY --from=build /app/build /usr/share/nginx/html
 
 # העתקת קובץ קונפיג של nginx (אם יש לך אחד מותאם אישית)
 COPY nginx.conf /etc/nginx/conf.d/default.conf
