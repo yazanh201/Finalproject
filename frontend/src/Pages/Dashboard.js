@@ -1,9 +1,5 @@
-// ייבוא React hooks ורכיבים נוספים
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import styles from "./cssfiles/Dashboard.module.css";
-
-// ייבוא טבלאות ורכיבים נוספים מתוך הפרויקט
 import CarsTable from "../Tabels/CarsTable";
 import Customers from "../Tabels/CustomersTable";
 import Inquiries from "../Tabels/Inquiries";
@@ -13,15 +9,25 @@ import Employees from "../Tabels/EmployeesTable";
 import CarsUnderMaintance from "../Tabels/CarsUnderMaintance";
 import CarOrders from "../Tabels/CarOrders";
 import CameraPanel from "../components/CameraPanel";
+import styles from "./cssfiles/Dashboard.module.css";
+import {
+  FaUserFriends,
+  FaCar,
+  FaEnvelope,
+  FaTools,
+  FaCalendarAlt,
+  FaUserTie,
+  FaWrench,
+  FaClipboardList,
+  FaPlusCircle,
+  FaCamera,
+  FaSignOutAlt,
+  FaTachometerAlt,
+  FaBars,
+} from "react-icons/fa";
 
-// אייקונים
-import { FaSignOutAlt, FaTachometerAlt } from "react-icons/fa";
-
-// קומפוננטת לוח הבקרה הראשי
 const Dashboard = () => {
   const navigate = useNavigate();
-
-  // משתני סטייט לניהול הרשאות, תצוגות, בחירות וכו'
   const [role, setRole] = useState("");
   const [activeView, setActiveView] = useState("home");
   const [selectedAppointmentNumber, setSelectedAppointmentNumber] = useState(null);
@@ -30,10 +36,8 @@ const Dashboard = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showCamera, setShowCamera] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
-
   const dropdownTimeoutRef = useRef(null);
 
-  // בודק אם המשתמש מחובר – אם לא, מעביר למסך התחברות
   useEffect(() => {
     const isLoggedIn = localStorage.getItem("isLoggedIn");
     const userRole = localStorage.getItem("role");
@@ -45,91 +49,28 @@ const Dashboard = () => {
     }
   }, [navigate]);
 
-  // יציאה מהמערכת
   const handleLogout = () => {
     localStorage.removeItem("isLoggedIn");
     localStorage.removeItem("role");
     navigate("/login");
   };
 
-  // הצגת תפריט נפתח בעכבר
   const handleMouseEnter = () => {
     clearTimeout(dropdownTimeoutRef.current);
     setShowDropdown(true);
   };
 
-  // הסתרת תפריט נפתח בעכבר לאחר השהייה
   const handleMouseLeave = () => {
     dropdownTimeoutRef.current = setTimeout(() => {
       setShowDropdown(false);
     }, 200);
   };
 
-  // הצגת התוכן הראשי לפי התצוגה הנבחרת (state של activeView)
-  const renderContent = () => {
-    switch (activeView) {
-      case "cars":
-        return <div className={styles.card}><CarsTable /></div>;
-      case "Customers":
-        return <div className={styles.card}><Customers /></div>;
-      case "Inquiries":
-        return <div className={styles.card}><Inquiries /></div>;
-      case "Treatments":
-        return (
-          <div className={styles.card}>
-            <TreatmentsTable
-              filterAppointment={selectedAppointmentNumber}
-              filterTreatmentNumber={selectedTreatmentNumber}
-              onNavigateToRepair={goToRepairType}
-              onNavigateToAppointment={goToAppointment}
-            />
-          </div>
-        );
-      case "Repairtypes":
-        return (
-          <div className={styles.card}>
-            <Repairtypes
-              filterRepairId={selectedRepairId}
-              onNavigateToTreatment={goToTreatment}
-            />
-          </div>
-        );
-      case "Appointments":
-        return (
-          <div className={styles.card}>
-            <Appointment
-              onSelectTreatment={(number) => {
-                setSelectedAppointmentNumber(number);
-                setActiveView("Treatments");
-              }}
-              filterAppointmentNumber={selectedAppointmentNumber}
-            />
-          </div>
-        );
-      case "Employees":
-        return <div className={styles.card}><Employees /></div>;
-      case "CarsUnderMaintance":
-        return <div className={styles.card}><CarsUnderMaintance /></div>;
-      case "CarOrders":
-        return <div className={styles.card}><CarOrders /></div>;
-      default:
-        // תצוגת ברירת מחדל – מסך הבית
-        return (
-          <div className={styles.card}>
-            <h3>ברוך הבא ללוח הבקרה</h3>
-            <p>כאן תוכל לנהל את נתוני המוסך בהתאם להרשאות שלך.</p>
-          </div>
-        );
-    }
-  };
-
-  // ניווט לתצוגת סוגי טיפולים (Repairtypes)
   const goToRepairType = (repairId) => {
     setSelectedRepairId(repairId);
     setActiveView("Repairtypes");
   };
 
-  // ניווט חכם לטיפול לפי מזהה (כולל קישור לתור)
   const goToTreatment = async (treatmentId) => {
     try {
       const res = await fetch(`http://localhost:5000/api/treatments/by-id/${treatmentId}`);
@@ -147,123 +88,295 @@ const Dashboard = () => {
     }
   };
 
-  // ניווט חזרה לתור ספציפי מתוך טיפול
   const goToAppointment = (appointmentNumber) => {
     setSelectedAppointmentNumber(appointmentNumber);
     setSelectedTreatmentNumber(null);
     setActiveView("Appointments");
   };
 
-  // בעת לחיצה על רקע כהה בתפריט צד (בנייד) – סוגר תפריט
-  const handleSidebarOverlayClick = () => {
-    setIsMenuOpen(false);
+  const renderContent = () => {
+    switch (activeView) {
+      case "cars":
+        return <CarsTable />;
+      case "Customers":
+        return <Customers />;
+      case "Inquiries":
+        return <Inquiries />;
+      case "Treatments":
+        return (
+          <TreatmentsTable
+            filterAppointment={selectedAppointmentNumber}
+            filterTreatmentNumber={selectedTreatmentNumber}
+            onNavigateToRepair={goToRepairType}
+            onNavigateToAppointment={goToAppointment}
+          />
+        );
+      case "Repairtypes":
+        return (
+          <Repairtypes
+            filterRepairId={selectedRepairId}
+            onNavigateToTreatment={goToTreatment}
+          />
+        );
+      case "Appointments":
+        return (
+          <Appointment
+            onSelectTreatment={(number) => {
+              setSelectedAppointmentNumber(number);
+              setActiveView("Treatments");
+            }}
+            filterAppointmentNumber={selectedAppointmentNumber}
+          />
+        );
+      case "Employees":
+        return <Employees />;
+      case "CarsUnderMaintance":
+        return <CarsUnderMaintance />;
+      case "CarOrders":
+        return <CarOrders />;
+      default:
+        return (
+          <div className={`${styles.cardash} card p-4 shadow-sm`}>
+            <h3>ברוך הבא למערכת הניהול</h3>
+            <p>בחר פעולה מהתפריט כדי להתחיל</p>
+          </div>
+        );
+    }
   };
 
-
   return (
-  <div className={styles.dashboardContainer}>
-    {/* כותרת לוח הבקרה – כוללת כפתור תפריט, תפקיד המשתמש וקישורים */}
-    <header className={styles.header}>
-      {/* כפתור תפריט לנייד (hamburger) */}
-      <button
-        className={styles["navbar-toggler"]}
-        onClick={() => setIsMenuOpen(!isMenuOpen)}
-        aria-label="פתח תפריט"
-      >
-        <span className={styles.hamburgerIcon}></span>
-      </button>
+    <div className={`${styles["dashboard-modern"]} container-fluid`} dir="ltr">
+      <header className={`${styles["dashboard-header"]} d-flex justify-content-between align-items-center p-3 sticky-top shadow-sm`}>
+        <div className="d-flex align-items-center gap-3">
+          <span className={`${styles["role-label"]} fw-bold`}>תפקיד: {role === "admin" ? "מנהל" : "עובד"}</span>
+          {role === "admin" && (
+            <Link to="/AdvancedDashboard" className={`${styles["menu-button"]} ms-2`}>
+              <FaTachometerAlt /> לוח מתקדם
+            </Link>
 
-      {/* כותרת לוח הבקרה עם תפקיד המשתמש */}
-      <div className={styles.dashboardTitle}>
-        <h4>Dashboard</h4>
-        <h5>תפקיד: {role === "admin" ? "מנהל" : "עובד"}</h5>
-      </div>
+          )}
 
-      {/* תפריט ניווט עליון שמופיע בהתאם להרשאות ולמצב פתיחה */}
-      <div className={`${styles["navbar-collapse"]} ${isMenuOpen ? styles.show : ""}`}>
-        {/* אם המשתמש הוא מנהל – הצג קישור ללוח מתקדם */}
-        {role === "admin" && (
-          <Link to="/AdvancedDashboard" className={styles.headerLink}>
-            <FaTachometerAlt className={styles.icon} /> לוח ניהול מתקדם
-          </Link>
-        )}
-
-        {/* תפריט נפתח – פעולות נוספות */}
-        <div
-          className={styles.dropdownWrapper}
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
-        >
-          <button className={styles.headerLink}>⚙️ פעולות נוספות</button>
-          {showDropdown && (
-            <div className={styles.dropdownMenu}>
-              {role === "admin" ? (
-                <>
-                  {/* כפתורים למנהל בלבד */}
-                  <button className={styles.dropdownItem} onClick={() => navigate("/add-customer-with-vehicle")}>➕ הוספת לקוח ורכב</button>
-                  <button className={styles.dropdownItem} onClick={() => navigate("/create-treatment")}>➕ הוספת טיפול חדש</button>
-                  <button className={styles.dropdownItem} onClick={() => navigate("/AppointmentForm")}>➕ קביעת תור</button>
-                  <button className={styles.dropdownItem} onClick={() => setShowCamera(true)}>📸 הפעל מצלמה</button>
-                  <button onClick={handleLogout} className={styles.headerLinkLogout}>
-                    <FaSignOutAlt className={styles.icon} /> התנתקות
+          {/* Dropdown רק למחשב */}
+            <div
+              className="position-relative d-none d-md-block"
+              onMouseEnter={handleMouseEnter}
+              onMouseLeave={handleMouseLeave}
+            >
+              <button className={styles["menu-button"]}>
+                <FaTools /> פעולות נוספות
+              </button>
+              {showDropdown && (
+                <div
+                  className={styles["dashboard-dropdown"]}
+                  style={{ position: "absolute", right: 0 }}
+                >
+                  {role === "admin" && (
+                    <>
+                      <button
+                        className={styles["dropdown-item"]}
+                        onClick={() => navigate("/add-customer-with-vehicle")}
+                      >
+                        לקוח ורכב <FaPlusCircle />
+                      </button>
+                      <button
+                        className={styles["dropdown-item"]}
+                        onClick={() => navigate("/create-treatment")}
+                      >
+                        טיפול חדש <FaWrench />
+                      </button>
+                      <button
+                        className={styles["dropdown-item"]}
+                        onClick={() => navigate("/AppointmentForm")}
+                      >
+                        קביעת תור <FaCalendarAlt />
+                      </button>
+                    </>
+                  )}
+                  <button
+                    className={styles["dropdown-item"]}
+                    onClick={() => setShowCamera(true)}
+                  >
+                    מצלמה <FaCamera />
                   </button>
-                </>
-              ) : (
-                <>
-                  {/* כפתורים לעובדים */}
-                  <button className={styles.dropdownItem} onClick={() => setShowCamera(true)}>📸 הפעל מצלמה</button>
-                  <button onClick={handleLogout} className={styles.headerLinkLogout}>
-                    <FaSignOutAlt className={styles.icon} /> התנתקות
+                  <button
+                    className={`${styles["dropdown-item"]} ${styles["text-danger"]}`}
+                    onClick={handleLogout}
+                  >
+                    התנתקות <FaSignOutAlt />
                   </button>
-                </>
+                </div>
               )}
             </div>
-          )}
         </div>
+
+        <div className="d-none d-md-block">
+          <span className={`${styles["dashboard-title"]} fw-bold fs-4 text-gradient`}>מערכת ניהול מוסך</span>
+        </div>
+
+        <div className="d-md-none">
+          <button className="btn btn-outline-primary rounded-circle" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+            <FaBars />
+          </button>
+        </div>
+      </header>
+
+      <div className="row">
+        <main className="col-12 col-md-9 col-lg-10 p-4 bg-light text-end" dir="rtl">
+          {renderContent()}
+        </main>
+
+        <aside className={`${styles["dashboard-sidebar"]} sidebar col-12 col-md-3 col-lg-2 ${isMenuOpen ? styles.open : ""}`}>
+  <h6 className={`${styles["sidebar-title"]} text-muted mb-3`}>תפריט</h6>
+  <ul className="nav flex-column gap-2">
+
+    {/* פעולות מהירות - מוצג תמיד במסך קטן */}
+<div className="d-md-none">
+  <li className="text-warning small">פעולות מהירות</li>
+
+  {/* הצגת פעולות מנהל */}
+  {role === "admin" && (
+    <>
+      <li>
+        <button
+          className={`${styles["sidebar-btn"]} btn w-100 d-flex align-items-center gap-2`}
+          onClick={() => {
+            navigate("/add-customer-with-vehicle");
+            setIsMenuOpen(false);
+          }}
+        >
+          <FaPlusCircle /> לקוח ורכב
+        </button>
+      </li>
+      <li>
+        <button
+          className={`${styles["sidebar-btn"]} btn w-100 d-flex align-items-center gap-2`}
+          onClick={() => {
+            navigate("/create-treatment");
+            setIsMenuOpen(false);
+          }}
+        >
+          <FaWrench /> טיפול חדש
+        </button>
+      </li>
+      <li>
+        <button
+          className={`${styles["sidebar-btn"]} btn w-100 d-flex align-items-center gap-2`}
+          onClick={() => {
+            navigate("/AppointmentForm");
+            setIsMenuOpen(false);
+          }}
+        >
+          <FaCalendarAlt /> קביעת תור
+        </button>
+      </li>
+    </>
+  )}
+
+  {/* פעולות שמוצגות לכולם */}
+  <li>
+    <button
+      className={`${styles["sidebar-btn"]} btn w-100 d-flex align-items-center gap-2`}
+      onClick={() => {
+        setShowCamera(true);
+        setIsMenuOpen(false);
+      }}
+    >
+      <FaCamera /> מצלמה
+    </button>
+  </li>
+  <li>
+    <button
+      className={`${styles["sidebar-btn"]} btn w-100 text-danger d-flex align-items-center gap-2`}
+      onClick={() => {
+        handleLogout();
+        setIsMenuOpen(false);
+      }}
+    >
+      <FaSignOutAlt /> התנתקות
+    </button>
+  </li>
+  <hr className="my-3 border-white border-opacity-50" />
+</div>
+
+
+    {/* טבלאות */}
+    {role === "admin" && (
+      <>
+        <li>
+          <button className={`${styles["sidebar-btn"]} btn w-100 d-flex flex-row-reverse justify-content-start align-items-center gap-2 ${activeView === "Customers" ? styles.active : ""}`} onClick={() => {
+            setActiveView("Customers");
+            setIsMenuOpen(false);
+          }}>
+            <FaUserFriends /> לקוחות
+          </button>
+        </li>
+        <li>
+          <button className={`${styles["sidebar-btn"]} btn w-100 d-flex flex-row-reverse justify-content-start align-items-center gap-2 ${activeView === "cars" ? styles.active : ""}`} onClick={() => {
+            setActiveView("cars");
+            setIsMenuOpen(false);
+          }}>
+            <FaCar /> רכבים
+          </button>
+        </li>
+        <li>
+          <button className={`${styles["sidebar-btn"]} btn w-100 d-flex flex-row-reverse justify-content-start align-items-center gap-2 ${activeView === "Inquiries" ? styles.active : ""}`} onClick={() => {
+            setActiveView("Inquiries");
+            setIsMenuOpen(false);
+          }}>
+            <FaEnvelope /> פניות
+          </button>
+        </li>
+        <li>
+          <button className={`${styles["sidebar-btn"]} btn w-100 d-flex flex-row-reverse justify-content-start align-items-center gap-2 ${activeView === "CarOrders" ? styles.active : ""}`} onClick={() => {
+            setActiveView("CarOrders");
+            setIsMenuOpen(false);
+          }}>
+            <FaTools /> הזמנות
+          </button>
+        </li>
+        <li>
+          <button className={`${styles["sidebar-btn"]} btn w-100 d-flex flex-row-reverse justify-content-start align-items-center gap-2 ${activeView === "Appointments" ? styles.active : ""}`} onClick={() => {
+            setActiveView("Appointments");
+            setIsMenuOpen(false);
+          }}>
+            <FaCalendarAlt /> תורים
+          </button>
+        </li>
+        <li>
+          <button className={`${styles["sidebar-btn"]} btn w-100 d-flex flex-row-reverse justify-content-start align-items-center gap-2 ${activeView === "Employees" ? styles.active : ""}`} onClick={() => {
+            setActiveView("Employees");
+            setIsMenuOpen(false);
+          }}>
+            <FaUserTie /> עובדים
+          </button>
+        </li>
+      </>
+    )}
+
+    <li>
+      <button className={`${styles["sidebar-btn"]} btn w-100 d-flex flex-row-reverse justify-content-start align-items-center gap-2 ${activeView === "Treatments" ? styles.active : ""}`} onClick={() => {
+        setActiveView("Treatments");
+        setIsMenuOpen(false);
+      }}>
+        <FaClipboardList /> טיפולים
+      </button>
+    </li>
+    <li>
+      <button className={`${styles["sidebar-btn"]} btn w-100 d-flex flex-row-reverse justify-content-start align-items-center gap-2 ${activeView === "CarsUnderMaintance" ? styles.active : ""}`} onClick={() => {
+        setActiveView("CarsUnderMaintance");
+        setIsMenuOpen(false);
+      }}>
+        <FaWrench /> רכבים בטיפול
+      </button>
+    </li>
+  </ul>
+</aside>
+
       </div>
-    </header>
 
-    {/* תוכן ראשי של הדשבורד */}
-    <div className={styles.mainWrapper}>
-      {/* שכבת רקע לסגירת סיידבר במובייל */}
-      {isMenuOpen && (
-        <div className={styles.sidebarOverlay} onClick={handleSidebarOverlayClick}></div>
-      )}
-
-      {/* סיידבר ניווט ראשי */}
-      <nav className={`${styles.sidebar} ${isMenuOpen ? styles.sidebarOpen : ""}`}>
-        <ul className={styles.navList}>
-          {/* תפריט מלא למנהל */}
-          {role === "admin" && (
-            <>
-              <li className={styles.navItem}><button className={styles.sidebarBtn} onClick={() => { setActiveView("Customers"); setIsMenuOpen(false); }}>לקוחות</button></li>
-              <li className={styles.navItem}><button className={styles.sidebarBtn} onClick={() => { setActiveView("cars"); setIsMenuOpen(false); }}>רכבים</button></li>
-              <li className={styles.navItem}><button className={styles.sidebarBtn} onClick={() => { setActiveView("Inquiries"); setIsMenuOpen(false); }}>פניות</button></li>
-              <li className={styles.navItem}><button className={styles.sidebarBtn} onClick={() => { setActiveView("CarOrders"); setIsMenuOpen(false); }}>הזמנות לרכבים</button></li>
-              <li className={styles.navItem}><button className={styles.sidebarBtn} onClick={() => { setActiveView("Appointments"); setIsMenuOpen(false); }}>תורים</button></li>
-              <li className={styles.navItem}><button className={styles.sidebarBtn} onClick={() => { setActiveView("Employees"); setIsMenuOpen(false); }}>עובדים</button></li>
-            </>
-          )}
-
-          {/* פריטים שכולם רואים */}
-          <li className={styles.navItem}><button className={styles.sidebarBtn} onClick={() => { setActiveView("Treatments"); setIsMenuOpen(false); }}>טיפולים</button></li>
-          <li className={styles.navItem}><button className={styles.sidebarBtn} onClick={() => { setActiveView("CarsUnderMaintance"); setIsMenuOpen(false); }}>רכבים בטיפול</button></li>
-        </ul>
-      </nav>
-
-      {/* תוכן משתנה לפי התצוגה הנבחרת */}
-      <main className={styles.mainContent}>
-        {renderContent()}
-      </main>
-
-      {/* פאנל מצלמה אם הופעל */}
-      {showCamera && (
-        <CameraPanel onClose={() => setShowCamera(false)} />
-      )}
+      {showCamera && <CameraPanel onClose={() => setShowCamera(false)} />}
     </div>
-  </div>
-);
-
+  );
 };
 
 export default Dashboard;

@@ -1,13 +1,14 @@
 /* עיצוב כללי למודל */
 .modal-overlay {
     position: fixed; /* המודל ממוקם באופן קבוע */
-    top: 0; /* מתחיל מלמעלה */
+    top:0; /* מתחיל מלמעלה */
     width: 400px; /* מכסה את כל רוחב המסך */
     background-color: whitesmoke;
     display: flex; /* עיצוב גמיש */
     justify-content: center; /* מרכז את המודל אופקית */
     align-items: center; /* מרכז את המודל אנכית */
     z-index: 1000; /* מביא את המודל לקדמת המסך */
+    margin-top: 110px;
   }
   
   /* עיצוב התוכן של המודל */

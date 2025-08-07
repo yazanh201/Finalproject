@@ -34,6 +34,8 @@ const AdvancedDashboard = () => {
   const { activeNotifications, addNotification } = useNotifications(); // ניהול התראות
   const [carsInServiceCount, setCarsInServiceCount] = useState(0);
   const [monthlyRevenue, setMonthlyRevenue] = useState(0);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
 
   // useEffect ראשון - טוען נתונים ברגע טעינת הקומפוננטה
   useEffect(() => {
@@ -173,14 +175,77 @@ const AdvancedDashboard = () => {
   <div className={styles.dashboardContainer}>
 
     {/* 🧭 כותרת עליונה עם שם הדשבורד וכפתור חזרה */}
-    <header className={styles.dashboardHeader}>
-      <h2 className={styles.headerTitle}>
+    <header className={`${styles.dashboardHeader} d-flex justify-content-between align-items-center p-3 sticky-top`} dir="rtl">
+      <button className={`${styles.hamburgerBtn} d-md-none btn`} onClick={() => setIsMobileMenuOpen(true)}>
+        ☰
+      </button>
+
+      <h2 className={`${styles.headerTitle} text-center m-0 flex-grow-1`}>
         <span role="img" aria-label="dashboard"></span> לוח ניהול מתקדם
       </h2>
-      <button className={styles.backBtn} onClick={() => navigate("/dashboard")}>
+
+      <button className={`${styles.backBtn} btn`} onClick={() => navigate("/dashboard")}>
         <FaArrowLeft className={styles.icon} /> חזור לדשבורד
       </button>
     </header>
+
+
+    {isMobileMenuOpen && (
+      <div className={styles.mobileSidebar}>
+        <button
+          className={styles.closeBtn}
+          onClick={() => setIsMobileMenuOpen(false)}
+        >
+          ✕
+        </button>
+        <ul className={styles.navList}>
+          <li className={styles.navItem}>
+            <button
+              className={styles.sidebarBtn}
+              onClick={() => {
+                showTable("recommendedCars");
+                setIsMobileMenuOpen(false);
+              }}
+            >
+               רכבים מומלצים
+            </button>
+          </li>
+          <li className={styles.navItem}>
+            <button
+              className={styles.sidebarBtn}
+              onClick={() => {
+                showTable("todayAppointments");
+                setIsMobileMenuOpen(false);
+              }}
+            >
+               תורים להיום
+            </button>
+          </li>
+          <li className={styles.navItem}>
+            <button
+              className={styles.sidebarBtn}
+              onClick={() => {
+                navigate("/monthlyreport");
+                setIsMobileMenuOpen(false);
+              }}
+            >
+               דוח חודשי
+            </button>
+          </li>
+          <li className={styles.navItem}>
+            <button
+              className={styles.sidebarBtn}
+              onClick={() => {
+                setSelectedTable("invoices");
+                setIsMobileMenuOpen(false);
+              }}
+            >
+               חשבוניות
+            </button>
+          </li>
+        </ul>
+      </div>
+    )}
 
     {/* 📌 סרגל צד שמכיל ניווט בין טבלאות/דפים שונים */}
     <aside className={styles.sidebar}>

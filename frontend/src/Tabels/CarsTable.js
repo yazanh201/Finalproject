@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Modal from "./Modal";
 import axios from "axios";
 
+
 const CarsTable = () => {
   // סטייטים כלליים
   const [modalType, setModalType] = useState(null); // 'edit' או 'search'
@@ -187,52 +188,52 @@ const CarsTable = () => {
       </div>
 
       <div className="table-responsive">
-        <table className="table table-striped table-bordered align-middle text-center">
-          <thead className="table">
-            <tr>
-              <th>#</th>
-              <th>מספר רכב</th>
-              <th>שם בעל הרכב</th>
-              <th>תעודת זהות</th>
-              <th>יצרן</th>
-              <th>דגם</th>
-              <th>שנת ייצור</th>
-              <th>צבע</th>
-              <th>קילומטראז'</th>
-              <th>פעולה</th>
+      <table className="table table-striped table-bordered align-middle text-center">
+        <thead className="table">
+          <tr>
+            <th>#</th>
+            <th>מספר רכב</th>
+            <th>שם בעל הרכב</th>
+            <th>תעודת זהות</th>
+            <th>יצרן</th>
+            <th>דגם</th>
+            <th>שנת ייצור</th>
+            <th>צבע</th>
+            <th>קילומטראז'</th>
+            <th>פעולה</th>
+          </tr>
+        </thead>
+        <tbody>
+          {cars.map((car, index) => (
+            <tr key={car._id}>
+              <td>{index + 1}</td>
+              <td>{car.vehicleNumber || '-'}</td>
+              <td>{car.ownerName || '-'}</td>
+              <td>{car.ownerIdNumber || '-'}</td>
+              <td>{car.manufacturer || '-'}</td>
+              <td>{car.model || '-'}</td>
+              <td>{car.year || '-'}</td>
+              <td>{car.color || '-'}</td>
+              <td>{car.mileage !== undefined ? `${car.mileage} ק"מ` : '-'}</td>
+              <td>
+                <button
+                  className="btn btn-primary btn-sm me-2"
+                  onClick={() => handleShowModal("edit", car)}
+                >
+                  עריכה
+                </button>
+                <button
+                  className="btn btn-danger btn-sm me-2"
+                  onClick={() => handleDelete(car._id)}
+                >
+                  מחיקה
+                </button>
+              </td>
             </tr>
-          </thead>
-          <tbody>
-            {cars.map((car, index) => (
-              <tr key={car._id}>
-                <td>{index + 1}</td>
-                <td>{car.vehicleNumber || '-'}</td>
-                <td>{car.ownerName || '-'}</td>
-                <td>{car.ownerIdNumber || '-'}</td>
-                <td>{car.manufacturer || '-'}</td>
-                <td>{car.model || '-'}</td>
-                <td>{car.year || '-'}</td>
-                <td>{car.color || '-'}</td>
-                <td>{car.mileage !== undefined ? `${car.mileage} ק"מ` : '-'}</td>
-                <td>
-                  <button
-                    className="btn btn-primary btn-sm me-2"
-                    onClick={() => handleShowModal("edit", car)}
-                  >
-                    עריכה
-                  </button>
-                  <button
-                    className="btn btn-danger btn-sm me-2"
-                    onClick={() => handleDelete(car._id)}
-                  >
-                    מחיקה
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+          ))}
+        </tbody>
+      </table>
+    </div>
 
 
 

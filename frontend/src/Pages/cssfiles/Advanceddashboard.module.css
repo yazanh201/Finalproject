@@ -22,6 +22,9 @@
 }
 
 .headerTitle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-size: 2.1rem;
   font-weight: 800;
   letter-spacing: 1px;
@@ -36,9 +39,9 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  background: linear-gradient(90deg, #6e7b87 0%, #484545 100%);
+  background: linear-gradient(135deg, #00b4d8, #0077b6);
   border: none;
-  color: #fff;
+  color: #fff !important;
   font-size: 1.1rem;
   font-weight: 700;
   cursor: pointer;
@@ -48,7 +51,7 @@
   transition: background 0.2s, color 0.2s, transform 0.2s;
 }
 .backBtn:hover {
-  background: #fbc531;
+  background: linear-gradient(135deg, #fbc531, #f5a623);
   color: #2d2d2d;
   transform: translateY(-2px) scale(1.04);
 }
@@ -415,4 +418,57 @@ td {
   transform: translateY(-2px);
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
 }
+
+.hamburgerBtn {
+  font-size: 1.8rem;
+  color: #007bff !important;
+  background: transparent;
+  border: none;
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .hamburgerBtn {
+    display: block; /* מופיע רק במסכים קטנים */
+  }
+
+  .sidebar {
+    display: none; /* הסתרת sidebar הרגיל במובייל */
+  }
+}
+
+.mobileSidebar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 80%;
+  max-width: 280px;
+  height: 100vh;
+  background-color: #1c1c1c;
+  padding-top: 9rem;
+  z-index: 999;
+  box-shadow: -2px 0 12px rgba(0, 0, 0, 0.5);
+  animation: slideIn 0.3s ease-in-out;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  font-size: 1.8rem;
+  color: #f1f1f1;
+  cursor: pointer;
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+}
+
 
