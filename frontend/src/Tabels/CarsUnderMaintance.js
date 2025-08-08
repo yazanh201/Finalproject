@@ -10,7 +10,8 @@ const CarsInService = () => {
 
   // ✅ שליפת כל הטיפולים בעת טעינת הקומפוננטה
   useEffect(() => {
-    fetch("http://localhost:5000/api/treatments")
+    fetch("https://garage-backend-o8do.onrender.com/api/treatments")
+
       .then(res => res.json())
       .then(data => {
         // דואג שגם אם התשובה אינה מערך עדיין יומר למערך
@@ -39,7 +40,8 @@ const CarsInService = () => {
   // שמירת השינויים בטיפול לשרת
   const handleSave = async () => {
     try {
-      const res = await fetch(`http://localhost:5000/api/treatments/${selectedTreatment._id}`, {
+       const res = await fetch(`https://garage-backend-o8do.onrender.com/api/treatments/${selectedTreatment._id}`, {
+
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import "../Pages/cssfiles/TablesResponsive.css";
 import DynamicTable from "./DynamicTable";
 import { FaEye, FaFileInvoice } from "react-icons/fa";
+const BASE_URL = "https://garage-backend-o8do.onrender.com";
+
 
 const TreatmentsTable = ({
   filterAppointment,
@@ -30,12 +32,15 @@ const TreatmentsTable = ({
 
   // שליפת טיפולים מהשרת לפי סינון (מספר תור או טיפול)
   useEffect(() => {
-    let url = "http://localhost:5000/api/treatments";
+    let url = `${BASE_URL}/api/treatments`;
+
 
     if (filterTreatmentNumber) {
-      url = `http://localhost:5000/api/treatments/by-id/${filterTreatmentNumber}`;
+      url = `${BASE_URL}/api/treatments/by-id/${filterTreatmentNumber}`;
+
     } else if (filterAppointment) {
-      url = `http://localhost:5000/api/treatments/by-appointment/${filterAppointment}`;
+     url = `${BASE_URL}/api/treatments/by-appointment/${filterAppointment}`
+;
     }
 
     fetch(url)
@@ -69,8 +74,8 @@ const TreatmentsTable = ({
       const method = modalType === "edit" ? "PUT" : "POST";
       const url =
         modalType === "edit"
-          ? `http://localhost:5000/api/treatments/${selectedTreatment._id}`
-          : "http://localhost:5000/api/treatments";
+       ? `${BASE_URL}/api/treatments/${selectedTreatment._id}`
+: `${BASE_URL}/api/treatments`;
 
       const res = await fetch(url, {
         method,
@@ -101,9 +106,9 @@ const TreatmentsTable = ({
   // חיפוש לפי תאריך
   const handleSearchByDate = async () => {
     try {
-      const res = await fetch(
-        `http://localhost:5000/api/treatments/by-date/${searchTerm}`
-      );
+     const res = await fetch(`${BASE_URL}/api/treatments/by-date/${searchTerm}`);
+
+
       const data = await res.json();
       setTreatments(data);
       handleCloseModal();
@@ -115,8 +120,8 @@ const TreatmentsTable = ({
   // חיפוש לפי מספר רכב
   const handleSearchByCar = async () => {
     try {
-      const res = await fetch(
-        `http://localhost:5000/api/treatments/by-car/${searchTerm}`
+      const res = await fetch(`${BASE_URL}/api/treatments/by-car/${searchTerm}` 
+
       );
       const data = await res.json();
       setTreatments(data);
@@ -130,7 +135,8 @@ const TreatmentsTable = ({
   const handleDelete = async (id) => {
     if (!window.confirm("האם אתה בטוח שברצונך למחוק את הטיפול הזה?")) return;
     try {
-      await fetch(`http://localhost:5000/api/treatments/${id}`, {
+      await fetch(`${BASE_URL}/api/treatments/${id}`, 
+ {
         method: "DELETE",
       });
       setTreatments((prev) => prev.filter((t) => t._id !== id));

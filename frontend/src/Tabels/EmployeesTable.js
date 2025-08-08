@@ -15,7 +15,8 @@ const Employees = () => {
 
   // ✅ שליפת עובדים בעת טעינה
   useEffect(() => {
-    fetch("http://localhost:5000/api/employees")
+    fetch("https://garage-backend-o8do.onrender.com/api/employees")
+
       .then((res) => res.json())
       .then((data) => setEmployees(data))
       .catch((err) => console.error("❌ שגיאה בשליפת עובדים:", err));
@@ -60,11 +61,11 @@ const Employees = () => {
     }
 
     try {
-      const method = modalType === "edit" ? "PUT" : "POST";
-      const url =
-        modalType === "edit"
-          ? `http://localhost:5000/api/employees/${selectedEmployee._id}`
-          : "http://localhost:5000/api/employees";
+const method = modalType === "edit" ? "PUT" : "POST";
+const url =
+  modalType === "edit"
+    ? `https://garage-backend-o8do.onrender.com/api/employees/${selectedEmployee._id}`
+    : "https://garage-backend-o8do.onrender.com/api/employees";
 
       const res = await fetch(url, {
         method,
@@ -97,9 +98,10 @@ const Employees = () => {
   const handleDelete = async (id) => {
     if (!window.confirm("האם אתה בטוח שברצונך למחוק את העובד הזה?")) return;
     try {
-      await fetch(`http://localhost:5000/api/employees/${id}`, {
-        method: "DELETE",
-      });
+      await fetch(`https://garage-backend-o8do.onrender.com/api/employees/${id}`, {
+  method: "DELETE"
+});
+
       setEmployees((prev) => prev.filter((emp) => emp._id !== id));
       alert("✅ העובד נמחק בהצלחה!");
     } catch (err) {

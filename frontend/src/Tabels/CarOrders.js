@@ -22,7 +22,8 @@ const CarOrders = () => {
   // פונקציה לשליפת הזמנות מהשרת
   const fetchOrders = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/carorders");
+      const response = await axios.get("https://garage-backend-o8do.onrender.com/api/carorders");
+
       setOrders(response.data); // שמירה ב־state
     } catch (error) {
       console.error("❌ שגיאה בשליפת הזמנות:", error);
@@ -45,9 +46,9 @@ const CarOrders = () => {
   // שמירה (עדכון או יצירה חדשה)
   const handleSave = async () => {
     const method = modalType === "edit" ? "put" : "post"; // האם עדכון או יצירה
-    const url = modalType === "edit"
-      ? `http://localhost:5000/api/carorders/${selectedOrder._id}` // עדכון לפי מזהה
-      : "http://localhost:5000/api/carorders"; // יצירה חדשה
+   const url = modalType === "edit"
+  ? `https://garage-backend-o8do.onrender.com/api/carorders/${selectedOrder._id}`
+  : "https://garage-backend-o8do.onrender.com/api/carorders";
 
     try {
       // שליחת הבקשה לשרת
@@ -75,7 +76,8 @@ const CarOrders = () => {
   const handleDelete = async (id) => {
     if (!window.confirm("האם אתה בטוח שברצונך למחוק את ההזמנה הזו?")) return;
     try {
-      await axios.delete(`http://localhost:5000/api/carorders/${id}`);
+      await axios.delete(`https://garage-backend-o8do.onrender.com/api/carorders/${id}`);
+
       alert("✅ ההזמנה נמחקה בהצלחה!");
       fetchOrders(); // רענון אחרי מחיקה
     } catch (error) {
