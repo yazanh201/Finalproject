@@ -35,13 +35,14 @@ const Customers = () => {
 
   // שליפת לקוחות מהשרת
   const fetchCustomers = async () => {
-    try {
-      await axios.get('https://garage-backend-o8do.onrender.com/api/customers');
-      setCustomers(response.data);
-    } catch (error) {
-      console.error('❌ שגיאה בשליפת לקוחות:', error.message);
-    }
-  };
+  try {
+    const response = await axios.get('https://garage-backend-o8do.onrender.com/api/customers');
+    setCustomers(response.data);
+  } catch (error) {
+    console.error('❌ שגיאה בשליפת לקוחות:', error.message);
+  }
+};
+
 
   // פתיחת מודל (edit בלבד)
   const handleShowModal = (type, customer = null) => {
