@@ -28,7 +28,8 @@ const Appointments = ({ onSelectTreatment, filterAppointmentNumber }) => {
   // 📥 שליפת תור לפי מזהה (אם הועבר כ־prop), אחרת שליפת כל התורים
   useEffect(() => {
     if (filterAppointmentNumber) {
-      fetch(`http://localhost:5000/api/appointments/by-number/${filterAppointmentNumber}`)
+      fetch(`https://garage-backend-o8do.onrender.com/api/appointments/by-number/${filterAppointmentNumber}`)
+
         .then((res) => res.json())
         .then((data) => {
           const result = Array.isArray(data) ? data : [data];
@@ -43,7 +44,9 @@ const Appointments = ({ onSelectTreatment, filterAppointmentNumber }) => {
   // 🧮 שליפת שעות פנויות לתאריך מסוים
   const fetchAvailableTimes = async (date) => {
     if (!date) return;
-    const res = await fetch(`http://localhost:5000/api/appointments/available-times/${date}`);
+   const res = await fetch(`https://garage-backend-o8do.onrender.com/api/appointments/available-times/${date}`);
+
+
     const data = await res.json();
     setAvailableTimes(data);
   };
@@ -51,7 +54,8 @@ const Appointments = ({ onSelectTreatment, filterAppointmentNumber }) => {
   // 🔄 שליפת כל התורים מהשרת
   const fetchAppointments = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/appointments");
+     const res = await fetch("https://garage-backend-o8do.onrender.com/api/appointments");
+
       const data = await res.json();
       setAppointments(data);
     } catch (error) {
@@ -82,7 +86,8 @@ const Appointments = ({ onSelectTreatment, filterAppointmentNumber }) => {
   const handleSave = async () => {
     try {
       if (modalType === "edit") {
-        const res = await fetch(`http://localhost:5000/api/appointments/${selectedAppointment._id}`, {
+    const res = await fetch(`https://garage-backend-o8do.onrender.com/api/appointments/${selectedAppointment._id}`, 
+ {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(selectedAppointment),
@@ -104,7 +109,8 @@ const Appointments = ({ onSelectTreatment, filterAppointmentNumber }) => {
   // 🔎 חיפוש לפי תעודת זהות
   const handleSearchById = async () => {
     try {
-      const res = await fetch(`http://localhost:5000/api/appointments/by-id/${searchTerm}`);
+      const res = await fetch(`https://garage-backend-o8do.onrender.com/api/appointments/by-id/${searchTerm}`);
+
       const data = await res.json();
       setAppointments(data);
       handleCloseModal();
@@ -116,7 +122,8 @@ const Appointments = ({ onSelectTreatment, filterAppointmentNumber }) => {
   // 🔎 חיפוש לפי תאריך
   const handleSearchByDate = async () => {
     try {
-      const res = await fetch(`http://localhost:5000/api/appointments/by-date/${searchTerm}`);
+      const res = await fetch(`https://garage-backend-o8do.onrender.com/api/appointments/by-date/${searchTerm}`);
+
       const data = await res.json();
       setAppointments(data);
       handleCloseModal();
@@ -128,7 +135,7 @@ const Appointments = ({ onSelectTreatment, filterAppointmentNumber }) => {
   // 🔎 חיפוש כללי לפי ת"ז או מספר רכב
   const handleSearchByIdOrCar = async () => {
     try {
-      const res = await fetch(`http://localhost:5000/api/appointments/search/${searchTerm}`);
+      
       const data = await res.json();
       setAppointments(data);
       handleCloseModal();
@@ -141,7 +148,8 @@ const Appointments = ({ onSelectTreatment, filterAppointmentNumber }) => {
   const handleDelete = async (id) => {
     if (!window.confirm("האם אתה בטוח שברצונך למחוק את התור הזה?")) return;
     try {
-      await fetch(`http://localhost:5000/api/appointments/${id}`, {
+await fetch(`https://garage-backend-o8do.onrender.com/api/appointments/${id}`, 
+ {
         method: "DELETE",
       });
       alert("✅ התור נמחק בהצלחה!");
