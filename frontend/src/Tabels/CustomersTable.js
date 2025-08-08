@@ -36,7 +36,7 @@ const Customers = () => {
   // שליפת לקוחות מהשרת
   const fetchCustomers = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/customers');
+      await axios.get('https://garage-backend-o8do.onrender.com/api/customers');
       setCustomers(response.data);
     } catch (error) {
       console.error('❌ שגיאה בשליפת לקוחות:', error.message);
@@ -102,7 +102,7 @@ const Customers = () => {
 
       // אם עריכה - שליחת עדכון לשרת
       if (modalType === "edit" && selectedCustomer) {
-        await axios.put(`http://localhost:5000/api/customers/${selectedCustomer._id}`, customerData);
+       await axios.put(`https://garage-backend-o8do.onrender.com/api/customers/${selectedCustomer._id}`, customerData);
         alert("✅ פרטי הלקוח עודכנו בהצלחה!");
       }
 
@@ -122,8 +122,7 @@ const Customers = () => {
         return;
       }
 
-      const response = await axios.get(`http://localhost:5000/api/customers/search?query=${searchQuery}`);
-      setCustomers(response.data);
+      const response = await axios.get(`https://garage-backend-o8do.onrender.com/api/customers/search?query=${searchQuery}`);
       handleCloseModal();
     } catch (error) {
       console.error('❌ שגיאה בחיפוש:', error.message);
@@ -139,9 +138,9 @@ const Customers = () => {
         return;
       }
 
-      await axios.put(`http://localhost:5000/api/customers/${selectedCustomer._id}/add-car`, {
-        vehicleNumber,
-      });
+      await axios.put(`https://garage-backend-o8do.onrender.com/api/customers/${selectedCustomer._id}/add-car`, {
+  vehicleNumber,
+});
 
       alert("✅ רכב נוסף ללקוח בהצלחה!");
       handleCloseModal();
@@ -164,7 +163,7 @@ const Customers = () => {
     if (!window.confirm("האם אתה בטוח שברצונך למחוק את הלקוח וכל הרכבים שלו?")) return;
 
     try {
-      await axios.delete(`http://localhost:5000/api/customers/${id}`);
+      await axios.delete(`https://garage-backend-o8do.onrender.com/api/customers/${id}`);
       alert("✅ הלקוח וכל הרכבים שלו נמחקו בהצלחה!");
       fetchCustomers();
     } catch (error) {
