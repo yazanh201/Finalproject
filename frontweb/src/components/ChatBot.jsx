@@ -51,58 +51,68 @@ const ChatBot = () => {
   /**
    * 📤 **sendMessage()** - שליחת הודעה לשרת וקבלת תשובה מהבוט.
    */
-  const sendMessage = async (customMessage = null) => {
-    const messageToSend = customMessage || message.trim();
-    if (!messageToSend || isLoading) return;
+  // עדיף לשים את ה־URL ב־.env: VITE_CHAT_API_URL=https://garage-chatbot.onrender.com/chat
+const CHAT_API_URL = import.meta.env?.VITE_CHAT_API_URL || "https://garage-chatbot.onrender.com/chat";
 
-    const userMessage = { sender: "אתה", text: messageToSend };
-    
-    if (!customMessage) {
-      setMessage(""); // איפוס שדה ההקלדה רק אם זו הודעה רגילה
+const sendMessage = async (customMessage = null) => {
+  const messageToSend = customMessage || message.trim();
+  if (!messageToSend || isLoading) return;
+
+  const userMessage = { sender: "אתה", text: messageToSend };
+
+  if (!customMessage) {
+    setMessage(""); // איפוס שדה ההקלדה רק אם זו הודעה רגילה
+  }
+
+  setIsLoading(true);
+  setIsTyping(true);
+  setShowQuickSuggestions(false); // הסתרת הצעות אחרי הודעה ראשונה
+
+  // הוספת הודעת המשתמש להיסטוריה
+  setChatHistory(prev => [...prev, userMessage]);
+
+  try {
+    // קריאה לשרת בענן עם fetch — בדיוק כמו בפונקציה שעבדה
+    const res = await fetch(CHAT_API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: messageToSend }),
+    });
+
+    // בדיקת שגיאת רשת/סטטוס
+    if (!res.ok) {
+      throw new Error(`Bad status: ${res.status}`);
     }
-    
-    setIsLoading(true);
-    setIsTyping(true);
-    setShowQuickSuggestions(false); // הסתרת הצעות אחרי הודעה ראשונה
 
-    // הוספת הודעת המשתמש להיסטוריה
-    setChatHistory(prev => [...prev, userMessage]);
+    const data = await res.json();
 
-    try {
-      // שליחת בקשה ל-Backend וקבלת תשובה מהבוט
-      const { data } = await axios.post("https://garage-frontend-zm8s.onrender.com", {
-        message: messageToSend 
-      });
-
-      // הדמיית הקלדה של הבוט
-      setTimeout(() => {
-        setIsTyping(false);
-        const botResponse = { 
-          sender: "ChatGPT", 
-          text: data.response,
-          timestamp: new Date().toLocaleTimeString('he-IL', { 
-            hour: '2-digit', 
-            minute: '2-digit' 
-          })
-        };
-        setChatHistory(prev => [...prev, botResponse]);
-        setIsLoading(false);
-      }, 1000 + Math.random() * 1000); // זמן אקראי בין 1-2 שניות
-
-    } catch (error) {
-      console.error("❌ שגיאה בשליחת ההודעה:", error);
+    // הדמיית הקלדה של הבוט (1–2 שניות) — אפשר להסיר אם לא צריך
+    setTimeout(() => {
       setIsTyping(false);
-      setIsLoading(false);
-      
-      // הודעת שגיאה
-      const errorMessage = { 
-        sender: "ChatGPT", 
-        text: "מצטער, יש בעיה בחיבור. אנא נסה שוב מאוחר יותר. 🔧",
-        isError: true
+      const botResponse = {
+        sender: "ChatGPT",
+        text: data?.response ?? "❔ לא התקבלה תשובה מהשרת",
+        timestamp: new Date().toLocaleTimeString("he-IL", { hour: "2-digit", minute: "2-digit" }),
       };
-      setChatHistory(prev => [...prev, errorMessage]);
-    }
-  };
+      setChatHistory(prev => [...prev, botResponse]);
+      setIsLoading(false);
+    }, 1000 + Math.random() * 1000);
+
+  } catch (error) {
+    console.error("❌ שגיאה בשליחת ההודעה:", error);
+    setIsTyping(false);
+    setIsLoading(false);
+
+    // הודעת שגיאה בצ'אט
+    const errorMessage = {
+      sender: "ChatGPT",
+      text: "מצטער, יש בעיה בחיבור. אנא נסה שוב מאוחר יותר. 🔧",
+      isError: true,
+    };
+    setChatHistory(prev => [...prev, errorMessage]);
+  }
+};
+
 
   /**
    * 📜 **useEffect** - גלילה אוטומטית להודעה האחרונה.
@@ -216,7 +226,7 @@ const ChatBot = () => {
             )}
 
             {/* הצעות מהירות */}
-            {showQuickSuggestions  && (
+            {showQuickSuggestions && (
               <div className="quick-suggestions">
                 <div className="suggestions-header">
                   <FaLightbulb />
