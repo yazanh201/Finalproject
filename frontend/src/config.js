@@ -1,2 +1,2 @@
-const API_BASE = "https://garage-backend-z20t.onrender.com";
+const API_BASE = "https://garage-backend-o8do.onrender.com";
 export default API_BASE;
