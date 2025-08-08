@@ -15,7 +15,7 @@ const RevenueByRepairTypeChart = () => {
 
   // טעינת הנתונים מהשרת בעת טעינת הרכיב
   useEffect(() => {
-    axios.get("http://localhost:5000/api/treatments/summary/revenue-by-category")
+    axios.get("https://garage-backend-o8do.onrender.com/api/treatments/summary/revenue-by-category")
       .then(res => {
         // בדיקה שהנתונים שהוחזרו הם מערך
         if (!Array.isArray(res.data)) {

@@ -36,7 +36,7 @@ const TreatmentTypePieChart = () => {
 
   // 🧠 שליפת נתונים מהשרת ברגע טעינת הקומפוננטה
   useEffect(() => {
-    axios.get("http://localhost:5000/api/treatments/summary/revenue-by-category")
+    axios.get("https://garage-backend-o8do.onrender.com/api/treatments/summary/revenue-by-category")
       .then(res => {
         if (!Array.isArray(res.data)) {
           console.error("❌ הצורה של הנתונים אינה מערך:", res.data);

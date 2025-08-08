@@ -43,9 +43,9 @@ const AdvancedDashboard = () => {
       try {
         // שליפה מקבילה של שלושת הנתונים הדרושים: לקוחות, תורים, טיפולים
         const [customersRes, appointmentsRes, treatmentsRes] = await Promise.all([
-          fetch("http://localhost:5000/api/customers/new-this-month"),
-          fetch("http://localhost:5000/api/appointments/month"),
-          fetch("http://localhost:5000/api/treatments")
+          fetch("https://garage-backend-o8do.onrender.com/api/customers/new-this-month"),
+          fetch("https://garage-backend-o8do.onrender.com/api/appointments/month"),
+          fetch("https://garage-backend-o8do.onrender.com/api/treatments")
         ]);
 
         // המרת התגובה ל-JSON
