@@ -52,7 +52,7 @@ const AddCustomerWithCar = () => {
       };
 
       // שליחת בקשת POST לשרת להוספת לקוח
-      await axios.post("https://garage-backend-o8do.onrender.com", payload);
+      await axios.post("https://garage-backend-o8do.onrender.com/api/customers", payload);
 
 
       // הודעת הצלחה וניווט לעמוד השלמה
