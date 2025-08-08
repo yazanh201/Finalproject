@@ -93,7 +93,7 @@ const CreateTreatment = () => {
     }
 
     // ✅ שליפת עובדים מהשרת
-    fetch("http://localhost:5000/api/employees")
+    fetch("https://garage-backend-o8do.onrender.com/api/employees")
       .then(res => res.json())
       .then(data => setEmployees(data))
       .catch(err => console.error("❌ שגיאה בשליפת עובדים:", err));
@@ -151,11 +151,11 @@ const CreateTreatment = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const API_BASE = process.env.REACT_APP_API_BASE || 'http://localhost:5000';
+    // const API_BASE = process.env.REACT_APP_API_BASE || 'http://localhost:5000';
     const isEdit = form.treatmentId && form.treatmentId.trim() !== '';
-    const url = isEdit
-      ? `${API_BASE}/api/treatments/${form.treatmentId}`
-      : `${API_BASE}/api/treatments`;
+   const url = isEdit
+  ? `https://garage-backend-o8do.onrender.com/api/treatments/${form.treatmentId}`
+  : `https://garage-backend-o8do.onrender.com/api/treatments`;
     const method = isEdit ? 'PUT' : 'POST';
 
     // יצירת FormData כולל קבצים

@@ -45,7 +45,7 @@ const CreateAppointment = () => {
       fetchAvailableTimes(data.date); // שליפת שעות לתאריך
     } else if (id) {
       // אם הגענו עם מזהה תור – נטען מהשרת
-      fetch(`http://localhost:5000/api/appointments/by-number/${id}`)
+      fetch(`https://garage-backend-o8do.onrender.com/api/appointments/by-number/${id}`)
         .then(res => res.json())
         .then(data => {
           setForm({
@@ -69,7 +69,7 @@ const CreateAppointment = () => {
   const fetchAvailableTimes = async (date) => {
     if (!date) return;
     try {
-      const res = await fetch(`http://localhost:5000/api/appointments/available-times/${date}`);
+      const res = await fetch(`https://garage-backend-o8do.onrender.com/api/appointments/available-times/${date}`);
       const data = await res.json();
       const times = data.includes(form.time) || !form.time ? data : [...data, form.time];
       setAvailableTimes(times); // עדכון זמני תור אפשריים
@@ -134,8 +134,8 @@ const CreateAppointment = () => {
     try {
       const isEdit = location.state?._id || id; // האם מדובר על עריכה
       const url = isEdit
-        ? `http://localhost:5000/api/appointments/${location.state?._id || id}`
-        : 'http://localhost:5000/api/appointments';
+        ? `https://garage-backend-o8do.onrender.com/api/appointments/${location.state?._id || id}`
+        : 'https://garage-backend-o8do.onrender.com/api/appointments';
       const method = isEdit ? 'PUT' : 'POST';
 
       // שליחה לשרת
@@ -181,7 +181,7 @@ const CreateAppointment = () => {
     setTypingTimeout(
       setTimeout(async () => {
         try {
-          const res = await fetch(`http://localhost:5000/api/customers/search?query=${value}`);
+          const res = await fetch(`https://garage-backend-o8do.onrender.com/api/customers/search?query=${value}`);
           const data = await res.json();
           setSuggestions(data); // עדכון הצעות
         } catch (error) {
