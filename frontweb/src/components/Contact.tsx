@@ -25,7 +25,7 @@ const Contact = () => {
     setLoading(true);
 
     try {
-      const res = await fetch("https://garage-backend-z20t.onrender.com/api/inquiries", {
+      const res = await fetch("https://garage-backend-o8do.onrender.com", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData)
