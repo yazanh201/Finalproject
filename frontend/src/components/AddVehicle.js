@@ -29,7 +29,8 @@ const AddVehicleDetails = () => {
   useEffect(() => {
     const fetchVehicle = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/api/cars?vehicleNumber=${plateNumber}`);
+        const res = await axios.get(`https://garage-backend-o8do.onrender.com/api/cars?vehicleNumber=${plateNumber}`)
+
         setVehicle(res.data); // שמירת נתוני הרכב
         // מילוי השדות בטופס אם קיימים
         setManufacturer(res.data.manufacturer || "");
@@ -59,14 +60,15 @@ const AddVehicleDetails = () => {
 
     try {
       // שליחת בקשת PUT לעדכון פרטי הרכב
-      await axios.put(`http://localhost:5000/api/cars/plate/${plateNumber}`, {
-        manufacturer,
-        model,
-        year,
-        color,
-        mileage,
-        vehicleNumber: plateNumber,
-      });
+      await axios.put(`https://garage-backend-o8do.onrender.com/api/cars/plate/${plateNumber}`, {
+  manufacturer,
+  model,
+  year,
+  color,
+  mileage,
+  vehicleNumber: plateNumber,
+});
+
 
       toast.success(" הרכב עודכן בהצלחה!"); // הודעת הצלחה
       navigate("/dashboard"); // מעבר חזרה ללוח הבקרה
