@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from "react";
-import axios from "axios";
 import { FaPaperPlane, FaComments, FaTimes, FaRobot, FaSpinner, FaMicrophone, FaMicrophoneSlash, FaLightbulb } from "react-icons/fa";
 import "./ChatBot.css";
 
