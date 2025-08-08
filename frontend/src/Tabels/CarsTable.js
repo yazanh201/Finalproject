@@ -28,7 +28,8 @@ const CarsTable = () => {
   // שליפת רכבים מהשרת
   const fetchCars = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/cars');
+      const response = await axios.get('https://garage-backend-o8do.onrender.com/api/cars');
+
       setCars(response.data); // שמירת הרכבים בסטייט
     } catch (error) {
       console.error('❌ שגיאה בשליפת רכבים:', error.message);
@@ -121,7 +122,8 @@ const CarsTable = () => {
         };
 
         // שליחת עדכון לשרת
-        await axios.put(`http://localhost:5000/api/cars/${selectedCar._id}`, carData);
+        await axios.put(`https://garage-backend-o8do.onrender.com/api/cars/${selectedCar._id}`, carData);
+
         alert("✅ פרטי הרכב עודכנו בהצלחה!");
       } else {
         // לא ניתן להוסיף כאן רכב חדש
@@ -147,7 +149,8 @@ const CarsTable = () => {
         return;
       }
 
-      const response = await axios.get(`http://localhost:5000/api/cars/search?query=${searchQuery}`);
+      const response = await axios.get(`https://garage-backend-o8do.onrender.com/api/cars/search?query=${searchQuery}`);
+
       setCars(response.data);
       handleCloseModal(); // סגירת המודל אחרי החיפוש
     } catch (error) {
@@ -168,7 +171,8 @@ const CarsTable = () => {
     if (!window.confirm("האם אתה בטוח שברצונך למחוק את הרכב הזה?")) return;
 
     try {
-      await axios.delete(`http://localhost:5000/api/cars/${id}`);
+      await axios.delete(`https://garage-backend-o8do.onrender.com/api/cars/${id}`);
+
       alert("✅ הרכב נמחק בהצלחה!");
       fetchCars(); // רענון הטבלה אחרי המחיקה
     } catch (error) {
