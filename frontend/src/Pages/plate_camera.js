@@ -27,7 +27,7 @@ const CameraPlateCapture = ({ onPlateDetected }) => {
       formData.append('image', blob, 'plate.jpg'); // הוספת התמונה לטופס
 
       // שליחת התמונה לשרת לניתוח
-      const response = await axios.post('http://localhost:5000/api/plate-detect', formData);
+      const response = await axios.post('https://garage-backend-o8do.onrender.com/api/plate-detect', formData);
       const { plateNumber } = response.data; // קבלת מספר הלוחית מהשרת
 
       setPlate(plateNumber); // הצגת לוחית שזוהתה

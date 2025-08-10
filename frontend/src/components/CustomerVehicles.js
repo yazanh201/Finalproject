@@ -20,7 +20,7 @@ const CustomerVehicles = () => {
   // שליפת רכבים לפי מזהה לקוח
   const fetchVehicles = async () => {
     try {
-      const res = await axios.get(`http://localhost:5000/api/cars/by-customer/${customerId}`);
+      const res = await axios.get(`https://garage-backend-o8do.onrender.com/api/cars/by-customer/${customerId}`);
       setVehicles(res.data);
     } catch (error) {
       console.error("❌ שגיאה בשליפת רכבים:", error.message);
@@ -51,7 +51,7 @@ const CustomerVehicles = () => {
       }
 
       // שליחת PUT לעדכון רכב
-      await axios.put(`http://localhost:5000/api/cars/${_id}`, {
+      await axios.put(`https://garage-backend-o8do.onrender.com/api/cars/${_id}`, {
         vehicleNumber,
         manufacturer,
         model,

@@ -34,7 +34,7 @@ const CameraPanel = ({ onClose }) => {
       formData.append("image", blob, "plate.png"); // צירוף קובץ לתמונה
 
       // קריאה ל־API לזיהוי לוחית רישוי
-      const detectRes = await axios.post("http://localhost:3300/api/plate-detect", formData);
+      const detectRes = await axios.post("https://plate-detector-trhb.onrender.com/api/plate-detect", formData);
       let { plateNumber } = detectRes.data;
       if (!plateNumber) throw new Error("לוחית לא זוהתה.");
 
@@ -43,7 +43,7 @@ const CameraPanel = ({ onClose }) => {
       setPlate(cleanedPlate); // הצגת לוחית על המסך
 
       // בדיקה אם יש טיפול פתוח לרכב
-      const checkRes = await axios.get("http://localhost:5000/api/treatments/check", {
+      const checkRes = await axios.get("https://garage-backend-o8do.onrender.com/api/treatments/check", {
         params: { plate: cleanedPlate }
       });
 

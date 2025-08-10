@@ -24,9 +24,9 @@ const AddCustomerWithVehicle = () => {
 
     try {
       // 🔍 בדיקה אם לקוח כבר קיים לפי שם או ת"ז
-      const checkCustomer = await axios.get(
-        `http://localhost:5000/api/customers/check?name=${customerData.name}&idNumber=${customerData.idNumber}`
-      );
+    const checkCustomer = await axios.get(
+  `https://garage-backend-o8do.onrender.com/api/customers/check?name=${encodeURIComponent(customerData.name)}&idNumber=${encodeURIComponent(customerData.idNumber)}`
+);
       if (checkCustomer.data.exists) {
         toast.error("❌ לקוח עם שם זה או תעודת זהות זו כבר קיים במערכת.");
         return;
@@ -34,21 +34,26 @@ const AddCustomerWithVehicle = () => {
 
       // 🔍 בדיקה אם הרכב כבר קיים לפי מספר רכב
       const checkVehicle = await axios.get(
-        `http://localhost:5000/api/cars/check?vehicleNumber=${vehicle.vehicleNumber}`
-      );
+  `https://garage-backend-o8do.onrender.com/api/cars/check?vehicleNumber=${encodeURIComponent(vehicle.vehicleNumber)}`
+);
       if (checkVehicle.data.exists) {
         toast.error(`❌ רכב עם מספר ${vehicle.vehicleNumber} כבר קיים במערכת.`);
         return;
       }
 
       // ✅ הוספת הלקוח למסד הנתונים
-      const customerRes = await axios.post("http://localhost:5000/api/customers", customerData);
+      const customerRes = await axios.post(
+  "https://garage-backend-o8do.onrender.com/api/customers",
+  customerData
+);
       const customerId = customerRes.data._id; // שמירת מזהה הלקוח החדש
 
       // ✅ הוספת הרכב עם קישור ללקוח באמצעות customerId
-      const vehicleWithCustomer = { ...vehicle, customerId };
-      await axios.post("http://localhost:5000/api/vehicles", vehicleWithCustomer);
-
+    const vehicleWithCustomer = { ...vehicle, customerId };
+await axios.post(
+  "https://garage-backend-o8do.onrender.com/api/cars",
+  vehicleWithCustomer
+);
       // הודעת הצלחה וניווט חזרה לרשימת הלקוחות
       toast.success("✅ הלקוח והרכב נוספו בהצלחה!");
       navigate("/customers");
