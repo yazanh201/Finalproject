@@ -8,7 +8,15 @@ dotenv.config();
 
 const app = express();
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  origin: [
+    "https://garage-frontweb.onrender.com", // כתובת ה-Frontend
+    "http://localhost:5173" // לפיתוח מקומי
+  ],
+  methods: ["POST", "GET", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"]
+}));
+
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
@@ -368,6 +376,15 @@ app.post("/chat", async (req, res) => {
   }
 });
 
+// ראוט ברירת מחדל לעמוד הראשי
+app.get("/", (req, res) => {
+  res.json({
+    message: "ברוך הבא ל-Garage Chatbot API",
+    health: "OK",
+    timestamp: new Date().toISOString()
+  });
+});
+
 // נקודת קצה למידע על המוסך
 app.get("/garage-info", (req, res) => {
   res.json(GARAGE_INFO);
@@ -375,16 +392,17 @@ app.get("/garage-info", (req, res) => {
 
 // נקודת קצה לבדיקת בריאות השרת
 app.get("/health", (req, res) => {
-  res.json({ 
-    status: "OK", 
+  res.json({
+    status: "OK",
     timestamp: new Date().toISOString(),
-    garage: GARAGE_INFO.name 
+    garage: GARAGE_INFO.name
   });
 });
 
+
 // הפעלת השרת
-const PORT = 5001;
-app.listen(PORT, () => {
+const PORT = process.env.PORT || 5001;
+app.listen(PORT, "0.0.0.0", () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`🏢 Garage: ${GARAGE_INFO.name}`);
   console.log(`📍 Address: ${GARAGE_INFO.address}`);
