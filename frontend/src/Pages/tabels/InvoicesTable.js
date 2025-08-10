@@ -13,7 +13,7 @@ const InvoicesTable = ({ onClose }) => {
 
   // בקשת GET מהשרת לשליפת החשבוניות
   useEffect(() => {
-    fetch("http://localhost:5000/api/invoices")
+    fetch("https://garage-backend-o8do.onrender.com/api/invoices")
       .then(res => res.json())
       .then(data => setInvoices(data))
       .catch(err => console.error("❌ שגיאה בשליפת חשבוניות:", err));

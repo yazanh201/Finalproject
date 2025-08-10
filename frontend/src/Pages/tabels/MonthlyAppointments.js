@@ -10,7 +10,7 @@ const MonthlyAppointments = ({ onClose }) => {
   useEffect(() => {
     const fetchMonthlyAppointments = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/appointments/month"); // בקשת GET מהשרת
+        const response = await axios.get("https://garage-backend-o8do.onrender.com/api/appointments/month"); // בקשת GET מהשרת
         console.log("📦 תורים שהגיעו מהשרת:", response.data); // הדפסת הנתונים לבדיקה
         setAppointments(response.data); // שמירת הנתונים בסטייט
       } catch (error) {

@@ -15,7 +15,7 @@ const ArrivedCars = ({ onClose }) => {
   // 🔄 שליפת תורים מהשרת וסינון לפי תאריך היום וסטטוס הגעה
   const fetchArrivedCars = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/appointments"); // קריאה לשרת
+      const res = await fetch("https://garage-backend-o8do.onrender.com/api/appointments"); // קריאה לשרת
       const data = await res.json(); // המרת תשובה ל-JSON
 
       const today = new Date().toISOString().slice(0, 10); // תאריך היום בפורמט YYYY-MM-DD

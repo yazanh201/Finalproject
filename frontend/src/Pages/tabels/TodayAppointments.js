@@ -15,7 +15,7 @@ const TodayAppointments = ({ onClose }) => {
   // ✅ שליפת תורים להיום שהסטטוס שלהם "בהמתנה"
   const fetchTodayAppointments = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/appointments");
+      const response = await fetch("https://garage-backend-o8do.onrender.com/api/appointments");
       const data = await response.json();
       const today = new Date().toISOString().slice(0, 10);
       const pendingAppointments = data.filter(
@@ -32,7 +32,7 @@ const TodayAppointments = ({ onClose }) => {
     const appointmentId = appointment._id;
     try {
       // שלב 1: עדכון סטטוס של התור ל"הגיע"
-      const res = await fetch(`http://localhost:5000/api/appointments/appointments/${appointmentId}/confirm-arrival`, {
+      const res = await fetch(`https://garage-backend-o8do.onrender.com/api/appointments/appointments/${appointmentId}/confirm-arrival`, {
         method: "POST",
         headers: { "Content-Type": "application/json" }
       });
@@ -43,7 +43,7 @@ const TodayAppointments = ({ onClose }) => {
       }
 
       // שלב 2: יצירת טיפול חדש מהתור
-      const treatmentRes = await fetch("http://localhost:5000/api/treatments/confirm-arrival", {
+      const treatmentRes = await fetch("https://garage-backend-o8do.onrender.com/api/treatments/confirm-arrival", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ appointmentId }) // שליחת מזהה התור
@@ -69,7 +69,7 @@ const TodayAppointments = ({ onClose }) => {
   const handleRejectArrival = async (appointment) => {
     const appointmentId = appointment._id;
     try {
-      const res = await fetch(`http://localhost:5000/api/appointments/appointments/${appointmentId}/reject-arrival`, {
+      const res = await fetch(`https://garage-backend-o8do.onrender.com/api/appointments/appointments/${appointmentId}/reject-arrival`, {
         method: "POST",
         headers: { "Content-Type": "application/json" }
       });

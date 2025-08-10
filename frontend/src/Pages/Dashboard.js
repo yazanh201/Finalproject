@@ -73,7 +73,7 @@ const Dashboard = () => {
 
   const goToTreatment = async (treatmentId) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/treatments/by-id/${treatmentId}`);
+      const res = await fetch(`https://garage-backend-o8do.onrender.com/api/treatments/by-id/${treatmentId}`);
       const data = await res.json();
       if (data && data.appointmentNumber) {
         setSelectedAppointmentNumber(data.appointmentNumber);

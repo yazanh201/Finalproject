@@ -9,7 +9,7 @@ const CarsUnderService = ({ onClose }) => {
 
   // ⏳ בעת טעינת הקומפוננטה, שליפת טיפולים מהשרת
   useEffect(() => {
-    fetch("http://localhost:5000/api/treatments") // קריאה ל-API
+    fetch("https://garage-backend-o8do.onrender.com/api/treatments") // קריאה ל-API
       .then(res => res.json())                    // המרת תשובה ל-JSON
       .then(data => {
         // 🛠️ במידה והשרת מחזיר אובייקט יחיד ולא מערך – נהפוך למערך

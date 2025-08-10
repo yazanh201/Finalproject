@@ -15,7 +15,7 @@ const CompletedTreatments = ({ onClose }) => {
   useEffect(() => {
     const fetchCompletedTreatments = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/treatments");
+        const res = await fetch("https://garage-backend-o8do.onrender.com/api/treatments");
         const data = await res.json();
 
         const today = new Date().toISOString().slice(0, 10); // תאריך היום (בפורמט YYYY-MM-DD)

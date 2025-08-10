@@ -11,7 +11,7 @@ const NewCustomers = ({ onClose }) => {
     // שליפת נתוני לקוחות חדשים מה-API
     const fetchNewCustomers = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/customers/new-this-month");
+        const res = await fetch("https://garage-backend-o8do.onrender.com/api/customers/new-this-month");
         const data = await res.json();
         setCustomers(data); // שמירת הנתונים בסטייט
       } catch (error) {

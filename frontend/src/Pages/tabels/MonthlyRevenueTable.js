@@ -9,7 +9,7 @@ const MonthlyRevenueTable = ({ onClose }) => {
     // פונקציה לשליפת טיפולים מה-API וסינון לפי חודש נוכחי
     const fetchMonthlyTreatments = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/treatments"); // קריאה ל-API
+        const res = await fetch("https://garage-backend-o8do.onrender.com/api/treatments"); // קריאה ל-API
         const data = await res.json(); // המרת התגובה ל-JSON
 
         const now = new Date(); // תאריך נוכחי
