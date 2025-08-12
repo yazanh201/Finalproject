@@ -28,7 +28,7 @@ const Appointments = ({ onSelectTreatment, filterAppointmentNumber }) => {
   // 📥 שליפת תור לפי מזהה (אם הועבר כ־prop), אחרת שליפת כל התורים
   useEffect(() => {
     if (filterAppointmentNumber) {
-      fetch(`https://garage-backend-o8do.onrender.com/api/appointments/by-Znumber/${filterAppointmentNumber}`)
+      fetch(`https://garage-backend-o8do.onrender.com/api/appointments/by-number/${searchTerm}`)
 
         .then((res) => res.json())
         .then((data) => {
@@ -86,8 +86,8 @@ const Appointments = ({ onSelectTreatment, filterAppointmentNumber }) => {
   const handleSave = async () => {
     try {
       if (modalType === "edit") {
-    const res = await fetch(`https://garage-backend-o8do.onrender.com/api/appointments/${selectedAppointment._id}`, 
- {
+    const res = await fetch(`https://garage-backend-o8do.onrender.com/api/appointments/${selectedAppointment._id}`, {
+ 
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(selectedAppointment),
@@ -133,26 +133,22 @@ const Appointments = ({ onSelectTreatment, filterAppointmentNumber }) => {
   };
 
   // 🔎 חיפוש כללי לפי ת"ז או מספר רכב
-const handleSearchByIdOrCar = async () => {
-  try {
-    const res = await fetch(
-      `https://garage-backend-o8do.onrender.com/api/appointments/search?q=${encodeURIComponent(searchTerm)}`
-    );
-    const data = await res.json();
-    setAppointments(Array.isArray(data) ? data : [data]);
-    handleCloseModal();
-  } catch (error) {
-    console.error("❌ שגיאה בחיפוש לפי ת\"ז או מספר רכב:", error);
-  }
-};
-
+  const handleSearchByIdOrCar = async () => {
+    try {
+      const res = await fetch(`https://garage-backend-o8do.onrender.com/api/appointments/search/${searchTerm}`);
+      const data = await res.json();
+      setAppointments(data);
+      handleCloseModal();
+    } catch (error) {
+      console.error("❌ שגיאה בחיפוש לפי ת\"ז או מספר רכב:", error);
+    }
+  };
 
   // 🗑️ מחיקת תור מהשרת ומהרשימה המקומית
   const handleDelete = async (id) => {
     if (!window.confirm("האם אתה בטוח שברצונך למחוק את התור הזה?")) return;
     try {
-await fetch(`https://garage-backend-o8do.onrender.com/api/appointments/${id}`, 
- {
+      await fetch(`https://garage-backend-o8do.onrender.com/api/appointments/${id}`, {
         method: "DELETE",
       });
       alert("✅ התור נמחק בהצלחה!");
