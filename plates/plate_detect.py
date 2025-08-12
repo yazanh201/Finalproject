@@ -54,7 +54,7 @@ def detect_plate_number(image_path):
 
             # זיהוי טקסט
             ocr_result = reader.readtext(gray, detail=0, paragraph=False)
-            print(f"🔍 תוצאה מ־OCR: {ocr_result}")
+            print(f" תוצאה מ־OCR: {ocr_result}")
 
             # ניקוי – השארת רק ספרות
             raw_text = ''.join(ocr_result).replace(" ", "")
@@ -66,5 +66,5 @@ def detect_plate_number(image_path):
             else:
                 print(f"⚠️ התוצאה לא עומדת בקריטריון אורך: {plate_text}")
 
-    print("❌ לא זוהתה לוחית סופית")
+    print(" לא זוהתה לוחית סופית")
     return None
