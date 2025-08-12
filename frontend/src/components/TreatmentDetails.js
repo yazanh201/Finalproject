@@ -12,8 +12,8 @@ const TreatmentDetails = () => {
   const [treatment, setTreatment] = useState(null); // 🔄 משתנה לאחסון פרטי הטיפול
 
   // 🔗 כתובות בסיס לטעינת קבצים ו־API
-  const BASE_URL = "http://localhost:5000/uploads/";
-  const BASE_API_URL = "http://localhost:5000/";
+ const BASE_API_URL = "https://garage-backend-o8do.onrender.com/";
+const BASE_URL = `${BASE_API_URL}uploads/`;
 
   // 📥 שליפת הטיפול מהשרת ברגע שהקומפוננטה נטענת או שה-id משתנה
   useEffect(() => {

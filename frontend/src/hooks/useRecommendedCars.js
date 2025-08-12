@@ -12,8 +12,8 @@ const useRecommendedCars = () => {
       try {
         // ✅ שליפת כל הרכבים וכל הלקוחות במקביל
         const [vehiclesRes, customersRes] = await Promise.all([
-          fetch("http://localhost:5000/api/cars"),
-          fetch("http://localhost:5000/api/customers"),
+          fetch("https://garage-backend-o8do.onrender.com/api/cars"),
+          fetch("https://garage-backend-o8do.onrender.com/api/customers"),
         ]);
         const vehicles = await vehiclesRes.json();
         const customers = await customersRes.json();
@@ -25,7 +25,7 @@ const useRecommendedCars = () => {
           vehicles.map(async (vehicle) => {
             // ✅ שליפת כל הטיפולים לפי מספר רכב
             const treatmentsRes = await fetch(
-              `http://localhost:5000/api/treatments/by-car/${vehicle.vehicleNumber}`
+              `https://garage-backend-o8do.onrender.com/api/treatments/by-car/${vehicle.vehicleNumber}`
             );
             const treatments = await treatmentsRes.json();
 

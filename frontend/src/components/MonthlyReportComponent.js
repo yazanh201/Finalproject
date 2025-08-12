@@ -22,17 +22,17 @@ const MonthlyReportComponent = () => {
     const fetchReport = async () => {
       try {
         // ✅ שליפת טיפולים חודשיים
-        const res = await fetch("http://localhost:5000/api/treatments/reports/monthly");
+        const res = await fetch("https://garage-backend-o8do.onrender.com/api/treatments/reports/monthly");
         const result = await res.json();
         setData(result);
 
         // ✅ שליפת הזמנות חודשיות
-        const ordersRes = await fetch("http://localhost:5000/api/carorders/reports/monthly");
+        const ordersRes = await fetch("https://garage-backend-o8do.onrender.com/api/carorders/reports/monthly");
         const ordersData = await ordersRes.json();
         setOrders(ordersData);
 
         // ✅ שליפת לקוחות חדשים החודש
-        const customersRes = await fetch("http://localhost:5000/api/customers/new-this-month");
+        const customersRes = await fetch("https://garage-backend-o8do.onrender.com/api/customers/new-this-month");
         const customersData = await customersRes.json();
         setNewCustomersList(customersData);
 

@@ -12,11 +12,9 @@ const CameraPanel = ({ onClose }) => {
   const navigate = useNavigate();
 
   // למעלה בקובץ
-const PLATE_API =
-  import.meta.env?.VITE_PLATE_API_URL ||
-  (window.location.hostname === "localhost"
-    ? "http://localhost:3300"
-    : "https://plate-detector-trhb.onrender.com");
+// למעלה בקובץ - פנייה ישירות לכתובת הענן
+const PLATE_API = "https://plate-detector-trhb.onrender.com";
+const GARAGE_API = "https://garage-backend-o8do.onrender.com";
 
 
   const capturePhoto = () => {
@@ -61,10 +59,11 @@ const PLATE_API =
       setPlate(cleanedPlate);
 
       // 🔎 בדיקת טיפול פתוח לרכב
-      const checkRes = await axios.get(
-        "https://garage-backend-o8do.onrender.com/api/treatments/check",
-        { params: { plate: cleanedPlate }, timeout: 15000 }
-      );
+   const checkRes = await axios.get(
+  `${GARAGE_API}/api/treatments/check`,
+  { params: { plate: cleanedPlate }, timeout: 15000 }
+);
+
 
       const { exists, treatmentId, customerName, idNumber, workerName } = checkRes.data || {};
       if (exists) {

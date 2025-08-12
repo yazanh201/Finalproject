@@ -25,8 +25,8 @@ const InvoicePage = () => {
   const [customItems, setCustomItems] = useState([]); // פריטים מותאמים אישית
 
   // נתיבי API
-  const BASE_URL = "http://localhost:5000/uploads/";
-  const BASE_API_URL = "http://localhost:5000/";
+  const BASE_URL = "https://garage-backend-o8do.onrender.com/uploads/";
+  const BASE_API_URL = "https://garage-backend-o8do.onrender.com/";
 
   // טוען את כל הנתונים בעת טעינת הקומפוננטה
   useEffect(() => {
