@@ -116,20 +116,28 @@ const Customers = () => {
   };
 
   // חיפוש לקוחות
-  const handleSearch = async () => {
-    try {
-      if (searchQuery.trim() === '') {
-        fetchCustomers();
-        return;
-      }
-
-      const response = await axios.get(`https://garage-backend-o8do.onrender.com/api/customers/search?query=${searchQuery}`);
+  // חיפוש לקוחות
+const handleSearch = async () => {
+  try {
+    const q = searchQuery.trim();
+    if (q === '') {
+      await fetchCustomers();   // חזרה לכל הלקוחות
       handleCloseModal();
-    } catch (error) {
-      console.error('❌ שגיאה בחיפוש:', error.message);
-      alert('❌ שגיאה בחיפוש');
+      return;
     }
-  };
+
+    const response = await axios.get(
+      `https://garage-backend-o8do.onrender.com/api/customers/search?query=${encodeURIComponent(q)}`
+    );
+
+    setCustomers(response.data || []);   // <-- זה היה חסר!
+    handleCloseModal();
+  } catch (error) {
+    console.error('❌ שגיאה בחיפוש:', error);
+    alert(error.response?.data?.message || '❌ שגיאה בחיפוש');
+  }
+};
+
 
   // הוספת רכב ללקוח
   const handleAddCar = async () => {
