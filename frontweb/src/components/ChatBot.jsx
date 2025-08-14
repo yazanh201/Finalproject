@@ -51,7 +51,7 @@ const ChatBot = () => {
    * 📤 **sendMessage()** - שליחת הודעה לשרת וקבלת תשובה מהבוט.
    */
   // עדיף לשים את ה־URL ב־.env: VITE_CHAT_API_URL=https://garage-chatbot.onrender.com/chat
-const CHAT_API_URL = import.meta.env?.VITE_CHAT_API_URL || "https://garage-chatbot.onrender.com";
+const CHAT_API_URL = "https://garage-chatbot.onrender.com/chat";
 
 const sendMessage = async (customMessage = null) => {
   const messageToSend = customMessage || message.trim();
