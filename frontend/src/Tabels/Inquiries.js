@@ -25,7 +25,7 @@ const Inquiries = () => {
   useEffect(() => {
     const fetchInquiries = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/inquiries");
+        const res = await fetch("https://garage-backend-o8do.onrender.com/api/inquiries");
         const data = await res.json();
         setInquiries(data);
       } catch (err) {
