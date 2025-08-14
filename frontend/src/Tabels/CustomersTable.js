@@ -116,7 +116,7 @@ const Customers = () => {
   };
 
   // חיפוש לקוחות
-  // חיפוש לקוחות
+
 const handleSearch = async () => {
   try {
     const q = searchQuery.trim();
@@ -127,7 +127,7 @@ const handleSearch = async () => {
     }
 
     const response = await axios.get(
-      `https://garage-backend-o8do.onrender.com/api/customers/search?query=${encodeURIComponent(q)}`
+      `https://garage-backend-o8do.onrender.com/api/customers/search?query=${searchQuery}`
     );
 
     setCustomers(response.data || []);   // <-- זה היה חסר!
