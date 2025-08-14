@@ -51,7 +51,7 @@ const Inquiries = () => {
   const handleSave = async () => {
     if (modalType === "edit") {
       try {
-        const response = await fetch(`http://localhost:5000/api/inquiries/${selectedInquiry._id}`, {
+        const response = await fetch(`https://garage-backend-o8do.onrender.com/api/inquiries/${selectedInquiry._id}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(selectedInquiry),
@@ -93,7 +93,7 @@ const Inquiries = () => {
     if (!window.confirm("האם אתה בטוח שברצונך למחוק את הפנייה הזו?")) return;
 
     try {
-      const res = await fetch(`http://localhost:5000/api/inquiries/${id}`, {
+      const res = await fetch(`https://garage-backend-o8do.onrender.com/api/inquiries/${id}`, {
         method: "DELETE",
       });
       const data = await res.json();
